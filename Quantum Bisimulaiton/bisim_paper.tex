@@ -18,6 +18,7 @@
 \algtext*{EndOtherwise}%
 \usepackage{tabularx}
 \usepackage{array}
+\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
 
 
 
@@ -175,35 +176,47 @@ We implement the previously defined ground bisimlarity checking algorithm to ver
 \section{Case Studies and Experiments}
 We provide several classical quantum communication protocols described in qCCS as the use cases for our experiment.
 \subsection{Examples: Quantum Communication Protocols}
-\subsubsection{Super-dense Coding Protocol} There are two roles $Alice$ and $Bob$. To simplify the experiment, we only consider the smallest case of the protocol, sending only one qubit. So in this example, there is totally one entanglement on two qubits. Besides the Clifford operators, we use a quantum operation $Set^{\Psi}$ to present the generation of Bell state instead of the combination of the quantum gates. The operation elements of $Set^{\Psi}$ is $\{|\beta_{00}\rangle\langle00|,|\beta_{00}\rangle\langle01|,|\beta_{00}\rangle\langle10|,|\beta_{00}\rangle\langle11|\}$. The measurement is according to the computational basis $|00\rangle,|01\rangle,|10\rangle,|11\rangle$. The specification of the super-dense protocol is defined as $Bob$ sets the 2-qubit variable to the value according to the classical value he received from $Alice$.
+\subsubsection{Super-dense Coding Protocol} There are two roles $Alice$ and $Bob$. To simplify the experiment, we only consider the smallest case of the protocol, sending only one qubit. So in this example, there is totally one entanglement on two qubits. Besides the Clifford operators, we use a quantum operation $Set^{\Psi}$ to present the generation of Bell state instead of the combination of the quantum gates. The operation elements of $Set^{\Psi}$ is $\{|\beta_{00}\rangle\langle00|,|\beta_{00}\rangle\langle01|,|\beta_{00}\rangle\langle10|,|\beta_{00}\rangle\langle11|\}$. The measurement is according to the computational basis $\{|00\rangle,|01\rangle,|10\rangle,|11\rangle\}$. The specification of the super-dense protocol is defined as $Bob$ sets the 2-qubit variable to the value according to the classical value he received from $Alice$.
 \subsubsection{Quantum Teleportation Protocol} In this example, there are still two roles. The operators we used here is similar with the last example containing Clifford operators, $Set^{\Psi}$ and the measurement according to the computational basis. However, we need one more entanglement and one more qubit if we just consider the smallest case. As there are entanglements between these qubits, the measurement on just a part of them may also affect the rest qubits. We considers the final result of this protocol, that is the third one, $Bob's$ qubit, becomes the same value of the first qubit. So the specification of that can be presented by applying a \textit{SWAP} operation between the first and the third qubit.
-\subsubsection{BB84 Quantum Key Distribution Protocol}
-\subsubsection{BB84 Protocol with an Eavesdropper} This example is an extension of the BB84 example, supposing there is an eavesdropper attending into the communication. 
-\subsection{Experiment Results}
+\subsubsection{BB84 Quantum Key Distribution Protocol} In BB84 protocol, there is no entanglement at all, its idea is generating qubits on different basis and using different measurement method without any contacts in advance with the other side. If someone try intercepting the information, the qubits might be measured in wrong basis, it brings a possible case that $Alice$ and $Bob$ are aware of the attack. So the protocol uses one more measurement according to the diagonal basis $\{|+\rangle,|-\rangle\}$. In common use case, BB84 will send a sequence of the qubits while qubits will not influence each other. We consider two kinds of result of the communication. First case is that $Alice$ and $Bob$ choose the same measurement then the results they get are also the same. Another case is that they choose different measurements then the result is discarded at this time. In the specification, we get results from the same sequence instead of two result sequence separately. Considering results from both sides is always the same, this operation will not bring any difference.
+\subsubsection{BB84 Protocol with an Eavesdropper} This example is an extension of the BB84 example, supposing there is an eavesdropper attending into the communication. There have three roles and the new role $Eve$ also randomly choose the measurement just as what $Alice$ and $Bob$ do. The specification is also similar with the one without an eavesdropper. It is possible that the eavesdropper will be recognized. It is a new result of the program. We conclude these results into three messages: emitting through the channel $alarm$ as the measurement methods are not matched; emitting through the channel $fail$ as the measurement methods are matched while the eavesdropping is recognized; normal emitting as the communication finished without recognizing the eavesdropper.
+\subsection{Experimental Results}
+We conducted experiments on those quantum communication protocols, and improved our input program according to the experiment results. The results were obtained on a macOS machine with an Intel Core i7 2.5 GHz processor and 16GB of RAM.
+\subsubsection{Experimental Results and Improvement}Table~\ref{tab:result} provides a summary of our experimental results over those four examples. In each case, we report the bisimilarity, the number of non-bisimilar states pair in $N$ and the runtime of our checking algorithm.
+
+We verify the super-dense coding with two different initial valuations of variable $x$ in the first two lines. In the case $x=1$, we can check that protocol and its specification are bisimilar. However, in the case $x=5$, when none of the four branches is chosen, they are not bisimilar because of the different length of the trace. The result shows that the program misses the solution for the valuation out of the expected scale. We improve the program through adding a new branch solving all the unexpected value. The result of the improved program is presented on the third line. 
+
+Another example brings a non-bisimilarity is on the sixth line of the table, the BB84 protocol considering the eavesdropper. $Alice$ and $Bob$ will make an alert if their measurement methods are not matched. The parallelism between the final test process and them leads to the process continues behaving some actions. That is not what the specification exactly describes. To improve this program, we modify the behavior, move the alert to the test process. $Alice$ and $Bob$ only send messages when they find they use different measurements. As a result, on the last line of the table, we find the program is bisimilar with the specification.
+\subsubsection{Analysis}
 \begin{table}[h]
-    \centering
+\centering
 \begin{tabular}{@{}m{0pt}@{}
-                >{\centering\arraybackslash}m{4cm}
-                |>{\centering\arraybackslash}m{2.5cm}
+                >{\centering\arraybackslash}m{3.5cm}
                 |>{\centering\arraybackslash}m{2cm}
-                |>{\centering\arraybackslash}m{2.5cm}}
+                |>{\centering\arraybackslash}m{2cm}
+                |>{\centering\arraybackslash}m{1.5cm}
+                |>{\centering\arraybackslash}m{2cm}}
 \hline
-\rule{0pt}{5mm}&\textbf{Program} & \textbf{Bisimilarity} & \textbf{Size of $N$} & \textbf{Runtime}(s) \\
+\rule{0pt}{5mm}&\textbf{Program} & \textbf{Variables} & \textbf{Bisimilarity} & \textbf{Size of $N$} & \textbf{Runtime}(s) \\
 \hline
 \hline
-\rule{0pt}{5mm}&super-dense coding & No & - & 2.6 \\
+\rule{0pt}{12mm}&Super-dense coding 1 & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$\\$x=1$} & Yes & 0 & 2.2 \\
 \hline
-\rule{0pt}{5mm}&super-dense(modified) & Yes & 0 & 2.5 \\
+\rule{0pt}{12mm}&Super-dense coding 2 & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$\\$x=5$} & No & - & 2.2 \\
 \hline
-\rule{0pt}{5mm}&Teleportation & Yes & 0 & 2.7 \\
+\rule{0pt}{12mm}&Super-dense coding (modified) & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$\\$x=5$} & Yes & 0 & 2.5 \\
 \hline
-\rule{0pt}{5mm}&BB84 & Yes & 304 & 4.7 \\
+\rule{0pt}{12mm}&Teleportation & \tabincell{c}{$q1=|1\rangle$\\$q2=|0\rangle$\\$q3=|0\rangle$} & Yes & 0 & 2.7 \\
 \hline
-\rule{0pt}{5mm}&BB84(with eavesdropper) & No & - & 74.6 \\
+\rule{0pt}{10mm}&BB84 & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$} & Yes & 304 & 4.7 \\
 \hline
-\rule{0pt}{10mm}&BB84(with eavesdropper \& modified) & Yes & 17272 & 1834 \\
+\rule{0pt}{12mm}&BB84 (with eavesdropper) & \tabincell{c}{$q1=|0\rangle$\\ $q2=|0\rangle$\\$q3=|0\rangle$} & No & - & 74.6 \\
+\hline
+\rule{0pt}{12mm}&BB84 (with eavesdropper \& modified) & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$\\$q3=|0\rangle$} & Yes & 17272 & 1834 \\
 \hline
 \end{tabular}
+\vspace{1em}
+\caption{Experimental Results}\label{tab:result}  
 \end{table}
 
 \section{Conclusion and Future Works}
