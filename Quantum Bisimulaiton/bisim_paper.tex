@@ -169,9 +169,10 @@ Then we consider the correctness of the algorithm. First, we let $(\theta, N)$ t
 \begin{definition}\label{def:match}
 \textbf{Match}$(t,u,W)$ is \textit{true} if the following condition is satisfied:
 \begin{itemize}
-    \item $W\cap N=\emptyset$
-    \item if $(t,u)\in W$, then $(t,u)\notin N$
+    \item $W\cap N=\emptyset$.
+    \item if $(t,u)\in W$, then $(t,u)\notin N$.
     \item if $(t,u)\notin W$, then either $\theta=true\wedge(t,u)\notin N$ or $\theta=false\wedge(t,u)\in N$.
+    \item $\texttt{R}(t,u,W,N)$.
 \end{itemize}
 Let \textbf{Bisim}$(t,u)=$\textbf{Match}$(t,u,\emptyset)$.
 \end{definition}
@@ -179,11 +180,12 @@ Let \textbf{Bisim}$(t,u)=$\textbf{Match}$(t,u,\emptyset)$.
 \textbf{MatchAction}$(\gamma,t,u,W)$ is \textit{true} if the following conditions are satisfied:
 \begin{itemize}
     \item $W\cap N=\emptyset$, $(t,u)\notin W$ and $(t,u)\notin N$.
+    \item $\texttt{R}(t,u,W,N)$.
     \item $\forall t\xrightarrow{\alpha}t', \exists u\xrightarrow{\alpha'}u'$, $(t',u')\notin \{(t,u)\}\cup W$ and 
     \begin{itemize}
-        \item if $\alpha\equiv a$ (including $c?x$) then $\alpha'\equiv a$ and $(t',u')\notin W\implies(t',u')\notin N$.
-        \item if $\alpha\equiv c!e$ then $\alpha'\equiv c!e'$ with $e=e'$ and $(t',u')\notin W\implies(t',u')\notin N$.
-        \item let $t'\equiv \Delta$ and $u'\equiv \Theta$, if $\alpha\equiv \tau$ then $\alpha'\equiv \tau$, $\forall t_i\in \lceil\Delta\rceil, u_j\in \lceil\Theta\rceil,\ (t_i,u_j)\notin W\implies (t_i,u_j)\notin N$.
+        \item if $\alpha\equiv a$ (including $c?x$) then $\alpha'\equiv a$ and $(t',u')\notin W\wedge(t',u')\notin N\implies t'\sim u'$.
+        \item if $\alpha\equiv c!e$ then $\alpha'\equiv c!e'$ with $e=e'$ and $(t',u')\notin W\wedge(t',u')\notin N\implies t'\sim u'$.
+        \item let $t'\equiv \Delta$ and $u'\equiv \Theta$, if $\alpha\equiv \tau$ then $\alpha'\equiv \tau$, $\forall t_i\in \lceil\Delta\rceil, u_j\in \lceil\Theta\rceil,\ (t_i,u_j)\notin W\wedge(t_i,u_j)\notin N\implies t_i\sim u_j$.
     \end{itemize}
 \end{itemize}
 \end{definition}
@@ -191,11 +193,12 @@ Let \textbf{Bisim}$(t,u)=$\textbf{Match}$(t,u,\emptyset)$.
 \textbf{MatchDistribution}$(\Delta,\Theta,W)$ is \textit{true} if the following conditions are satisfied:
 \begin{itemize}
     \item $W\cap N=\emptyset$, $\forall t_i\in \lceil\Delta\rceil, u_j\in \lceil\Theta\rceil,\ (t_i,u_j)\notin W$ and $(t_i,u_j)\notin N$.
+    \item $\texttt{R}(t,u,W,N)$.
     \item the condition for lifting operation.
 \end{itemize}
 \end{definition}
 \begin{proposition}Let $\textbf{MatchAction}_\gamma(\gamma,t,u,W)$ is the execution of the function with action $\gamma$.
-If $\textbf{MatchAction}_\gamma(\gamma,t,u,W)$ is $true$ for each action $\gamma$ then \textbf{Match}$(t,u,W)$ is also $true$, where its return  $\theta=\bigwedge_\gamma\theta_\gamma$ and $N=\bigcup_\gamma N_\gamma$.
+If $\textbf{MatchAction}_\gamma(\gamma,t,u,W)$ is $true$ for each action $\gamma$ then \textbf{Match}$(t,u,W)$ is also $true$, where it returns $\theta=\bigwedge_\gamma\theta_\gamma$ and $N=\bigcup_\gamma N_\gamma$.
 \end{proposition}
 \begin{proof}
 As $(t,u)$ is added into $W$ during the execution of \textbf{MatchAction}, according to the Definition~\ref{def:matchaction}, $W\cap N=\emptyset$. 
@@ -206,25 +209,43 @@ So it satisfy the verifying condition of \textbf{Match}.
 \end{proof}
 \begin{proposition} Suppose $(t,u)\notin W$.
 If \textbf{Match}$(t',u',W\cup\{(t,u)\})$ is $true$ for all action $\gamma\neq\tau$ derivations$(t\xrightarrow{\gamma}t'$, $u\xrightarrow{\gamma}u')$ and \textbf{MatchDistribution}$(\Delta,\Theta,W\cup\{(t,u)\})$ is $true$ for all action $\gamma=\tau$ derivations $(t\xrightarrow{\tau}\Delta,u\xrightarrow{\tau}\Theta)$ then\\
-\textbf{MatchAction}$(\gamma,t',u',W\cup\{(t,u)\})$ is $true$ where
+\textbf{MatchAction}$(\gamma,t,u,W\cup\{(t,u)\})$ is $true$ where
 $\theta=\bigwedge_i(\bigvee_j\theta_{ij})\wedge\bigwedge_j(\bigvee_i\theta_{ij})$, $N=\bigcup N_{ij}$.
 \end{proposition}
 \begin{proof}
-
+From the structure of the function \textbf{MatchAction}, the first condition is satisfied.
+According to the verification conditions of \textbf{March}, there are:
+\[(t_i,u_j)\in W\cup\{(t,u)\}\implies(t_i,u_j)\notin N_{ij})\]
+\[(t_i,u_j)\notin W\cup\{(t,u)\vee\theta_{ij}=true\}\implies(t_i,u_j)\notin N_{ij})\]
+\[(t_i,u_j)\notin W\cup\{(t,u)\vee\theta_{ij}=false\}\implies(t_i,u_j)\in N_{ij})\]
 \end{proof}
 \begin{proposition}
-Suppose $\forall t_i\in\lceil\Delta\rceil,u_j\in\lceil\Theta\rceil , (t,u)\notin W$.\\
+Suppose $\forall t_i\in\lceil\Delta\rceil,u_j\in\lceil\Theta\rceil , (t_i,u_j)\notin W$.
 If \textbf{Match}$(t_i,u_j,W)$ is $true$ then \textbf{MatchDistribution}$(\Delta,\Theta,W)$ is $true$ where $\Delta$ and $\Theta$ satisfy the condition for lifting condition, $\theta=\textbf{Check}(\Delta,\Theta,\textit{R})\wedge\bigvee_{ij}\theta_{ij}$  and $N=\bigcup_{ij}N_{ij}$.
 \end{proposition}
 \begin{proof}
-
+According to the verification conditions of \textbf{March}, there are:
+\[(t_i,u_j)\in W\cup\{(t,u)\}\implies(t_i,u_j)\notin N_{ij})\]
+\[(t_i,u_j)\notin W\cup\{(t,u)\vee\theta_{ij}=true\}\implies(t_i,u_j)\notin N_{ij})\]
+\[(t_i,u_j)\notin W\cup\{(t,u)\vee\theta_{ij}=false\}\implies(t_i,u_j)\in N_{ij})\]
 \end{proof}
 \begin{theorem}[Correctness]
 
 Given two states $t$ and $u$ from two pLTSs, \textbf{Bisim}$(t,u)$ returns \textit{true} if and only if they are bisimilar.
 \end{theorem} 
 \begin{proof}
+From the verification condition of \textbf{Match}, we have
+\textbf{Bisim}$(t,u)=$\\\textbf{Match}$(t,u,\emptyset)$, if it
+returns $(true, N)$, we guarantee the bisimilarity $t\sim u$.
+\end{proof}
+At the end of this section, we compute the time complexity of the algorithm.
+\begin{theorem}[Complexity]
+Let the number of nodes in two transition graphs reachable from $t$ and $u$ is n. The time complexity of function \textbf{Bisim}$(t,u)$ is $O(n^5/log\ n)$ and the space complexity of it is $O(n^2)$.
+\end{theorem}
+\begin{proof}
+ The number of state pairs is bounded by $n^2$. Since the graphs there are finite trees, for each pair of states, the number of comparisons of transitions could be $n^2$ in the worst case. So the visited state pairs set $W$ contains at most $O(n^2)$ elements.
 
+And if in each call of \textbf{MatchAction}, it call \textbf{MactchDistribution} other than \textbf{Match}, there will cost more time checking the condition of lifting operation through \textbf{Check}. In previous work~\ref{}, we know \textbf{Check} cost time $O(n^3/log\ n)$. As a result, the execution of \textbf{Bisim}$(t,u)$ takes at most $O(n^5/log\ n)$ time in total.
 \end{proof}
 \subsection{Implementation}
 Our tool is implemented in Python 3.7. Its workflow is illustrated in Fig.~\ref{fig:arch}. The input is a quantum program and its specification, both of them are described in qCCS. Execution of the tool yields a terminal output showing the details of the whole process, including the pLTS generation and the checking algorithm, and the result of the checking by a table mapping each pair of pLTS states to its most general boolean. The tool invokes Z3 solver to verify the most general boolean of the initial state pair. A counterexample will be given if the boolean can be unsatisfied.
