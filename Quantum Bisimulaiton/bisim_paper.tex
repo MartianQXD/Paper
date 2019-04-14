@@ -34,7 +34,7 @@
 
 
 \begin{document}
-\title{Verifying Strong Ground Bisimilarity of Quantum Communication Protocols}
+\title{Verifying Strong Ground Bisimilarity of Quantum Programs}
 \author{First Author\inst{1} \and
 Second Author\inst{2,3} \and
 Third Author\inst{3}}
@@ -50,7 +50,7 @@ ABC Institute, Rupert-Karls-University Heidelberg, Heidelberg, Germany\\
 
 \maketitle
 
-\begin{abstract}This paper gives a strong ground bisimulation verification algorithm for quantum programs. We further implement the algorithm that enable us to make experiments on existing quantum communication protocols. As a preparation of the experiments, we encode the quantum communication protocol into a quantum program. Then we check whether a quantum program is bisimilar with its specification. According to the results, we make some improvements on the quantum programs.
+\begin{abstract}Several bisimulations on quantum processes have been proposed. The symbolic quantum bisimulation is proposed for verifying programs with arbitrary iuput values, its ``concrete'' version still needs input but does not have problem on normalizing measurement result. This paper gives a strong ground bisimulation verification algorithm for quantum programs basing on the ``concrete'' version of quantum bisimulation. Furthermore, we implement the algorithm that enable us to make experiments on existing quantum communication protocols. As a preparation of the experiments, we encode the quantum communication protocol into a quantum program. Then we check whether a quantum program is bisimilar with its specification. According to the results, we make some improvements on the quantum programs.
 
 \keywords{Quantum programs  \and Verification \and Bisimualtion.}
 \end{abstract}
@@ -62,7 +62,7 @@ ABC Institute, Rupert-Karls-University Heidelberg, Heidelberg, Germany\\
 \section{qCCS}
 
 \section{Bisimulation Verification}
-In this section, we give an algorithm to verify the strong ground bisimulation between two pLTSs and show its implementation.
+In this section, we give an algorithm to verify the strong ground bisimulation.
 
 \begin{algorithm}[h]
 \caption{Bisim(t,u)}
@@ -123,41 +123,38 @@ In this section, we give an algorithm to verify the strong ground bisimulation b
 % \EndFunction
 \end{algorithmic}
 \end{algorithm}
-\subsection{A Strong Ground Bisimilarity Checking Algorithm}
-The algorithm~\ref{alg:bisim} is based on the work of \cite{TOCL2014}. The main function is \textbf{Bisim}$(t,u)$, its job is to initialize the start states pair $(t,u)$, visited states pair $W$ which is an empty set and then find the bisimulation basing on that initialization. The difference between it and the previous work in several aspects.
 
-The algorithm keeps updating two sets $W$ for visited states pairs and $N$ for non-bisimilar states pairs. The function \textbf{Match}$(t,u,W)$ invokes a depth-first traversal to match a pair of 
-states $(t,u)$ with all their possible behaviors. The states pair is checked to be non-bisimilar if one of their transitions are not matched or their quantum variables, so do the quantum registers, are not matched. Then the algorithm adds the current states pair into $N$. 
+The algorithm~\ref{alg:bisim} bases on the work of \cite{TOCL2014}. The main function is \textbf{Bisim}$(t,u)$, its job is to initialize the start states pair $(t,u)$, visited states pair $W$ which is an empty set and then find the bisimulation basing on that initialization. The difference between it and the previous work in several aspects.
 
-An auxiliary function \textbf{Act}$(t,u)$ is called in \textbf{Match} to discover the next action that both two states can behave. If both two states have no more action it returns an empty set. Furthermore, if there is only one of them has no more action it will lead to a non-bisimilarity. It makes the algorithm more efficient as it terminates at an early time point if those pLTSs are indeed not bisimilar. Next we prove why we can ensure that.
+The algorithm keeps updating two sets, $W$ for visited state pairs and $N$ for non-bisimilar state pairs. The function \textbf{Match}$(t,u,W)$ invokes a depth-first traversal to match a pair of 
+states $(t,u)$ with all their possible behaviors. The state pair will be non-bisimilar if one of their transitions are not matched or their quantum variables are not matched, so do the quantum registers. All the non-bisimilar state pairs are added into $N$. 
+
+An auxiliary function \textbf{Act}$(t,u)$ is called in \textbf{Match} to discover the next action that both two states can behave. If both of two states have no more action to do it returns an empty set. In addition, if only one of them has no more action to do that will lead to a non-bisimilarity. It makes the algorithm more efficient as it terminates at an early time point if those pLTSs are indeed not bisimilar. Next we prove why we can ensure that.
 \begin{lemma}
-Todo: support that I can ensure non-bisimilar if there is a trace longer than any trace from another side.
+Todo: prove that we can ensure in such case, the trace is  longer than any other trace from another side or unmatched with them.
 \end{lemma}
 \begin{theorem}[Early termination]
-If the algorithm reaches a leaf state of the tree-like pLTS while the state of the other pLTS is not leaf state, then these two pLTSs are not bisimilar.
+If the algorithm reaches a leaf state of the tree-like pLTS while the state of the other pLTS is not a leaf state, then these two pLTSs are not bisimilar.
 \end{theorem}
 \begin{proof}
-We consider it on the aspect of the length of the traces. From the structure of the algorithm, each time \textbf{MatchAction} is called \textbf{Act} will be called before it. So the we can ensure that two states have the same action to behave. There exists the trace that
+We consider it on the aspect of the length of the traces. From the structure of the algorithm, each time \textbf{MatchAction} is called \textbf{Act} will be called before it. So we can ensure that two states have the same action to behave. There exists the trace that
 \[T = \langle t_0,\rho\rangle\xrightarrow{\gamma_0}...\xrightarrow{\gamma_i}\langle t_i,\rho\rangle\text{ and }U = \langle u_0,\sigma\rangle\xrightarrow{\gamma_0}...\xrightarrow{\gamma_i}\langle u_i,\sigma\rangle.\]
-Let $|T|=|U|=n$, if one of these states $u_i$ is not leaf state, then there has a longer trace $|U'|=n+1$. As there is no loop contained, the trace $|T'|=n+1$ does not exist, so we can not find a trace has the same length as the other one. According to the definition of the open bisimulation, these two pLTS should not satisfy the relation.
+Let $|T|=|U|=n$, if one of these states $u_i$ is not a leaf, then there has a longer trace $|U'|=n+1$. As there is no loop contained, the trace $|T'|=n+1$ does not exist, so we can not find a trace has the same length as that one. According to the definition of the bisimulation, these two pLTS should not satisfy it.
 \end{proof}
 
-The other set $W$ is update in function \textbf{MatchAction}$(\gamma,t,u,W)$. It discovers next states pairs according to the action $\gamma$ and recursively invokes the function \textbf{Match} when there is a pair of states or \textbf{MatchDistribution} when there is a pair of distributions of states. The current states pair is added to $W$ when it invokes new function.
+The other set $W$ is updated in \textbf{MatchAction}$(\gamma,t,u,W)$. It discovers next state pairs according to the action $\gamma$ and recursively invokes the function \textbf{Match} when there is a pair of states or \textbf{MatchDistribution} when there is a pair of state distributions. The current state pair is added to $W$ when the new function is invoked.
 
-The \textbf{MatchDistribution}$(\Delta,\Theta,\textit{R})$ is an extra step if we match a pair of distributions of states instead of a single pair of states. It returns a boolean value indicating if the distributions are bisimilar. It continues invoking \textbf{Match} to match next pair of states from the pair of states distributions. After checking the bisimilarity of their states, the function generates an equivalence relation of the states from the distribution those who are not contained in the non-bisimilar states set $N$. Another auxiliary set \textbf{Check}$(\Delta,\Theta,\textit{R})$ is used for checking the lifting condition of the bisimulation relation. Besides the lifting condition, we check the disjunction of the returning boolean value from \textbf{Match} functions. The function return such result basing on the following theorem.
+The \textbf{MatchDistribution}$(\Delta,\Theta,\textit{R})$ is an extra step between \textbf{Match} and \textbf{MatchAction} if we match a pair of state distributions instead of a single pair of states. It returns a boolean value indicating if the distributions are bisimilar. It matches each pair of states from the distributions. After checking the bisimilarity of these state pairs, the function generates an equivalence relation of the state pairs those who are not contained in the non-bisimilar state pairs set $N$. Another auxiliary function \textbf{Check}$(\Delta,\Theta,\textit{R})$ is used for checking the lifting condition of the bisimulation relation. Besides the lifting condition, we check the disjunction of the returning boolean value from \textbf{Match} functions. The function returns such result basing on the following definition.
 
-\begin{theorem}[Bisimulation of distributions]
+\begin{definition}[Lifting Condition]
 
 Let $\textit{R}\subseteq Dist(Con)\times Dist(Con)$ be the (strong) open bisimulation relation between two distributions, then for any $\mu,\nu\in Dist(Con),\ \mu\textit{R}\nu$ can imply that:
 \begin{item}
 \item[(1)] The relation satisfies the lifting condition, that is $\mu=\sum_{i\in I}p_i\textit{C}_i$, for each $i\in I,\ \textit{C}_i\textit{R}\textit{D}_i$ for some $\textit{D}_i$, and $\nu=\sum_{i\in I}p_i\textit{D}_i$.
 \item[(2)] The set $I$ is not an empty set, s.t. $\exists C,D\in Con, \mu(C)>0\wedge\nu(D)>0$.
 \end{item}
-\end{theorem} 
-\begin{proof}
-From the definition of the lift operation, the condition must be satisfied. And we need to filter the case that two distributions have no behaviour in common, so there need at least a pair of states is bisimilar.
-\end{proof}
-The correctness of the algorithm is presented in the theorem below.
+\end{definition}
+After the introduction of the algorithm, we discuss its termination and correctness. They are presented in the theorem below.
 \begin{theorem}[Termination]
 
 Given two states $t$ and $u$ from two pLTSs, \textbf{Bisim(t,u)} always terminates.
@@ -259,6 +256,8 @@ Let the number of nodes in two transition graphs reachable from $t$ and $u$ is n
 
 And if in each call of \textbf{MatchAction}, it call \textbf{MactchDistribution} other than \textbf{Match}, there will cost more time checking the condition of lifting operation through \textbf{Check}. In previous work~\ref{}, we know \textbf{Check} cost time $O(n^3/log\ n)$. As a result, the execution of \textbf{Bisim}$(t,u)$ takes at most $O(n^5/log\ n)$ time in total.
 \end{proof}
+\section{Experimental Results}
+In this section, we report an implementation of our approach and provide several classical quantum communication protocols described in qCCS as the use cases for our experiment. We show that our approach is able to distinguish the bisimilarity, and we can make improvement by the result of the algorithm.
 \subsection{Implementation}
 Our tool is implemented in Python 3.7. Its workflow is illustrated in Fig.~\ref{fig:arch}. The input is a quantum program and its specification, both of them are described in qCCS. Execution of the tool yields a terminal output showing the details of the whole process, including the pLTS generation and the checking algorithm, and the result of the checking by a table mapping each pair of pLTS states to its most general boolean. The tool invokes Z3 solver to verify the most general boolean of the initial state pair. A counterexample will be given if the boolean can be unsatisfied.
 \subsubsection{pLTS Generation}
@@ -271,12 +270,10 @@ We implement the previously defined ground bisimlarity checking algorithm to ver
 \caption{Verification workflow.}
 \label{fig:arch}
 \end{figure}
-\section{Case Studies and Experiments}
-We provide several classical quantum communication protocols described in qCCS as the use cases for our experiment.
 \subsection{Examples: Quantum Communication Protocols}
-\subsubsection{Super-dense Coding Protocol} There are two roles $Alice$ and $Bob$. To simplify the experiment, we only consider the smallest case of the protocol, sending only one qubit. So in this example, there is totally one entanglement on two qubits. Besides the Clifford operators, we use a quantum operation $Set^{\Psi}$ to present the generation of Bell state instead of the combination of the quantum gates. The operation elements of $Set^{\Psi}$ is $\{|\beta_{00}\rangle\langle00|,|\beta_{00}\rangle\langle01|,|\beta_{00}\rangle\langle10|,|\beta_{00}\rangle\langle11|\}$. The measurement is according to the computational basis $\{|00\rangle,|01\rangle,|10\rangle,|11\rangle\}$. The specification of the super-dense protocol is defined as $Bob$ sets the 2-qubit variable to the value according to the classical value he received from $Alice$.
-\subsubsection{Quantum Teleportation Protocol} In this example, there are still two roles. The operators we used here is similar with the last example containing Clifford operators, $Set^{\Psi}$ and the measurement according to the computational basis. However, we need one more entanglement and one more qubit if we just consider the smallest case. As there are entanglements between these qubits, the measurement on just a part of them may also affect the rest qubits. We considers the final result of this protocol, that is the third one, $Bob's$ qubit, becomes the same value of the first qubit. So the specification of that can be presented by applying a \textit{SWAP} operation between the first and the third qubit.
-\subsubsection{BB84 Quantum Key Distribution Protocol} In BB84 protocol, there is no entanglement at all, its idea is generating qubits on different basis and using different measurement method without any contacts in advance with the other side. If someone try intercepting the information, the qubits might be measured in wrong basis, it brings a possible case that $Alice$ and $Bob$ are aware of the attack. So the protocol uses one more measurement according to the diagonal basis $\{|+\rangle,|-\rangle\}$. In common use case, BB84 will send a sequence of the qubits while qubits will not influence each other. We consider two kinds of result of the communication. First case is that $Alice$ and $Bob$ choose the same measurement then the results they get are also the same. Another case is that they choose different measurements then the result is discarded at this time. In the specification, we get results from the same sequence instead of two result sequence separately. Considering results from both sides is always the same, this operation will not bring any difference.
+\subsubsection{Super-dense Coding Protocol} There are two roles $Alice$ and $Bob$. To simplify the experiment, we only consider the smallest case of the protocol, sending only one qubit. So there is totally one entanglement on two qubits in this example. Besides the Clifford operators, we use a quantum operation $Set^{\Psi}$ to present the generation of Bell state instead of the combination of the quantum gates. The operation elements of $Set^{\Psi}$ is $\{|\beta_{00}\rangle\langle00|,|\beta_{00}\rangle\langle01|,|\beta_{00}\rangle\langle10|,|\beta_{00}\rangle\langle11|\}$. The measurement is according to the computational basis $\{|00\rangle,|01\rangle,|10\rangle,|11\rangle\}$. The specification of the super-dense protocol is defined as $Bob$ sets the 2-qubit variable to the value according to the classical value he received from $Alice$.
+\subsubsection{Quantum Teleportation Protocol} In this example, there are still two roles. The operators we used here is similar with the last example containing Clifford operators, $Set^{\Psi}$ and the measurement according to the computational basis. However, we need one more entanglement and one more qubit even if we just consider the smallest case. As there are more than one entanglements between these qubits, although the measurement is just applied on a part of them, it may also affect the rest qubits. We consider the final result of this protocol is presented on the third qubit, $Bob's$ qubit. It should become the same value of the first qubit. So the specification of that can be presented by applying a \textit{SWAP} operation between the first and the third qubit.
+\subsubsection{BB84 Quantum Key Distribution Protocol} In BB84 protocol, there is no entanglement at all, its method needs generating qubits on different basis and using different measurement method without any contacts in advance with the other side. If someone tries intercepting the information, the qubits might be measured in wrong basis, it brings a possibility that $Alice$ and $Bob$ can be aware of the attack. So the protocol uses one more kind of measurement which is according to the diagonal basis $\{|+\rangle,|-\rangle\}$. In common use case, BB84 will send a sequence of the qubits while qubits will not influence each other. We consider two kinds of result of the communication. First case is that $Alice$ and $Bob$ choose the same measurement then the results they get are also the same. Another case is that they choose different measurements then the result is discarded at this time. In the specification, we get results from the same sequence instead of two result sequence separately. Considering results from both sides is always the same, this operation will not bring any difference.
 \subsubsection{BB84 Protocol with an Eavesdropper} This example is an extension of the BB84 example, supposing there is an eavesdropper attending into the communication. There have three roles and the new role $Eve$ also randomly choose the measurement just as what $Alice$ and $Bob$ do. The specification is also similar with the one without an eavesdropper. It is possible that the eavesdropper will be recognized. It is a new result of the program. We conclude these results into three messages: emitting through the channel $alarm$ as the measurement methods are not matched; emitting through the channel $fail$ as the measurement methods are matched while the eavesdropping is recognized; normal emitting as the communication finished without recognizing the eavesdropper.
 \subsection{Experimental Results}
 We conducted experiments on those quantum communication protocols, and improved our input program according to the experiment results. The results were obtained on a macOS machine with an Intel Core i7 2.5 GHz processor and 16GB of RAM.
