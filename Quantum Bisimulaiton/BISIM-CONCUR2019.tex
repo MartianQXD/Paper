@@ -162,7 +162,7 @@
 %\ccsdesc[100]{General and reference~General literature}
 %\ccsdesc[100]{General and reference}%TODO mandatory: Please choose ACM 2012 classifications from https://dl.acm.org/ccs/ccs_flat.cfm 
 
-\keywords{Quantum processes; bisimulation; algorithm.}%TODO mandatory; please add comma-separated list of keywords
+\keywords{Quantum processes, Bisimulation, Algorithm.}%TODO mandatory; please add comma-separated list of keywords
 
 \category{}%optional, e.g. invited paper
 
@@ -414,7 +414,7 @@ Similar extension applies to $\Delta[f]$ and $\Delta\backslash L$.
 \section{Algorithm}
 In this section, we present an on-the-fly algorithm to check if two configurations are ground bisimilar.
 
-\begin{algorithm}[h]
+\begin{algorithm}[htbp]
 \caption{Bisim(t,u)}
 \label{alg:bisim}
 \begin{algorithmic}[1]
@@ -658,28 +658,30 @@ Another example brings a non-bisimilarity is on the sixth line of the table, the
 \begin{table}[h]
 \centering
 \begin{tabular}{@{}m{0pt}@{}
-                >{\centering\arraybackslash}m{3.5cm}
-                |>{\centering\arraybackslash}m{2cm}
-                |>{\centering\arraybackslash}m{2cm}
+                >{\centering\arraybackslash}m{3cm}
                 |>{\centering\arraybackslash}m{1.5cm}
-                |>{\centering\arraybackslash}m{2cm}}
+                |>{\centering\arraybackslash}m{1cm}
+                |>{\centering\arraybackslash}m{1cm}
+                |>{\centering\arraybackslash}m{1cm}
+                |>{\centering\arraybackslash}m{1.5cm}
+                |>{\centering\arraybackslash}m{1cm}}
 \hline
-\rule{0pt}{5mm}&\textbf{Program} & \textbf{Variables} & \textbf{Bisimilarity} & \textbf{Size of $N$} & \textbf{Runtime}(s) \\
+\rule{0pt}{5mm}&\textbf{Program} & \textbf{Variables} & \textbf{Bisim} & \textbf{MN} & \textbf{SN} & \textbf{Size of $N$} & \textbf{Sec} \\
 \hline
 \hline
-\rule{0pt}{12mm}&Super-dense coding 1 & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$\\$x=1$} & Yes & 0 & 2.2 \\
+\rule{0pt}{12mm}&Super-dense coding 1 & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$\\$x=1$} & Yes & & & 0 & 2.2 \\
 \hline
-\rule{0pt}{12mm}&Super-dense coding 2 & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$\\$x=5$} & No & - & 2.2 \\
+\rule{0pt}{12mm}&Super-dense coding 2 & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$\\$x=5$} & No & & & - & 2.2 \\
 \hline
-\rule{0pt}{12mm}&Super-dense coding (modified) & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$\\$x=5$} & Yes & 0 & 2.5 \\
+\rule{0pt}{12mm}&Super-dense coding (modified) & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$\\$x=5$} & Yes & & & 0 & 2.5 \\
 \hline
-\rule{0pt}{12mm}&Teleportation & \tabincell{c}{$q1=|1\rangle$\\$q2=|0\rangle$\\$q3=|0\rangle$} & Yes & 0 & 2.7 \\
+\rule{0pt}{12mm}&Teleportation & \tabincell{c}{$q1=|1\rangle$\\$q2=|0\rangle$\\$q3=|0\rangle$} & Yes & & & 0 & 2.7 \\
 \hline
-\rule{0pt}{10mm}&BB84 & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$} & Yes & 304 & 4.7 \\
+\rule{0pt}{10mm}&BB84 & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$} & Yes & & & 304 & 4.7 \\
 \hline
-\rule{0pt}{12mm}&BB84 (with eavesdropper) & \tabincell{c}{$q1=|0\rangle$\\ $q2=|0\rangle$\\$q3=|0\rangle$} & No & - & 74.6 \\
+\rule{0pt}{12mm}&BB84 (with eavesdropper) & \tabincell{c}{$q1=|0\rangle$\\ $q2=|0\rangle$\\$q3=|0\rangle$} & No & & & - & 74.6 \\
 \hline
-\rule{0pt}{12mm}&BB84 (with eavesdropper \& modified) & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$\\$q3=|0\rangle$} & Yes & 17272 & 1834 \\
+\rule{0pt}{12mm}&BB84 (with eavesdropper \& modified) & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$\\$q3=|0\rangle$} & Yes & & & 17272 & 1834 \\
 \hline
 \end{tabular}
 \vspace{1em}
@@ -687,13 +689,13 @@ Another example brings a non-bisimilarity is on the sixth line of the table, the
 \end{table}
 
 \section{Conclusion and Future Works}
-In this paper, we have proposed a algorithm  verifying strong ground bisimulation for quantum programs in qCCS. We also have given an implementation of the algorithm. To show its performance, we further made several experiments with it on several quantum communication protocols such as BB84. The result shows that the algorithm can figure out the non-bisimilarity and help us make improvement on the program. As an illustration, in verifying super-dense coding protocol, we found that the program we coded missed the case that an unexpected input value is given. Furthermore, we ensured that the program after modifying fulfills all the cases.
+In this paper, we have presented an on-the-fly algorithm verifying strong ground bisimulation for quantum programs in qCCS. Furthermore, we have developed a tool for bisimilarity checking basing on the algorithm. To show its performance, we further made experiments on several quantum communication protocols such as BB84. 
+% The result shows that the algorithm can figure out the non-bisimilarity and help us make improvement on the program. As an illustration, in verifying super-dense coding protocol, we found that the program we coded missed the case that an unexpected input value is given. Furthermore, we ensured that the program after modifying fulfills all the cases.
+The experimental results have showed the algorithm is able to give hints for two kinds of improvement: (1) supplementing the missing cases of the programs; (2) adjusting the parallel behaviours.
 
-There are still many questions remaining for further study:
-\begin{itemize}
-    \item Firstly, the bisimulation checking may not only several possible inputs which we can enumerate all of them in a short time. One of the solution of that is to introduce the idea of symbolic bisimulation proposed in~\cite{FDY14}. Symbolic bisimulation uses an accumulation of the super-operators instead of a density operator to present the state which allows us to verify the programs with arbitrary inputs. However, the normalizing operation is also unavailable without the density operator, so it becomes a challenge.
-    \item Secondly, it is eye-catching that there are too many invisible action $\tau$ contained in the programs especially the specification programs matching the internal communications and quantum operations in the implementation programs. To deal with this problem, we are going to implement a weak bisimulation checking algorithm wipe out those invisible actions. 
-\end{itemize}
+There are still many questions remaining for further study.Firstly, the bisimulation checking may not only several possible inputs which we can enumerate all of them in a short time. One of the solution of that is to introduce the idea of symbolic bisimulation proposed in~\cite{FDY14}. Symbolic bisimulation uses an accumulation of the super-operators instead of a density operator to present the state which allows us to verify the programs with arbitrary inputs. However, the normalizing operation is also unavailable without the density operator, so it becomes a challenge.
+
+Secondly, it is eye-catching that there are too many invisible action $\tau$ contained in the programs especially the specification programs matching the internal communications and quantum operations in the implementation programs. To deal with this problem, we are going to implement a weak bisimulation checking algorithm wipe out those invisible actions. 
 
 %%
 %% Bibliography
@@ -706,7 +708,7 @@ There are still many questions remaining for further study:
 
 \appendix
 
-\section{qCCS Examples}
+\section{Examples in qCCS}
 \subsection{Super-dense Coding Protocol}
 \paragraph*{Implementation}
 We code the program of super-dense coding protocol in qCCS as follow:
