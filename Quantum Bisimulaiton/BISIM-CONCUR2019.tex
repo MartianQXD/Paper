@@ -691,8 +691,8 @@ In this paper, we have proposed a algorithm  verifying strong ground bisimulatio
 
 There are still many questions remaining for further study:
 \begin{itemize}
-    \item 
-    \item 
+    \item Firstly, the bisimulation checking may not only several possible inputs which we can enumerate all of them in a short time. One of the solution of that is to introduce the idea of symbolic bisimulation proposed in~\cite{FDY14}. Symbolic bisimulation uses an accumulation of the super-operators instead of a density operator to present the state which allows us to verify the programs with arbitrary inputs. However, the normalizing operation is also unavailable without the density operator, so it becomes a challenge.
+    \item Secondly, it is eye-catching that there are too many invisible action $\tau$ contained in the programs especially the specification programs matching the internal communications and quantum operations in the implementation programs. To deal with this problem, we are going to implement a weak bisimulation checking algorithm wipe out those invisible actions. 
 \end{itemize}
 
 %%
@@ -701,19 +701,140 @@ There are still many questions remaining for further study:
 
 %% Please use bibtex, 
 
+\bibliographystyle{abbrv}
 \bibliography{ref}
 
 \appendix
 
-\section{Examples in qCCS}
-\paragraph*{Super-dense Coding Protocol}
-\begin{flalign}
-    Alice \over{def}= 
-\end{flalign}
+\section{qCCS Examples}
+\subsection{Super-dense Coding Protocol}
+\paragraph*{Implementation}
+We code the program of super-dense coding protocol in qCCS as follow:
+\begin{flalign*}
+    Alice \overset{def}{=}& \texttt{c}_{A}?q_1.\sum_{0\leq  i\leq 3}(\textbf{if}\ x=i\ \textbf{then}\ \sigma^{i}[q_1].\texttt{e}!q_1.\textbf{nil});\\
+    Bob \overset{def}{=}& \texttt{c}_{B}?q_2.\texttt{e}?q_1.\mathcal{CN}[q_1,q_2].\mathcal{H}[q_1].M[q_1,q_2;x].d!x.\textbf{nil};\\
+    EPR \overset{def}{=}& Set^{\Psi}[q_1,q_2].\texttt{c}_{B}!q_2.\texttt{e}_{A}!q_1.\textbf{nil};\\
+    Sdc \overset{def}{=}& c?x.(Alice||Bob||EPR)\setminus \{\texttt{c}_{A},\texttt{c}_{B},\texttt{e}\}
+\end{flalign*}
+where $\mathcal{CN}$ is the controlled-not operation and $\mathcal{H}$ is the Hadamard operation, $Set^{\Psi}$ is the operation transforming all the inputs into a Bell state $|\beta_{00}\rangle$, its operation elements are $\{|\beta_{00}\rangle\langle 00|,|\beta_{00}\rangle\langle 01|,|\beta_{00}\rangle\langle 10|,|\beta_{00}\rangle\langle 11|\}$, and $\sigma^{i}$ are Pauli operators  $\sigma^{0}=I,\sigma^{1}=X,\sigma^{2}=Z,\sigma^{3}=Y$. The element set of measurement \textit{M} is $\{|00\rangle\langle 00|,|01\rangle\langle 01|,|10\rangle\langle 10|,|11\rangle\langle 11|\}$.
+\paragraph*{Specification}
+The specification of super-dense coding protocol can be defined as:
+\begin{flalign*}
+    Sdc_{spec} \overset{def}{=}& c?x.\tau^{11}.\sum_{i=0}^{3}(\textbf{if}\ x=i\ \textbf{then}\ Set^{i}[q_1,q_2].d!x.\textbf{nil})
+\end{flalign*}
+where $Set^{i}$ is the operation transforming the current state into the state decided by the value of $i$ like $Set^{\Psi}$.
 \paragraph*{Improved Super-dense Coding Protocol}
-\paragraph*{Quantum Teleportation Protocol}
-\paragraph*{BB84 Protocol}
-\paragraph*{BB84 Protocol with an Eavesdropper}
+We improve the program through adding an extra solution for the value $i\neq 1,2,3,4$. We send a message alarming we have encountered such case and skip all the rest operations. The new program of $Sdc$ is:
+\begin{flalign*}
+    Alice \overset{def}{=}& \texttt{c}_{A}?q_1.(\sum_{0\leq  i\leq 3}(\textbf{if}\ x=i\ \textbf{then}\ \sigma^{i}[q_1].\texttt{e}!q_1.\textbf{nil})\ \\
+    & +\ \textbf{if}\ \neg\bigvee_{0\leq  i\leq 3} x=i\ \textbf{then}\ c_{C}!msg.\textbf{nil});\\
+    Bob \overset{def}{=}& \texttt{c}_{B}?q_2.(\texttt{e}?q_1.\mathcal{CN}[q_1,q_2].\mathcal{H}[q_1].M[q_1,q_2;x].d!x.\textbf{nil}\ +\ c_{C}?msg.\tau^{8}.d!x.\textbf{nil});\\
+    EPR \overset{def}{=}& Set^{\Psi}[q_1,q_2].\texttt{c}_{B}!q_2.\texttt{c}_{A}!q_1.\textbf{nil};\\
+    Sdc \overset{def}{=}& c?x.(Alice||Bob||EPR)\setminus \{\texttt{c}_{A},\texttt{c}_{B},c_{C},\texttt{e}\}.
+\end{flalign*}
+And we adjust the specification as the program has a new branch, so it is defined as:
+\begin{flalign*}
+    Sdc_{spec} \overset{def}{=}& c?x.\tau^{11}.\sum_{i=0}^{3}(\textbf{if}\ x=i\ \textbf{then}\ Set^{i}[q_1,q_2].d!x.\textbf{nil})\\
+    &\ +\ \textbf{if}\ \neg\bigvee_{0\leq  i\leq 3} x=i\  \textbf{then}\ Set^{\Psi}[q_1,q_2].d!x.\textbf{nil}).
+\end{flalign*}
+\subsection{Quantum Teleportation Protocol}
+\paragraph*{Implementation}
+The program of quantum teleportation protocol can be coded in qCCS as follow:
+\begin{flalign*}
+    Alice \overset{def}{=}& \texttt{c}_{A}?q2.\mathcal{CN}[q_1,q_2].\mathcal{H}[q_1].M[q_1,q_2;x].Set^{\Psi}[q_1,q_2].e!x.\textbf{nil};\\
+    Bob \overset{def}{=}& \texttt{c}_{B}?q_3.e?x.\sum_{0\leq i\leq 3}(\textbf{if}\ x=i\ \textbf{then}\ \sigma^{i}[q3].\textbf{nil});\\
+    EPR \overset{def}{=}& Set^{\Psi}[q_1,q_2].\texttt{c}_{A}!q_2.\texttt{c}_{B}!q_3.\textbf{nil};\\
+    Tel \overset{def}{=}& (Alice||Bob||EPR)\setminus \{\texttt{c}_{A},\texttt{c}_{B},e\}
+\end{flalign*}
+where the operators used are all already declared before. 
+\paragraph*{Specification}
+The specification of quantum teleportation protocol can also be described in qCCS. To show the soundness of $Tel$ it suffices to prove that $Tel$ is bisimilar to an swap operation between the first and the thrid qubits,  $\mathcal{SWAP}_{1,3}[q_1,q_3]$. The program can be coded as follow:
+\begin{flalign*}
+    Spec &\overset{def}{=} \tau^{13}.\mathcal{SWAP}[q_1,q_3].\textbf{nil}.
+\end{flalign*}
+\subsection{BB84 Quantum Key Distribution Protocol}
+\paragraph*{Implementation}
+The program we coding only contains one qubit, it is enough to reflect all the cases could occur. The other qubits used here are auxiliary qubits for $Ran$ operation.
+\begin{flalign*}
+    Alice \overset{def}{=}& Ran[q_1;B_{a}].Ran[q_1;K_{a}].Set_{K_{a}}[q_1].H_{B_{a}}[q_1].\texttt{A2B}!q_1.\\ 
+    &\qquad\qquad\qquad b2a?B_{b}.a2b!B_{a}.key_{a}!cmp(K_{a},B_{a},B_{b}).\textbf{nil};\\
+    Bob \overset{def}{=}& \texttt{A2B}?q_1.Ran[q_2;B_{b}].M_{B_{b}}[q_1;K_{b}].b2a!B_{b}.\\
+    &\qquad\qquad\qquad a2b?B_{a}.key_{b}!cmp(K_{b},B_{a},B_{b}).\textbf{nil};\\
+    BB84 \overset{def}{=}& (Alice||Bob)\setminus\{a2b,b2a,\texttt{A2B}\}
+\end{flalign*}
+where there are several special operations:
+\begin{itemize}
+    \item $Ran[q;x]=Set_{+}[q].M_{0,1}[q;x].Set_{0}[q]$, where $Set_{+}$ (resp.$Set_{0}$) is the operation which sets a qubit it applies on to $|+\rangle$ (resp.$|0\rangle$), $M_{0,1}[q;x]$ is the quantum measurement on $q$ according to the basis $\{|0\rangle,|1\rangle\}$ and stores the result into $x$.
+    \item $Set_{K}[q]$ sets the qubit $q$ to the state $|K\rangle$.
+    \item $H_{B}[q]$ applies $H$ or does nothing on the qubit $q$ depending on whether the value of $B$ is 1 or 0.
+    \item $M_{B}[q;K]$ is the quantum measurement on $q$ according to the basis $\{|+\rangle,|-\rangle\}$ or $\{|0\rangle,|1\rangle\}$ depending on whether the value of $B$ is 1 or 0.
+    \item $cmp(x,y,z)$ returns $x$ if $y$ and $z$ match, and $\epsilon$, meaning it is empty, if they do not match.
+\end{itemize}
+\paragraph*{Specification}
+Its specification can be defined as follow using the same operations:
+\begin{flalign*}
+    BB84_{spec} \overset{def}{=}& Ran[q_1;B_{a}].Ran[q_1;K_{a}].Ran[q_2;B_{b}]\\
+    &\qquad\qquad\qquad.(key_{a}!cmp(K_{a},B_{a},B_{b}).\textbf{nil}||cmp(K_{b},B_{a},B_{b}).\textbf{nil}).
+\end{flalign*}
+
+\paragraph*{Implementation with an Eavesdropper}
+Then we proceed to describe the protocol with an eavesdropper. We extend the processes $Alice$ and $Bob$ with a process for eavesdropper detection.
+\begin{flalign*}
+    Alice' \overset{def}{=}& key_{a}?K'_{a}.Pstr_{K'_{a}}[q_1;x].a2b!x.a2b!SubStr(K'_{a},x).b2a?K''_{b}.\\
+    &(\textbf{if}\ SubStr(K'_{a},x)=K''_{b}\ \textbf{then}\ key'_{a}!RemStr(K'_{a},x).\textbf{nil} \\
+    &\textbf{else}\ alarm_{a}!0.\textbf{nil});\\
+    Bob' \overset{def}{=}& key_{b}?K'_{b}.a2b?x.a2b?K''_{a}.b2a!SubStr(K'_{b},x).\\
+    &(\textbf{if}\ SubStr(K'_{b},x)=K''_{a}\ \textbf{then}\ key'_{b}!RemStr(K'_{b},x).\textbf{nil} \\
+    &\textbf{else}\ alarm_{b}!0.\textbf{nil})
+\end{flalign*}
+where there are three more special operations:
+\begin{itemize}
+    \item $Pstr$ is a measurement which is similar to $Ran$, randomly generates the value of $x$.
+    \item $SubStr(K,x)$ returns the substring of K at the index specified by $x$.
+    \item $RemStr(K,x)$ returns the remaining substring of K by deleting $SubStr(K,x)$.
+\end{itemize}
+After that, we give the definition of the eavesdropper:
+\begin{flalign*}
+    Eve \overset{def}{=}& \texttt{A2E}?q_1.Ran[q_3;B_{e}].M_{B_{e}}[q_1;K_{e}].Set_{K_{e}}[q_1].H_{B_{e}}[q_1].\texttt{E2B}!q_1.key_{e}!K_{e}.\textbf{nil}.
+\end{flalign*}
+With the attending of $Eve$, we adjust the communication of $Alice$ and $Bob$:
+\begin{flalign*}
+    Alice\longrightarrow Alice[f_{a}], Bob\longrightarrow Bob[f_{b}]
+\end{flalign*}
+where $f_{a}(\texttt{A2B})=\texttt{A2E}$, and $f_{b}(\texttt{A2B})=\texttt{E2B}$.
+
+We use a test process to conclude the final result:
+\begin{flalign*}
+    Test \overset{def}{=}& key'_{a}?x.key'_{b}?y.key'_{e}?z.\\
+    &(\textbf{if}\ x\neq y\ \textbf{then}\  fail!0.\textbf{nil}\\
+    &\ +\ \textbf{if}\ x=y\ \textbf{then}\ key_{e}!z.skey!x.\textbf{nil});\\
+    BB84 \overset{def}{=}& (Alice||Bob||Alice'||Bob'||Eve||Test)\setminus C
+\end{flalign*}
+where $C=\{a2b,b2a,key_{a},key_{b},\texttt{A2E},\texttt{E2B},alarm_{a},alarm_{b}\}$.
+\paragraph*{Specification}
+The specification of that can be defined as:
+\begin{flalign*}
+    Spec \overset{def}{=}& Ran[q_1;B_{a}].Ran[q_1;K_{a}].Ran[q_3;B_{e}].Ran'_{B_{a},B_{e},K_{a}}[q_1;K_{e}].Ran[q_2;K_{b}].\\
+    &Ran'_{B_{e},B_{b},K_{e}}[q_1;K_{b}].Pstr_{}[q_1;x].\\
+    &(\textbf{if}\ K_{ab}=K_{ba}\ \textbf{then}\ key_{e}!K_{e}.skey!RemStr(K_{ab},x).\textbf{nil}\\
+    &\ + \textbf{if}\ K_{ab}\neq K_{ba}\ \textbf{then}\\
+    &\ (\textbf{if}\ K^{x}_{ab}\neq K^{x}_{ba}\ \textbf{then}\ alarm_{a}!0.\textbf{nil}||alarm_{b}!0.\textbf{nil}\\
+    &\ +\ \textbf{if}\ K^{x}_{ab}=K^{x}_{ba}\ \textbf{then}\ fail!0.\textbf{nil}))
+\end{flalign*}
+where $K_{ab}=cmp(K_{a},B_{a},B_{b})$,  $K_{ba}=cmp(K_{b},B_{a},B_{b})$, $K^{x}_{ab}=SubStr(K_{ab},x)$, $K^{x}_{ab}=SubStr(K_{ba},x)$. And similar to $Ran$, $Ran'_{x,y,z}[q;v]$ is a special measurement randomly generate the value of $v$ if $x$ and $y$ do not match and give $v$ the value of $z$ if they match.
+
 \paragraph*{Improved BB84 Protocol with an Eavesdropper}
+As the reason why the problem occurred is that the operation $alarm$ is not concluded in $Test$ and the implementation have more behaviours than what the specification requires. So we only refine the program of implementation, adding a message communication with $Test$:
+\begin{flalign*}
+    Alice' \overset{def}{=}& key_{a}?K'_{a}.Pstr_{K'_{a}}[q_1;x].a2b!x.a2b!SubStr(K'_{a},x).b2a?K''_{b}.\\
+    &(\textbf{if}\ SubStr(K'_{a},x)=K''_{b}\ \textbf{then}\ key'_{a}!RemStr(K'_{a},x).\textbf{nil} \\
+    &\textbf{else}\ msg_{a}!0.\textbf{nil});\\
+    Bob' \overset{def}{=}& key_{b}?K'_{b}.a2b?x.a2b?K''_{a}.b2a!SubStr(K'_{b},x).\\
+    &(\textbf{if}\ SubStr(K'_{b},x)=K''_{a}\ \textbf{then}\ key'_{b}!RemStr(K'_{b},x).\textbf{nil} \\
+    &\textbf{else}\ msg_{b}!0.\textbf{nil});\\
+    Test \overset{def}{=}& key'_{a}?x.key'_{b}?y.key'_{e}?z.\\
+    &(\textbf{if}\ x\neq y\ \textbf{then}\  fail!0.\textbf{nil}\ +\ \textbf{if}\ x=y\ \textbf{then}\ key_{e}!z.skey!x.\textbf{nil})\\
+    &+\ msg_{a}?x.msg_{b}?y.key'_{e}?z.alarm!0.\textbf{nil}.
+\end{flalign*}
 
 \end{document}
