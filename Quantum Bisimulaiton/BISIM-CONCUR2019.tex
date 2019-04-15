@@ -17,7 +17,97 @@
 \usepackage{algorithm}
 \usepackage[noend]{algpseudocode}
 \usepackage{amsmath}
+\usepackage{amssymb}
+%\usepackage{amsmath}
+%\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{latexsym}
+\usepackage{amstext}
+\usepackage{xspace}
+\usepackage{enumerate}
+\usepackage{macrosLLNCS}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{epstopdf}
 % New definitions
+
+\def\>{\ensuremath{\rangle}}
+\def\<{\ensuremath{\langle}}
+\def\h{\ensuremath{\mathcal{H}}}
+\def\p{\ensuremath{\mathcal{P}}}
+\def\l{\ensuremath{\mathcal{L}}}
+\def\g{\ensuremath{\mathcal{G}}}
+\def\lh{\ensuremath{\mathcal{L(H)}}}
+\def\dh{\ensuremath{\mathcal{D(H})}}
+
+\def\r{\ensuremath{\mathcal{R}}}
+
+\def\ra{\ensuremath{\rightarrow}}
+\def\e{\ensuremath{\mathcal{E}}}
+\def\f{\ensuremath{\mathcal{F}}}
+
+\def\c{\ensuremath{\mathcal{C}}}
+\def\d{\ensuremath{\mathcal{D}}}
+\def\le{\ensuremath{\sqsubseteq}}
+\def\z{\ensuremath{{\bf 0}}}
+
+\newcommand{\abis}{\stackrel{\lambda}\approx}
+\newcommand{\abisa}[1]{\stackrel{#1}\approx}
+\newcommand {\qbit} {\mbox{\bf{new}}}
+\newcommand {\nil} {\mbox{\bf{nil}}}
+\newcommand {\iif} {\mbox{\bf{if}}}
+\newcommand {\then} {\mbox{\bf{then}}}
+\newcommand {\eelse} {\mbox{\bf{else}}}
+\newcommand {\qcf}[1] {{\sf{#1}}}
+\newcommand{\con}[3]{\iif\ {#1}\ \then\ {#2}\ \eelse\ {#3}}
+
+\newcommand{\ptr}{{\rm env}}
+\newcommand{\rto}[1]{\stackrel{#1}\longrightarrow}
+\newcommand{\Rto}[1]{\stackrel{#1}\Longrightarrow}
+\newcommand{\nrto}[1]{\stackrel{#1}\nrightarrow}
+
+\newcommand{\Rhto}[1]{\stackrel{\widehat{#1}}\Longrightarrow}
+\newcommand{\define}{\stackrel{\it def}=}
+\newcommand{\rsim}{\simeq}
+\newcommand{\obis}{\approx_o}
+%%%%%%%%%%%%%%%%% Distributions
+\newcommand{\eDis}{\varepsilon}
+\newcommand{\Stop}{{\times}}
+\newcommand{\Mass}[1]{|#1|}
+\newcommand{\subdist}[1]{\mathop{\mbox{$\mathcal D_{\textsl{sub}}$}}(#1)}
+\newcommand{\dist}[1]{\mathop{Dist} ({#1})   } % distributions
+\newcommand{\pdist}[1]{\overline{#1}  } % distributions
+\newcommand{\support}[1]{\lceil{#1}\rceil}
+\newcommand{\lift}[1]{\mathrel{{#1}^\circ}}
+
+%%%%%%%%%%%%%%%% language
+\newcommand{\probc}[1]{\mathrel{\!_{\scriptscriptstyle #1}\oplus}}
+\newcommand{\Act}{\ensuremath{\mathsf{Act}}\xspace}
+
+\newcommand{\setof}[2]{\{ \, #1 \, \mid \, #2 \, \}}% set comprehension
+\newcommand{\Nat}{\mathbb{N}}
+\newcommand{\Real}{\mathbb{R}}
+\newcommand{\pair}[1]{\langle{#1}\rangle}
+\newcommand{\ket}[1]{|{#1}\rangle}
+\newcommand{\bra}[1]{\langle{#1}|}
+
+%\newcommand{\so}{{\cal TSO}}
+\newcommand{\Con}{{\it Con}}
+\newcommand{\qv}{{\it qv}}
+\newcommand{\qc}{\underline{c}}
+\newcommand{\qd}{\underline{d}}
+\newcommand{\cVar}{{\it cVar}}
+\newcommand{\qVar}{{\it qVar}}
+\newcommand{\cChan}{{\it cChan}}
+\newcommand{\qChan}{{\it qChan}}
+\newcommand{\tr}{{\rm tr}}
+\newcommand{\CE}{{\cal E}}
+\newcommand{\CH}{{\cal H}}
+\newcommand{\CL}{{\cal L}}
+\newcommand{\CC}{{\cal C}}
+\newcommand{\CD}{{\cal D}}
+\newcommand{\ifthen}[2]{{\textbf{if} ~#1~ \textbf{then} ~#2}}
+
 \algnewcommand\algorithmicswitch{\textbf{switch}}
 \algnewcommand\algorithmiccase{\textbf{case}}
 \algnewcommand\algorithmicotherwise{\textbf{otherwise}}
@@ -34,6 +124,16 @@
 \usepackage{array}
 \newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
 
+% New "environments"
+\algdef{SE}[SWITCH]{Switch}{EndSwitch}[1]{\algorithmicswitch\ #1\ \algorithmicdo}{\algorithmicend\ \algorithmicswitch}%
+\algdef{SE}[CASE]{Case}{EndCase}[1]{\algorithmiccase\ #1}{\algorithmicend\ \algorithmiccase}%
+\algdef{SE}[CASE]{Otherwise}{EndOtherwise}[1]{\algorithmicotherwise\ #1}{\algorithmicend\ \algorithmicotherwise}%
+\algtext*{EndSwitch}%
+\algtext*{EndCase}%
+\algtext*{EndOtherwise}%
+\usepackage{tabularx}
+\usepackage{array}
+%\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
 
 
 
@@ -42,7 +142,8 @@
 
 
 
-\title{Verifying Strong Ground Bisimilarity of Quantum Programs}
+
+\title{Verifying Ground Bisimilarity of Quantum Programs}
 
 \titlerunning{}%optional, please use if title is longer than one line
 
@@ -101,11 +202,212 @@ Several bisimulations on quantum processes have been proposed. The symbolic quan
 \label{sec:introduction}
 
 \section{Preliminaries}
+\label{sec:plts}
+We review the model of probabilistic labelled
+transition systems (pLTSs). Later on we will interpret the behaviour
+of quantum processes in terms of pLTSs because quantum measurements give rise to probability distributions naturally.
 
-\section{qCCS}
+We begin with some notations. A (discrete) probability distribution
+over a set $S$ is a function $\Delta : S \rightarrow [0, 1] $ with
+$\sum_{s\in S} \Delta(s) = 1$; the support of such a $\Delta$ is
+the set $\support{\Delta} = \setof{s \in S}{\Delta(s) > 0}$.
+The point distribution $\pdist{s}$ assigns probability
+$1$ to $s$ and $0$ to all other elements of $S$, so that
+$\support{\pdist{s}} = \{s\}$. In this paper we only need to use distributions with finite support, and let $\dist{S}$ denote the set of
+finite support distributions over $S$, ranged over by $\Delta,\Theta$ etc.
+If $\sum_{k \in K} p_k = 1$ for some
+collection of  $p_k \geq 0$, and the $\Delta_k$ are distributions,
+then so is $\sum_{k \in K}p_k \cdot \Delta_k$ with
+$(\sum_{k \in K}p_k \cdot \Delta_k)(s)~=~\sum_{k\in K} p_k\cdot \Delta_k(s).$
 
-\section{Bisimulation Verification}
-In this section, we give an algorithm to verify the strong ground bisimulation.
+
+\begin{definition}\label{def:LTS}
+	A \emph{probabilistic labelled transition system}
+	is a triple
+	$\langle S, \Act,  \rightarrow  \rangle$, where
+	$S$ is a set of states,
+	$\Act$ is a set of actions, and $\rightarrow \subseteq
+	S \times \Act \times \dist{S}$ is the transition relation.
+\end{definition}
+
+We often write $s\ar{\alpha}\Delta$ for $(s,\alpha,\Delta)\in\rightarrow$, and $s\ar{\alpha}$ for $\exists \Delta: s\ar{\alpha}\Delta$.
+In a pLTS actions are only performed by states, in that actions are
+given by relations from states to distributions. But in general we
+allow distributions over states to perform an action. For this
+purpose, we \emph{lift} these relations so that they also apply to
+distributions \cite{DGHM09}.
+\begin{definition}\label{def:lift}
+	Let  $\mathord{\aRel} \subseteq
+	S\times\dist{S}$ be a relation from states to distributions in a pLTS.
+	Then $\mathord{\lift{\aRel}} \subseteq \dist{S} \times
+	\dist{S}$ is the smallest relation that satisfies the two rules:
+	(i) $s \aRel \Theta$ implies $\pdist{s} \lift{\aRel} \Theta$;
+	(ii) $\Delta_i \lift{\aRel} \Theta_i$ for all $i\in I$ implies
+	$(\sum_{i\in I}p_i\cdot\Delta_i)\lift{\aRel}(\sum_{i\in I}p_i\cdot\Theta_i)$
+	for any $p_i \in [0,1]$ with $\sum_{i\in I}p_i = 1$, where $I$ is a
+	countable index set.
+\end{definition}
+\noindent
+
+We apply this operation to the relations  $\ar{\alpha}$ in the pLTS
+for $\alpha\in \Act_{\tau}$, where we also write $\ar{\alpha}$ for
+$\lift{(\ar{\alpha})}$. Thus as source of
+a relation $\ar{\alpha}$ we now also allow distributions.
+But note that  $\pdist{s} \ar{\alpha} \Delta$ is more general than
+$s \ar{\alpha} \Delta$ because if
+$\pdist{s}\ar{\alpha}\Delta$ then there is a collection of distributions
+$\Delta_i$ and probabilities $p_i$ such that $s\ar{\alpha}\Delta_i$ for each $i\in I$ and
+$\Delta=\sum_{i\in I}p_i\cdot\Delta_i$ with $\sum_{i\in I}p_i=1$.
+
+Let $\aRel\ \subseteq S \times S$ be a relation between states. It induces a special relation $\hat{\aRel}\subseteq S\times\dist{S}$ between states and distributions by letting
+$\hat{\aRel} \define \sset{(s,\pdist{t})\mid s\aRel t}.$
+Then we can use Definition~\ref{def:lift} to lift $\hat{\aRel}$ to be a relation $\lift{(\hat{\aRel})}$ between distributions. For simplicity, we combine the above two lifting operations and directly write $\lift{\aRel}$ for $\lift{(\hat{\aRel})}$ in the sequel, with the intention that a relation between states can be lifted to a relation between distributions via a special application of Definition~\ref{def:lift}. In this particular case, it holds that $\Delta \lift{\aRel} \Theta$ implies $\Theta \lift{(\aRel^{-1})}\Delta$, where $s \aRel t$ iff $t\aRel^{-1} s$ for any $s,t\in S$. This way of lifting relations has elegant mathematical characterisations; see \cite{DD11} for more details.
+
+
+\section{Quantum CCS}\label{sec:qccs}
+
+We introduce a quantum extension of classical CCS (qCCS) which was originally studied in \cite{FDJY07,YFDJ09,FDY11}. Three types of data are considered in qCCS: as classical data we have \texttt{Bool} for booleans and \texttt{Real} for real numbers, and as quantum data we have \texttt{Qbt} for qubits. Consequently,
+two countably infinite sets of variables are assumed: $\cVar$ for classical variables, ranged over by $x,y,...$, and $\qVar$ for quantum variables, ranged over by $q,r,...$.
+We assume a set ${\it Exp}$, which includes $\cVar$ as a subset and is ranged over by $e,e',\dots$,  of classical data expressions over
+\texttt{Real}, and a set of boolean-valued expressions ${\it BExp}$, ranged over by $b, b',\dots$, with the usual  boolean constants $\texttt{true}$, $\texttt{false}$, and operators
+$\neg$, $\wedge$, $\vee$, and $\ra$. In particular, we let $e\bowtie e'$ be a boolean expression for any $e,e'\in {\it Exp}$ and ${\bowtie} \in\sset{>, <, \geq, \leq, =}$.
+We further assume that only classical variables can occur freely in both data expressions and boolean expressions.
+Two types of channels are used: $\cChan$ for classical channels, ranged over by $c,d,...$, and $\qChan$ for quantum channels, ranged over by $\qc,\qd$,.... A relabelling function $f$ is a map on $\cChan\; \cup\; \qChan$ such that $f(\cChan)\subseteq \cChan$ and $f(\qChan)\subseteq \qChan$.
+Sometimes we abbreviate a sequence of distinct variables $q_1,...,q_n$ into $\tilde{q}$.
+
+The terms in qCCS are given by:
+\[\begin{array}{rcl}
+P,Q &::=& \Cnil \BNFsep \tau.P \BNFsep c?x.P \BNFsep c!e.P
+\BNFsep \qc?q.P \BNFsep
+\qc!q.P \BNFsep \CE[\tilde{q}].P
+\BNFsep M[\tilde{q};x].P \BNFsep \\
+& & P + Q \BNFsep  P \Cpar Q\;
+\BNFsep P[f] \BNFsep P\backslash L \BNFsep \ifthen{b}{P} \BNFsep
+A(\tilde{q};\tilde{x})
+\end{array}\]
+where $f$ is a relabelling function and $L\subseteq \cChan\cup \qChan$ is a set of channels.
+Most of the constructors are standard as in CCS \cite{ccs}.
+We briefly explain a few new constructors. The process $\qc?q.P$ receives a quantum datum along quantum channel $\qc$ and evolves into $P$, while $\qc!q.P$ sends out a quantum datum along quantum channel $\qc$ before evolving into $P$. The symbol $\CE$ represents a trace-preserving super-operator applied on the systems $\tilde{q}$. The process $M[\widetilde{q};x].P$ measures the state of qubits $\widetilde{q}$
+according to the observable $M$ and stores the measurement outcome into the
+classical variable $x$ of $P$.
+
+Free classical variables can be defined in the usual way, except for the fact that the variable $x$ in the quantum measurement $M[\tilde{q};x]$ is bound. A process $P$ is closed if it contains no free classical variable, i.e. $fv(P)=\emptyset$.
+
+The set of free quantum variables for process $P$, denoted by $qv(P)$ can be inductively defined as in Figure~\ref{fig:fqv}.
+\begin{figure*}[t]
+	\[\small\begin{array}{rclrcl}
+	qv(\Cnil) & = & \emptyset & qv(\tau.P) & = & qv(P)\\
+	qv(c?x.P) & = & qv(P) & qv(c!e.P) & = & qv(P) \\
+	qv(\qc?q.P) & = & qv(P)-\sset{q} & qv(\qc!q.P) & = & qv(P)\cup\sset{q} \\
+	qv(\CE[\tilde{q}].P) & = & qv(P)\cup \tilde{q} &
+	qv(M[\tilde{q};x].P) & = & qv(P) \cup \tilde{q}\\
+	qv(P+Q) & = & qv(P)\cup qv(Q) \qquad &
+	qv(P \Cpar Q) & = & qv(P)\cup qv(Q)\\
+	qv(P[f]) & = & qv(P) &
+	qv(P\backslash L) & = & qv(P)\\
+	qv(\ifthen{b}{P}) & = & qv(P) &
+	qv(A(\tilde{q};\tilde{x})) & = & \tilde{q}.
+	\end{array}\]
+	\caption{Free quantum variables}\label{fig:fqv}
+\end{figure*}
+For a process to be legal, we require that
+\begin{enumerate}
+	\item $q\not\in qv(P)$ in the process $\qc!q.P$;
+	\item $qv(P)\cap qv(Q)=\emptyset$ in the process $P \Cpar Q$;
+	\item Each constant $A(\tilde{q};\tilde{x})$ has a defining equation $A(\tilde{q};\tilde{x}) \Defs P$, where $P$ is a term with $qv(P)\subseteq\tilde{q}$ and $fv(P)\subseteq \tilde{x}$.
+\end{enumerate}
+The first condition says that a quantum system will not be referenced after it has been sent out. This is a requirement of the quantum no-cloning theorem. The second condition says that parallel composition $\Cpar$ models separate parties that never reference a quantum system simultaneously. 
+
+Throughout the paper we implicitly assume the convention that processes are identified up to $\alpha$-conversion, bound variables differ from each other and they are different from free variables.
+
+We now give the %turn to the %operational 
+semantics of qCCS. For each quantum variable $q$ we assume a 2-dimensional Hilbert space $\CH_q$. For any nonempty subset $S\subseteq \qVar$ we write $\CH_S$ for the tensor product space $\bigotimes_{q\in S}\CH_q$ and $\CH_{\overline{S}}$ for $\bigotimes_{q\not\in S}\CH_q$. In particular, $\CH=\CH_{\qVar}$ is the state space of the whole environment consisting of all the quantum variables, which is a countably infinite dimensional Hilbert space.
+
+
+Let $P$ be a closed quantum process and $\rho$ a density operator on $\CH$,\footnote{As $\CH$ is infinite dimensional, $\rho$ should be understood as a density operator on some finite dimensional subspace of $\CH$ which contains $\h_{\qv(P)}$.} the pair $\pair{P,\rho}$ is called a \emph{configuration}. We write $\Con$ for the set of all configurations, ranged over by $\CC$ and $\CD$.
+We interpret qCCS with a pLTS whose states are all the configurations definable in the language,
+and whose transitions are determined by the rules in Figure~\ref{fig:opsem}; we have omitted the obvious
+symmetric counterparts to the rules \Rlts{C-Com}, \Rlts{Q-Com}, \Rlts{Int} and
+\Rlts{Sum}.
+The set of actions $\Act$ takes the following form, consisting of classical/quantum input/output actions.
+\begin{eqnarray*}
+	\sset{c?v, c!v \mid c\in \cChan, v\in\texttt{Real}}&\cup&
+	\sset{\qc?r,\qc!r \mid \qc\in \qChan,r\in \qVar}
+\end{eqnarray*}
+%The symbol $\tau$ denotes invisible actions. We write $\Act$ for $\Act\cup\sset{\tau}$, which is ranged over by $\alpha$.
+We use $cn(\alpha)$ for the set of channel names in action $\alpha$. For example, we have $cn(\qc?x)=\sset{\qc}$ and $cn(\tau)=\emptyset$.
+
+In the first eight rules in Figure~\ref{fig:opsem}, the targets of arrows are point distributions, and we use the slightly abbreviated form $\CC\ar{\alpha}\CC'$ to mean $\CC\ar{\alpha}\pdist{\CC'}$.
+
+The rules use the obvious extension of the function~$\Cpar$ on terms to configurations and distributions. To be precise,
+$\CC\Cpar P$ is the configuration $\<Q\Cpar P,\rho \>$ where $\CC=\<Q,\rho\>$, and
+$\Delta\Cpar P$ is the distribution defined by:
+%\vskip -2mm
+\[(\Delta\Cpar P)(\pair{Q,\rho}) \define \left\{\begin{array}{ll}
+\Delta(\pair{Q',\rho}) & \mbox{if $Q=Q'\Cpar P$ for some } Q'\\
+0 & \mbox{otherwise.}
+\end{array}\right.\]
+Similar extension applies to $\Delta[f]$ and $\Delta\backslash L$.
+
+
+\begin{figure*}[t]
+	\[\small\begin{array}{ll}
+	\slinfer[\Rlts{Tau}]{\pair{\tau.P, \rho} \ar{\tau} \pair{P, \rho}}
+	&\linfer[\Rlts{C-Inp}]{v\in\texttt{Real}}{\pair{c?x.P,\rho} \ar{c?v} \pair{P[v/x],\rho}}
+	\\[3pt]
+	\linfer[\Rlts{C-Outp}]{v=\Op{e}}{\pair{c!e.P,\rho} \ar{c!v} \pair{P,\rho} }
+	
+	&
+	\linfer[\Rlts{C-Com}]{\pair{P_1,\rho}\ar{c?v}\pair{P'_1,\rho}\qquad
+		\pair{P_2,\rho}\ar{c!v}\pair{P'_2,\rho}
+	}
+	{\pair{P_1\Cpar P_2,\rho} \ar{\tau} \pair{P'_1\Cpar P'_2,\rho} }
+	\\[3pt]
+	\linfer[\Rlts{Q-inp}]{r\not\in qv(\qc?q.P)}
+	{\pair{\qc?q.P,\rho} \ar{\qc?r} \pair{P[r/q],\rho}}
+	&
+	\slinfer[\Rlts{Q-Outp}]{\pair{\qc!q.P,\rho} \ar{\qc!q} \pair{P,\rho} }
+	\\[3pt]
+	\linfer[\Rlts{Q-Com}]{\pair{P_1,\rho} \ar{\qc?r} \pair{P'_1,\rho} \qquad \pair{P_2,\rho}\ar{\qc!r} \pair{P'_2,\rho}}
+	{\pair{P_1\Cpar P_2, \rho } \ar{\tau} \pair{P'_1\Cpar P'_2, \rho}}
+	&
+	\slinfer[\Rlts{Oper}]{\pair{\CE[\tilde{q}].P,\rho} \ar{\tau} \pair{P,\CE_{\tilde{q}}(\rho)}}
+	\\[3pt]
+	\linfer[\Rlts{Meas}]{M=\sum_{i\in I}\lambda_i E^i \qquad p_i=tr(E^i_{\tilde{q}}\rho)}
+	{\pair{M[\tilde{q};x].P,\rho} \ar{\tau} \sum_{i\in I}p_i \pair{P[\lambda_i/x], E^i_{\tilde{q}}\rho E^i_{\tilde{q}} / p_i}}
+	&
+	\\
+	\linfer[\Rlts{Int}]{\pair{P_1,\rho} \ar{\alpha} \Delta\qquad qbv(\alpha)\cap qv(P_2)=\emptyset}{\pair{P_1 \Cpar P_2,\rho} \ar{\alpha} \Delta\Cpar P_2}
+	%\\[3pt]
+	%\linfer[\Rlts{Inp-Int}]{\pair{P_1,\rho} \ar{\qc?r} \pair{P'_1,\rho}\qquad r\not\in qv(P_2)}{\pair{P_1\Cpar P_2,\rho} \ar{\qc?r} \pair{P'_1\Cpar P_2,\rho}}
+	&
+	\linfer[\Rlts{Sum}]{\pair{P_1,\rho} \ar{\alpha} \Delta}{\pair{P_1+P_2,\rho} \ar{\alpha} \Delta}
+	\\[3pt]
+	\linfer[\Rlts{Rel}]{\pair{P,\rho} \ar{\alpha} \Delta}{\pair{P[f],\rho} \ar{f(\alpha)} \Delta[f]}
+	&
+	\linfer[\Rlts{Res}]{\pair{P,\rho} \ar{\alpha} \Delta \qquad cn(\alpha)\cap L=\emptyset}{\pair{P\backslash L,\rho} \ar{\alpha} \Delta\backslash L}
+	\\[3pt]
+	\linfer[\Rlts{Cho}]{\pair{P,\rho} \ar{\alpha} \Delta \qquad \Op{b}=\texttt{true}}{\pair{\ifthen{b}{P},\rho} \ar{\alpha} \Delta}
+	&
+	\linfer[\Rlts{Cons}]{\pair{P[\widetilde{v}/\widetilde{x},\tilde{r}/\tilde{q}],\rho} \ar{\alpha} \Delta \qquad A(\widetilde{x}, \tilde{q})\Defs P}{\pair{A(\widetilde{v},\tilde{r}),\rho} \ar{\alpha} \Delta}
+	\end{array}\]
+	\caption{Operational semantics of qCCS. Here in rule $\Rlts{C-Outp}$, $\Op{e}$ is the evaluation of $e$, and in rule $\Rlts{Meas}$, $E^i_{\tilde{q}}$ denotes the operator $E^i$ acting on the quantum systems $\tilde{q}$.\label{fig:opsem}
+	}
+\end{figure*}
+
+\begin{definition}[\cite{DF12}]
+	A relation $\aRel\ \subseteq \Con\times\Con$ is a \emph{ground simulation} if
+	$\CC\aRel \CD$ implies that $\qv(\CC)=\qv(\CD)$, $\ptr(\CC)=\ptr(\CD)$,
+	and
+	\begin{itemize}
+		\item whenever $\CC\ar{\alpha} \Delta$, there is some distribution $\Theta$ with $\CD\dar{\hat{\alpha}}\Theta$ and $\Delta \lift{\aRel} \Theta$.
+	\end{itemize}
+	A relation $\aRel$ is a \emph{ground bisimulation} if both $\aRel$ and
+	$\aRel^{-1}$ are ground simulations. Two configurations are \emph{ground bisimilar} if they are related by some ground bisimulation.
+\end{definition}
+
+\section{Algorithm}
+In this section, we present an on-the-fly algorithm to check if two configurations are ground bisimilar.
 
 \begin{algorithm}[h]
 \caption{Bisim(t,u)}
@@ -167,27 +469,27 @@ In this section, we give an algorithm to verify the strong ground bisimulation.
 \end{algorithmic}
 \end{algorithm}
 
-The algorithm~\ref{alg:bisim} bases on the work of \cite{DBLP:journals/tocl/FengDY14}. The main function is \textbf{Bisim}$(t,u)$, its job is to initialize the start states pair $(t,u)$, visited states pair $W$ which is an empty set and then find the bisimulation basing on that initialization. The difference between it and the previous work in several aspects.
+In Algorithm~\ref{alg:bisim}, the main function is \textbf{Bisim}$(t,u)$. It initializes the start state pair $(t,u)$, the set $W$ for visited state pairs,  which is empty initially, and then searches for a bisimulation based on that initialization. 
+%The difference between it and that in the previous work in several aspects.
+The algorithm keeps updating two sets: the above mentioned $W$  and the set $N$ for non-bisimilar state pairs. The function \textbf{Match}$(t,u,W)$ invokes a depth-first traversal to match a pair of 
+states $(t,u)$ with all their possible behaviors. There are three possibilities that two states are deemed be non-bisimilar:  (1) one state has a transition that the other cannot match, (2) they do have have the same set of free quantum variables, or (3) the density operators corresponding to their quantum registers are different. If one of the three cases takes places, we add the state pair into $N$. 
 
-The algorithm keeps updating two sets, $W$ for visited state pairs and $N$ for non-bisimilar state pairs. The function \textbf{Match}$(t,u,W)$ invokes a depth-first traversal to match a pair of 
-states $(t,u)$ with all their possible behaviors. The state pair will be non-bisimilar if one of their transitions are not matched or their quantum variables are not matched, so do the quantum registers. All the non-bisimilar state pairs are added into $N$. 
-
-An auxiliary function \textbf{Act}$(t,u)$ is called in \textbf{Match} to discover the next action that both two states can behave. If both of two states have no more action to do it returns an empty set. In addition, if only one of them has no more action to do that will lead to a non-bisimilarity. It makes the algorithm more efficient as it terminates at an early time point if those pLTSs are indeed not bisimilar. Next we prove why we can ensure that.
-
+An auxiliary function \textbf{Act}$(t,u)$ is called in \textbf{Match} to discover the next action that both $t$ and $u$ can perform. If both states have no more action to do the function returns an empty set. If only one of them has no more action to do then the two states are immediately declared to be non-bisimilar. 
+%It makes the algorithm more efficient as it terminates at an early time point if those pLTSs are indeed not bisimilar. Next we prove why we can ensure that.
 \begin{lemma}
-Todo: prove that we can ensure in such case, the trace is  longer than any other trace from another side or unmatched with them.
+	Todo: prove that we can ensure in such case, the trace is  longer than any other trace from another side or unmatched with them.
 \end{lemma}
-
 \begin{theorem}[Early termination]
-If the algorithm reaches a leaf state of the tree-like pLTS while the state of the other pLTS is not a leaf state, then these two pLTSs are not bisimilar.
+	If the algorithm reaches a leaf state of the tree-like pLTS while the state of the other pLTS is not a leaf state, then these two pLTSs are not bisimilar.
 \end{theorem}
 \begin{proof}
-We consider it on the aspect of the length of the traces. From the structure of the algorithm, each time \textbf{MatchAction} is called \textbf{Act} will be called before it. So we can ensure that two states have the same action to behave. There exists the trace that
-\[T = \langle t_0,\rho\rangle\xrightarrow{\gamma_0}...\xrightarrow{\gamma_i}\langle t_i,\rho\rangle\text{ and }U = \langle u_0,\sigma\rangle\xrightarrow{\gamma_0}...\xrightarrow{\gamma_i}\langle u_i,\sigma\rangle.\]
-Let $|T|=|U|=n$, if one of these states $u_i$ is not a leaf, then there has a longer trace $|U'|=n+1$. As there is no loop contained, the trace $|T'|=n+1$ does not exist, so we can not find a trace has the same length as that one. According to the definition of the bisimulation, these two pLTS should not satisfy it.
+	We consider it on the aspect of the length of the traces. From the structure of the algorithm, each time \textbf{MatchAction} is called \textbf{Act} will be called before it. So we can ensure that two states have the same action to behave. There exists the trace that
+	\[T = \langle t_0,\rho\rangle\xrightarrow{\gamma_0}...\xrightarrow{\gamma_i}\langle t_i,\rho\rangle\text{ and }U = \langle u_0,\sigma\rangle\xrightarrow{\gamma_0}...\xrightarrow{\gamma_i}\langle u_i,\sigma\rangle.\]
+	Let $|T|=|U|=n$, if one of these states $u_i$ is not a leaf, then there has a longer trace $|U'|=n+1$. As there is no loop contained, the trace $|T'|=n+1$ does not exist, so we can not find a trace has the same length as that one. According to the definition of the bisimulation, these two pLTS should not satisfy it.
 \end{proof}
 
-The other set $W$ is updated in \textbf{MatchAction}$(\gamma,t,u,W)$. It discovers next state pairs according to the action $\gamma$ and recursively invokes the function \textbf{Match} when there is a pair of states or \textbf{MatchDistribution} when there is a pair of state distributions. The current state pair is added to $W$ when the new function is invoked.
+The other set $W$ is updated in function \textbf{MatchAction}$(\gamma,t,u,W)$. This function discovers next state pairs according to the action $\gamma$ and recursively invokes the function \textbf{Match} when there is a pair of states or \textbf{MatchDistribution} when there is a pair of state distributions. The current state pair is added to $W$ when the new function is invoked.
+
 
 The \textbf{MatchDistribution}$(\Delta,\Theta,\textit{R})$ is an extra step between \textbf{Match} and \textbf{MatchAction} if we match a pair of state distributions instead of a single pair of states. It returns a boolean value indicating if the distributions are bisimilar. It matches each pair of states from the distributions. After checking the bisimilarity of these state pairs, the function generates an equivalence relation of the state pairs those who are not contained in the non-bisimilar state pairs set $N$. Another auxiliary function \textbf{Check}$(\Delta,\Theta,\textit{R})$ is used for checking the lifting condition of the bisimulation relation. Besides the lifting condition, we check the disjunction of the returning boolean value from \textbf{Match} functions. The function returns such result basing on the following definition.
 
@@ -394,7 +696,8 @@ There are still many questions remaining for further study:
 
 %% Please use bibtex, 
 
-\bibliography{BISIM-CONCUR2019}
+\bibliographystyle{abbrv}
+\bibliography{ref}
 
 \appendix
 
