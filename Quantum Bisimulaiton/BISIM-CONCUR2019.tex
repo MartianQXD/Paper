@@ -162,7 +162,8 @@
 %\ccsdesc[100]{General and reference~General literature}
 %\ccsdesc[100]{General and reference}%TODO mandatory: Please choose ACM 2012 classifications from https://dl.acm.org/ccs/ccs_flat.cfm 
 
-\keywords{Quantum processes; bisimulation; algorithm.}%TODO mandatory; please add comma-separated list of keywords
+\keywords{Quantum process algebra; bisimulation;
+verification; quantum communication protocols}%TODO mandatory; please add comma-separated list of keywords
 
 \category{}%optional, e.g. invited paper
 
@@ -200,7 +201,7 @@
 %TODO mandatory: add short abstract of the document
 \begin{abstract}
 	
-One important application of quantum process algebras is to formally verify quantum communication protocols. With a suitable notion of behavioural equivalence and a decision method, one can determine if the specification of a protocol is consistent with an implementation. Ground bisimulation is a convenient behavioural equivalence for processes in quantum CCS because of its associated coinduction proof technique. We exploit this technique to design and implement an on-the-fly algorithm to check if two given quantum processes are equivalent. This enables us to develop a tool that can verify interesting quantum protocols such as the BB84 quantum key distribution scheme.
+One important application of quantum process algebras is to formally verify quantum communication protocols. With a suitable notion of behavioural equivalence and a decision method, one can determine if the specification of a protocol is consistent with an implementation. Ground bisimulation is a convenient behavioural equivalence for quantum processes because of its associated coinduction proof technique. We exploit this technique to design and implement an on-the-fly algorithm to check if two given processes in quantum CCS are equivalent, which enables us to develop a tool that can verify interesting quantum protocols such as the BB84 quantum key distribution scheme.
 \end{abstract}
 
 \section{Introduction}
@@ -479,7 +480,7 @@ In Algorithm~\ref{alg:bisim}, the main function is \textbf{Bisim}$(t,u)$. It ini
 The algorithm keeps updating two sets: the above mentioned $W$  and the set $N$ for non-bisimilar state pairs. The function \textbf{Match}$(t,u,W)$ invokes a depth-first traversal to match a pair of 
 states $(t,u)$ with all their possible behaviors. There are three possibilities that two states are deemed be non-bisimilar:  (1) one state has a transition that the other cannot match, (2) they do have have the same set of free quantum variables, or (3) the density operators corresponding to their quantum registers are different. If one of the three cases takes places, we add the state pair into $N$. 
 
-An auxiliary function \textbf{Act}$(t,u)$ is called in \textbf{Match} to discover the next action that both $t$ and $u$ can perform. If both states have no more action to do the function returns an empty set. If only one of them has no more action to do then the two states are immediately declared to be non-bisimilar. 
+An auxiliary function \textbf{Act}$(t,u)$ is called in \textbf{Match} to discover the next action that both $t$ and $u$ can perform. If the two states have no more action to do then the function returns an empty set. If only one of them has no more action to do then the two states are immediately declared to be non-bisimilar. 
 %It makes the algorithm more efficient as it terminates at an early time point if those pLTSs are indeed not bisimilar. Next we prove why we can ensure that.
 \begin{lemma}
 	Todo: prove that we can ensure in such case, the trace is  longer than any other trace from another side or unmatched with them.
@@ -493,10 +494,10 @@ An auxiliary function \textbf{Act}$(t,u)$ is called in \textbf{Match} to discove
 	Let $|T|=|U|=n$, if one of these states $u_i$ is not a leaf, then there has a longer trace $|U'|=n+1$. As there is no loop contained, the trace $|T'|=n+1$ does not exist, so we can not find a trace has the same length as that one. According to the definition of the bisimulation, these two pLTS should not satisfy it.
 \end{proof}
 
-The other set $W$ is updated in function \textbf{MatchAction}$(\gamma,t,u,W)$. This function discovers next state pairs according to the action $\gamma$ and recursively invokes the function \textbf{Match} when there is a pair of states or \textbf{MatchDistribution} when there is a pair of state distributions. The current state pair is added to $W$ when the new function is invoked.
+The other set $W$ is updated in function \textbf{MatchAction}$(\gamma,t,u,W)$. This function discovers next pairs or states or distributions, depending on the type of transitions,  and recursively invokes the function \textbf{Match} or \textbf{MatchDistribution}. The current state pair is added to $W$ when the new functions are invoked.
 
 
-The \textbf{MatchDistribution}$(\Delta,\Theta,\textit{R})$ is an extra step between \textbf{Match} and \textbf{MatchAction} if we match a pair of state distributions instead of a single pair of states. It returns a boolean value indicating if the distributions are bisimilar. It matches each pair of states from the distributions. After checking the bisimilarity of these state pairs, the function generates an equivalence relation of the state pairs those who are not contained in the non-bisimilar state pairs set $N$. Another auxiliary function \textbf{Check}$(\Delta,\Theta,\textit{R})$ is used for checking the lifting condition of the bisimulation relation. Besides the lifting condition, we check the disjunction of the returning boolean value from \textbf{Match} functions. The function returns such result basing on the following definition.
+The function \textbf{MatchDistribution}$(\Delta,\Theta,\textit{R})$ is called if we need to compare a pair of state distributions instead of a single pair of states. It returns a boolean value indicating whether the distributions are equivalent. In order to do so, it compares each pair of states from the supports of the two distributions. After checking the bisimilarity of these state pairs, the function generates an equivalence relation of the state pairs not contained in the set $N$ for non-bisimilar state pairs. Another auxiliary function \textbf{Check}$(\Delta,\Theta,\textit{R})$ is used for checking the lifting condition of the bisimulation relation. Besides the lifting condition, we check the disjunction of the returning boolean value from \textbf{Match} functions. The function returns such result basing on the following definition.
 
 \begin{definition}[Lifting Condition]
 
