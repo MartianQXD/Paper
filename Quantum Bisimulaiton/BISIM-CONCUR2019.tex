@@ -9,8 +9,6 @@
 %for enabling cleveref support, use "autoref"
 
 
-%\graphicspath{{./graphics/}}%helpful if your graphic files are in another directory
-
 \bibliographystyle{plainurl}% the mandatory bibstyle
 
 \usepackage{graphicx}
@@ -143,22 +141,28 @@
 
 
 
-\title{Verifying Ground Bisimilarity of Quantum Programs}
+\title{Verifying Quantum Communication Protocols with Ground Bisimulation}
+%{Checking Ground Bisimilarity for Quantum Processes}
 
 \titlerunning{}%optional, please use if title is longer than one line
 
-\author{John Q. Public}{Dummy University Computing Laboratory, [optional: Address], Country \and My second affiliation, Country \and \url{http://www.myhomepage.edu} }{johnqpublic@dummyuni.org}{https://orcid.org/0000-0002-1825-0097}{(Optional) author-specific funding acknowledgements}%TODO mandatory, please use full name; only 1 author per \author macro; first two parameters are mandatory, other parameters can be empty. Please provide at least the name of the affiliation and the country. The full address is optional
+%\author{Xudong Qin}{Dummy University Computing Laboratory, [optional: Address], Country \and My second affiliation, Country \and \url{http://www.myhomepage.edu} }{johnqpublic@dummyuni.org}{https://orcid.org/0000-0002-1825-0097}{(Optional) author-specific funding acknowledgements}%TODO mandatory, please use full name; only 1 author per \author macro; first two parameters are mandatory, other parameters can be empty. Please provide at least the name of the affiliation and the country. The full address is optional
+\author{Xudong Qin}{Shanghai Key Laboratory of Trustworthy Computing, East China Normal University, China}{marsxd@gmail.com}{}{}
 
-\author{Joan R. Public\footnote{Optional footnote, e.g. to mark corresponding author}}{Department of Informatics, Dummy College, [optional: Address], Country}{joanrpublic@dummycollege.org}{[orcid]}{[funding]}
+\author{Yuxin Deng}{Shanghai Key Laboratory of Trustworthy Computing, East China Normal University, China}{yxdeng@sei.ecnu.edu.cn}{}{}
 
-\authorrunning{J.\,Q. Public and J.\,R. Public}%TODO mandatory. First: Use abbreviated first/middle names. Second (only in severe cases): Use first author plus 'et al.'
+%\author{Joan R. Public\footnote{Optional footnote, e.g. to mark corresponding author}}{Department of Informatics, Dummy College, [optional: Address], Country}{joanrpublic@dummycollege.org}{[orcid]}{[funding]}
 
-\Copyright{John Q. Public and Joan R. Public}%TODO mandatory, please use full first names. LIPIcs license is "CC-BY";  http://creativecommons.org/licenses/by/3.0/
+\authorrunning{X. Qin and Y. Deng}%TODO mandatory. First: Use abbreviated first/middle names. Second (only in severe cases): Use first author plus 'et al.'
 
-\ccsdesc[100]{General and reference~General literature}
-\ccsdesc[100]{General and reference}%TODO mandatory: Please choose ACM 2012 classifications from https://dl.acm.org/ccs/ccs_flat.cfm 
+\Copyright{Xudong Qin and Yuxin Deng}%TODO mandatory, please use full first names. LIPIcs license is "CC-BY";  http://creativecommons.org/licenses/by/3.0/
 
-\keywords{Quantum programs  \and Verification \and Bisimualtion.}%TODO mandatory; please add comma-separated list of keywords
+\ccsdesc[500]{Theory of computation~Process calculi}
+\ccsdesc[300]{Theory of computation~Operational semantics}
+%\ccsdesc[100]{General and reference~General literature}
+%\ccsdesc[100]{General and reference}%TODO mandatory: Please choose ACM 2012 classifications from https://dl.acm.org/ccs/ccs_flat.cfm 
+
+\keywords{Quantum processes; bisimulation; algorithm.}%TODO mandatory; please add comma-separated list of keywords
 
 \category{}%optional, e.g. invited paper
 
@@ -195,7 +199,8 @@
 
 %TODO mandatory: add short abstract of the document
 \begin{abstract}
-Several bisimulations on quantum processes have been proposed. The symbolic quantum bisimulation is proposed for verifying programs with arbitrary iuput values, its ``concrete'' version still needs input but does not have problem on normalizing measurement result. This paper gives a strong ground bisimulation verification algorithm for quantum programs basing on the ``concrete'' version of quantum bisimulation. Furthermore, we implement the algorithm that enable us to make experiments on existing quantum communication protocols. As a preparation of the experiments, we encode the quantum communication protocol into a quantum program. Then we check whether a quantum program is bisimilar with its specification. According to the results, we make some improvements on the quantum programs.
+	
+One important application of quantum process algebras is to formally verify quantum communication protocols. With a suitable notion of behavioural equivalence and a decision method, one can determine if the specification of a protocol is consistent with an implementation. Ground bisimulation is a convenient behavioural equivalence for processes in quantum CCS because of its associated coinduction proof technique. We exploit this technique to design and implement an on-the-fly algorithm to check if two given quantum processes are equivalent. This enables us to develop a tool that can verify interesting quantum protocols such as the BB84 quantum key distribution scheme.
 \end{abstract}
 
 \section{Introduction}
@@ -696,7 +701,6 @@ There are still many questions remaining for further study:
 
 %% Please use bibtex, 
 
-\bibliographystyle{abbrv}
 \bibliography{ref}
 
 \appendix
