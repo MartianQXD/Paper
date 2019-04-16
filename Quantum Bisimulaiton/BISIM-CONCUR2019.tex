@@ -414,6 +414,8 @@ Similar extension applies to $\Delta[f]$ and $\Delta\backslash L$.
 
 \section{Algorithm}
 In this section, we present an on-the-fly algorithm to check if two configurations are ground bisimilar.
+For convenience, we will only consider pLTSs with finite tree structures. On the one hand, this makes the algorithm easier to describe and analyse. On the other hand, our main motivation of this work is to verify quantum communication protocols and, to the best of our knowledge, almost all of them can be specified by qCCS processes without recursion.
+Modifying the algorithm to deal with pLTSs with loops is possible, with an increased (but still polynomial) time complexity.
 
 \begin{algorithm}[htbp]
 \caption{Bisim(t,u)}
