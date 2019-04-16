@@ -442,20 +442,25 @@ In this section, we present an on-the-fly algorithm to check if two configuratio
 \Function{\textbf{MatchAction}}{$\gamma,t,u,W$}
 \Switch{$\gamma$}
 \Case{$c!$}
-\For{$t\xrightarrow{c!e_i}t_i \text{ and } u\xrightarrow{c!e'_j}u_j$}
+\For{$t\xrightarrow{c!e_i}t_i$} 
+ \For {$u\xrightarrow{c!e'_j}u_j$}
     \State $(\theta_{ij},N_{ij}):=\textbf{Match}(t_i,u_j,W\cup \{(t,u)\}$
+\EndFor
 \EndFor
 \State \textbf{return} $(\bigwedge_{i}(\bigvee_j(\theta_{ij}\wedge e_i=e'_j))\wedge\bigwedge_{j}(\bigvee_i(\theta_{ij}\wedge e_i=e'_j)),\bigcup_{ij}N_{ij})$
 \EndCase
 \Case{$\tau$}
-\For{$t\xrightarrow{\tau}\Delta_i \text{ and } u\xrightarrow{\tau}\Theta_j$}
+\For{$t\xrightarrow{\tau}\Delta_i$} \For{$u\xrightarrow{\tau}\Theta_j$}
     \State $(\theta_{ij},N_{ij}):=\textbf{MatchDistribution}(\Delta_i,\Theta_j,W\cup \{(t,u)\}$
+\EndFor
 \EndFor
 \State \textbf{return} $(\bigwedge_{i}(\bigvee_j\theta_{ij})\wedge\bigwedge_{j}(\bigvee_i\theta_{ij}),\bigcup_{ij}N_{ij})$
 \EndCase
 \Otherwise{}
-\For{$t\xrightarrow{\gamma}t_i \text{ and } u\xrightarrow{\gamma}u_j$}
+\For{$t\xrightarrow{\gamma}t_i$} 
+\For{$u\xrightarrow{\gamma}u_j$}
     \State $(\theta_{ij},N_{ij}):=\textbf{Match}(t_i,u_j,W\cup \{(t,u)\}$
+\EndFor
 \EndFor
 \State \textbf{return} $(\bigwedge_{i}(\bigvee_j\theta_{ij})\wedge\bigwedge_{j}(\bigvee_i\theta_{ij}),\bigcup_{ij}N_{ij})$
 \EndOtherwise
@@ -466,7 +471,7 @@ In this section, we present an on-the-fly algorithm to check if two configuratio
 \For{$t_i\in \lceil\Delta\rceil\text{ and }u_j\in \lceil\Theta\rceil$}
     \State $(\theta_{ij},N_{ij}):=\textbf{Match}(t_i,u_j,W)$
 \EndFor
-\State $\textit{R}$:=$\{(t_i,u_j)|(t_i,u_j)\notin \bigcup_{ij}N_{ij}\}*$
+\State $\textit{R}$:=$\{(t_i,u_j)|(t_i,u_j)\notin \bigcup_{ij}N_{ij}\}^*$
 \State \textbf{return} ($\textbf{Check}(\textit{$\Delta$,$\Theta$,$R$})\wedge\bigvee_{ij}\theta_{ij},\bigcup_{ij}N_{ij}$)
 \EndFunction
 % \State
