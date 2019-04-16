@@ -653,7 +653,7 @@ We implement the previously defined ground bisimlarity checking algorithm to ver
 \label{fig:arch}
 \end{figure}
 \subsection{Examples: Quantum Communication Protocols}
-\paragraph*{Super-dense Coding Protocol} There are two roles $Alice$ and $Bob$. To simplify the experiment, we only consider the smallest case of the protocol, sending only one qubit. So there is totally one entanglement on two qubits in this example. Besides the Clifford operators, we use a quantum operation $Set^{\Psi}$ to present the generation of Bell state instead of the combination of the quantum gates. The operation elements of $Set^{\Psi}$ is $\{|\beta_{00}\rangle\langle00|,|\beta_{00}\rangle\langle01|,|\beta_{00}\rangle\langle10|,|\beta_{00}\rangle\langle11|\}$. The measurement is according to the computational basis $\{|00\rangle,|01\rangle,|10\rangle,|11\rangle\}$. The specification of the super-dense protocol is defined as $Bob$ sets the 2-qubit variable to the value according to the classical value he received from $Alice$.
+\paragraph*{Super-dense Coding Protocol} There are two roles $Alice$ and $Bob$. To simplify the experiment, we only consider the smallest case of the protocol, sending only one qubit. So there is totally one entanglement on two qubits in this example. Besides the Clifford operators, we use a quantum operation $Set^{\Psi}$ to present the generation of EPR state instead of the combination of the quantum gates. The operation elements of $Set^{\Psi}$ is $\{|\beta_{00}\rangle\langle00|,|\beta_{00}\rangle\langle01|,|\beta_{00}\rangle\langle10|,|\beta_{00}\rangle\langle11|\}$. The measurement is according to the computational basis $\{|00\rangle,|01\rangle,|10\rangle,|11\rangle\}$. The specification of the super-dense protocol is defined as $Bob$ sets the 2-qubit variable to the value according to the classical value he received from $Alice$.
 \paragraph*{Quantum Teleportation Protocol} In this example, there are still two roles. The operators we used here is similar with the last example containing Clifford operators, $Set^{\Psi}$ and the measurement according to the computational basis. However, we need one more entanglement and one more qubit even if we just consider the smallest case. As there are more than one entanglements between these qubits, although the measurement is just applied on a part of them, it may also affect the rest qubits. We consider the final result of this protocol is presented on the third qubit, $Bob's$ qubit. It should become the same value of the first qubit. So the specification of that can be presented by applying a \textit{SWAP} operation between the first and the third qubit.
 \paragraph*{BB84 Quantum Key Distribution Protocol} In BB84 protocol, there is no entanglement at all, its method needs generating qubits on different basis and using different measurement method without any contacts in advance with the other side. If someone tries intercepting the information, the qubits might be measured in wrong basis, it brings a possibility that $Alice$ and $Bob$ can be aware of the attack. So the protocol uses one more kind of measurement which is according to the diagonal basis $\{|+\rangle,|-\rangle\}$. In common use case, BB84 will send a sequence of the qubits while qubits will not influence each other. We consider two kinds of result of the communication. First case is that $Alice$ and $Bob$ choose the same measurement then the results they get are also the same. Another case is that they choose different measurements then the result is discarded at this time. In the specification, we get results from the same sequence instead of two result sequence separately. Considering results from both sides is always the same, this operation will not bring any difference.
 \paragraph*{BB84 Protocol with an Eavesdropper} This example is an extension of the BB84 example, supposing there is an eavesdropper attending into the communication. There have three roles and the new role $Eve$ also randomly choose the measurement just as what $Alice$ and $Bob$ do. The specification is also similar with the one without an eavesdropper. It is possible that the eavesdropper will be recognized. It is a new result of the program. We conclude these results into three messages: emitting through the channel $alarm$ as the measurement methods are not matched; emitting through the channel $fail$ as the measurement methods are matched while the eavesdropping is recognized; normal emitting as the communication finished without recognizing the eavesdropper.
@@ -669,7 +669,7 @@ Another example brings a non-bisimilarity is on the sixth line of the table, the
 \centering
 \begin{tabular}{@{}m{0pt}@{}
                 >{\centering\arraybackslash}m{3cm}
-                ||>{\centering\arraybackslash}m{1.5cm}
+                ||>{\centering\arraybackslash}m{3cm}
                 |>{\centering\arraybackslash}m{1cm}
                 |>{\centering\arraybackslash}m{0.8cm}
                 |>{\centering\arraybackslash}m{0.8cm}
@@ -685,7 +685,11 @@ Another example brings a non-bisimilarity is on the sixth line of the table, the
 \hline
 \rule{0pt}{12mm}&Super-dense coding (modified) & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$\\$x=5$} & Yes & 15 & 15 & 0 & 2.5 \\
 \hline
-\rule{0pt}{12mm}&Teleportation & \tabincell{c}{$q1=|1\rangle$\\$q2=|0\rangle$\\$q3=|0\rangle$} & Yes & 33 & 15 & 0 & 2.7 \\
+\rule{0pt}{12mm}&Teleportation 1 & \tabincell{c}{$q1=|1\rangle$\\$q2=|0\rangle$\\$q3=|0\rangle$} & Yes & 33 & 15 & 0 & 2.2 \\
+\hline
+\rule{0pt}{15mm}&Teleportation 2 & \tabincell{c}{$q1=\frac{1}{\sqrt{2}}|0\rangle+\frac{1}{\sqrt{2}}|1\rangle$\\$q2=|0\rangle$\\$q3=|0\rangle$} & Yes & 33 & 15 & 0 & 2.2 \\
+\hline
+\rule{0pt}{15mm}&Teleportation 3 & \tabincell{c}{$q1=\frac{\sqrt{3}}{2}|0\rangle+\frac{1}{2}|1\rangle$\\$q2=|0\rangle$\\$q3=|0\rangle$} & Yes & 33 & 15 & 0 & 2.2 \\
 \hline
 \rule{0pt}{10mm}&BB84 & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$} & Yes & 151 & 131 & 304 & 4.7 \\
 \hline
@@ -718,15 +722,25 @@ Secondly, it is eye-catching that there are too many invisible action $\tau$ con
 
 \section{Examples in qCCS}
 \subsection{Super-dense Coding Protocol}
+Super-dense coding is proposed by Bennett and Wiesner in 1992~\cite{BW92}. It is a quantum communication protocol allowing two classical bits to be encoded in one qubit during a transmission, so it needs only one quantum channel. Such advantage bases on the use of a maximally
+entangled state, EPR state. An EPR state can be transformed into all the four kinds of EPR states through an one-qubit operation, and these EPR states are mutually orthogonal. We suppose the sender and the receiver of the communication are $Alice$ and $Bob$, then the protocol goes as follows:
+\begin{bracketenumerate}
+    \item $Alice$ and $Bob$ prepare an EPR state $|\beta_{00}\rangle_{q_1,q_2}$ together. Then they share the qubits, $Alice$ holding $q_1$ and $Bob$ holding $q_2$.
+    \item If $Alice$ wants to send value $x\in \{0,1,2,3\}$, she applies the corresponding Pauli operation $\sigma^{x}$ on her qubit $q_1$.
+    \item $Alice$ sends the qubit $q_1$ to $Bob$.
+    \item $Bob$ applies a controlled-not operation on $q_1,q_2$ and a Hadamard operation on $q_1$ to remove the entanglement.
+    \item $Bob$ measures $q_1$ and $q_2$ to get the value $x$.
+\end{bracketenumerate}
+After the execution of the protocol above, $Bob$ gets the value $x$ which $Alice$ wants to send. Considering $x$ could be presented in a two-bit string, the protocol exactly transmits two classical bits of information by sending one qubit from $Alice$ to $Bob$.
 \paragraph*{Implementation}
-We code the program of super-dense coding protocol in qCCS as follow:
+Now we design the program of super-dense coding protocol in qCCS as follows:
 \begin{flalign*}
     Alice \overset{def}{=}& \texttt{c}_{A}?q_1.\sum_{0\leq  i\leq 3}(\textbf{if}\ x=i\ \textbf{then}\ \sigma^{i}[q_1].\texttt{e}!q_1.\textbf{nil});\\
     Bob \overset{def}{=}& \texttt{c}_{B}?q_2.\texttt{e}?q_1.\mathcal{CN}[q_1,q_2].\mathcal{H}[q_1].M[q_1,q_2;x].d!x.\textbf{nil};\\
     EPR \overset{def}{=}& Set^{\Psi}[q_1,q_2].\texttt{c}_{B}!q_2.\texttt{e}_{A}!q_1.\textbf{nil};\\
     Sdc \overset{def}{=}& c?x.(Alice||Bob||EPR)\setminus \{\texttt{c}_{A},\texttt{c}_{B},\texttt{e}\}
 \end{flalign*}
-where $\mathcal{CN}$ is the controlled-not operation and $\mathcal{H}$ is the Hadamard operation, $Set^{\Psi}$ is the operation transforming all the inputs into a Bell state $|\beta_{00}\rangle$, its operation elements are $\{|\beta_{00}\rangle\langle 00|,|\beta_{00}\rangle\langle 01|,|\beta_{00}\rangle\langle 10|,|\beta_{00}\rangle\langle 11|\}$, and $\sigma^{i}$ are Pauli operators  $\sigma^{0}=I,\sigma^{1}=X,\sigma^{2}=Z,\sigma^{3}=Y$. The element set of measurement \textit{M} is $\{|00\rangle\langle 00|,|01\rangle\langle 01|,|10\rangle\langle 10|,|11\rangle\langle 11|\}$.
+where $\mathcal{CN}$ is the controlled-not operation and $\mathcal{H}$ is the Hadamard operation, $Set^{\Psi}$ is the operation transforming all the inputs into an EPR state $|\beta_{00}\rangle=(|00\rangle+|11\rangle)/\sqrt{2}$, its operation elements are $\{|\beta_{00}\rangle\langle 00|,|\beta_{00}\rangle\langle 01|,|\beta_{00}\rangle\langle 10|,|\beta_{00}\rangle\langle 11|\}$, and $\sigma^{i}$ are Pauli operators  $\sigma^{0}=I,\sigma^{1}=X,\sigma^{2}=Z,\sigma^{3}=Y$. The element set of measurement \textit{M} is $\{|00\rangle\langle 00|,|01\rangle\langle 01|,|10\rangle\langle 10|,|11\rangle\langle 11|\}$.
 \paragraph*{Specification}
 The specification of super-dense coding protocol can be defined as:
 \begin{flalign*}
@@ -748,8 +762,16 @@ And we adjust the specification as the program has a new branch, so it is define
     &\ +\ \textbf{if}\ \neg\bigvee_{0\leq  i\leq 3} x=i\  \textbf{then}\ Set^{\Psi}[q_1,q_2].d!x.\textbf{nil}).
 \end{flalign*}
 \subsection{Quantum Teleportation Protocol}
+Quantum teleportation~\cite{BB93} is one of the most important protocols in quantum information theory. It teleports an unknown quantum state by only sending  classical information, so it just requires a classical communications channel. It makes the use of the maximally entangled states that the post-measurement state can be known from the result of partial measurement for a set of entangled states. Let sender and receiver to be $Alice$ and $Bob$ as defined in super-dense coding example, the quantum teleportation protocol goes as follows:
+\begin{bracketenumerate}
+    \item $Alice$ and $Bob$ prepare an EPR state $|\beta_{00}\rangle_{q_2,q_3}$ together. Then they share the qubits, $Alice$ holding $q_2$ and $Bob$ holding $q_3$.
+    \item To transmit qubit $q_1$, $Alice$ applies a $\mathcal{CN}$ operation on $q_1$ and $q_2$ followed by a $\mathcal{H}$ operation on $q_1$.
+    \item $Alice$ measures $q_1$ and $q_2$ and sends the outcome $x$ to $Bob$.
+    \item $Bob$ applies corresponding $\sigma^{x}$ operation on his qubit $q_3$ to recover the original state of $q_1$.
+\end{bracketenumerate}
+After the execution, $Bob's$ qubit $q_3$ has the same state as the qubit $q_1$.
 \paragraph*{Implementation}
-The program of quantum teleportation protocol can be coded in qCCS as follow:
+The program of quantum teleportation protocol can be encoded in qCCS as follows:
 \begin{flalign*}
     Alice \overset{def}{=}& \texttt{c}_{A}?q2.\mathcal{CN}[q_1,q_2].\mathcal{H}[q_1].M[q_1,q_2;x].Set^{\Psi}[q_1,q_2].e!x.\textbf{nil};\\
     Bob \overset{def}{=}& \texttt{c}_{B}?q_3.e?x.\sum_{0\leq i\leq 3}(\textbf{if}\ x=i\ \textbf{then}\ \sigma^{i}[q3].\textbf{nil});\\
@@ -758,13 +780,35 @@ The program of quantum teleportation protocol can be coded in qCCS as follow:
 \end{flalign*}
 where the operators used are all already declared before. 
 \paragraph*{Specification}
-The specification of quantum teleportation protocol can also be described in qCCS. To show the soundness of $Tel$ it suffices to prove that $Tel$ is bisimilar to an swap operation between the first and the thrid qubits,  $\mathcal{SWAP}_{1,3}[q_1,q_3]$. The program can be coded as follow:
+The specification of quantum teleportation protocol can also be described in qCCS. To show the soundness of $Tel$, it suffices to prove that $Tel$ is bisimilar to an swap operation between the first and the thrid qubits, that is  $\mathcal{SWAP}_{1,3}[q_1,q_3]$. The program can be coded as follow:
 \begin{flalign*}
     Spec &\overset{def}{=} \tau^{13}.\mathcal{SWAP}[q_1,q_3].\textbf{nil}.
 \end{flalign*}
 \subsection{BB84 Quantum Key Distribution Protocol}
+BB84 is the first quantum key distribution protocol developed by Bennett and Brassard in
+1984~\cite{BB84}. It provides a provably secure way to create a private key between two partners with a classical authenticated channel and a quantum insecure
+channel between them. The protocol does not make the use of entangled states. It ensures its security through the basic property of quantum mechanics: if the states to be distinguished are not orthogonal, such as $|0\rangle$ and $|+\rangle$, then information gain about a quantum state is only
+possible at the expense of changing the state. Let sender and receiver to be $Alice$ and $Bob$ as defined in previous examples, the basic BB84 protocol with a sequence of qubits $\tilde{q}$ with size $n$ goes as follows:
+\begin{bracketenumerate}
+    \item $Alice$ randomly generates two sequences of bits $\tilde{B}_a$ and $\tilde{K}_a$ using her qubits $\tilde{q}$.
+    \item $Alice$ prepares the state of $\tilde{q}$, such that the \textit{i}th bits of $\tilde{q}$ is $|x_{y}\rangle$ where $x$ and $y$ are the \textit{i}th bits of $\tilde{B}_a$ and $\tilde{K}_a$, and respectively,  $|0_0\rangle=|0\rangle$, $|0_1\rangle=|1\rangle$, $|1_0\rangle=|+\rangle=(|0\rangle+|1\rangle)/\sqrt{2}$ and $|1_1\rangle=|-\rangle=(|0\rangle-|1\rangle)/\sqrt{2}$.
+    \item $Alice$ sends her qubits $\tilde{q}$ to $Bob$.
+    \item $Bob$ randomly generates a sequence of bits $\tilde{B}_b$ using his qubits $\tilde{q'}$.
+    \item $Bob$ measures the \textit{i}th qubit of $\tilde{q}$ he received from $Alice$ according to the basis determined by the \textit{i}th bit of $\tilde{B}_b$. Respectively, the basis is $\{|0\rangle,|1\rangle\}$ if it is $0$ and $\{|+\rangle,|-\rangle\}$ if it is $1$.
+    \item $Bob$ sends his choice of measurements $\tilde{B}_{b}$ to $Alice$, and after receiving the information, $Alice$ sends her $\tilde{B}_{a}$ to $Bob$.
+    \item $Alice$ and $Bob$ match two sequences of bits $\tilde{B}_{a}$ and $\tilde{B}_{b}$ to determine at which positions the bits are equal. If the bits match, they keep the corresponding bits of $\tilde{K}_a$ and $\tilde{K}_b$. Otherwise, they discard them.
+\end{bracketenumerate}
+After execution the basic BB84 protocol, the remaining bits of $\tilde{K}_a$ and $\tilde{K}_b$ should be the same, provided that the communication channels are prefect and there is no eavesdropper.
+
+Then we consider the case that there exists an eavesdropper called $Eve$ taking part in the communication. $Alice$ and $Bob$ also have more behaviours to detect $Eve$. In the BB84 protocol with eavesdropper, let $\tilde{K'}_a$ and $\tilde{K'}_b$ to be the remaining bits of $\tilde{K}_a$ and $\tilde{K}_b$ with size $k$, $Eve$, $Alice$ and $Bob$ proceed as follows:
+\begin{bracketenumerate}
+    \item $Alice$ randomly chooses $\lceil k/2\rceil$ bits of $\tilde{K'}_a$, denoted by $\tilde{K''}_a$ and sends it to $Bob$ together with the indexes of the chosen bits.
+    \item After receiving the information from $Alice$, $Bob$ chooses $\lceil k/2\rceil$ bits of $\tilde{K'}_b$ according to the indexes he received, denoted by $\tilde{K''}_b$ and sends it back to $Alice$.
+    \item $Alice$ and $Bob$ match two sequences of bits $\tilde{K''}_{a}$ and $\tilde{K''}_{b}$. If two sequences match, then they have not detected the eavesdropper and the remaining substring of $\tilde{K'}_{a}$ and $\tilde{K'}_{b}$ are used as the secure key. Otherwise, they detect $Eve$ and the protocol halts without generating any secure keys.
+\end{bracketenumerate}
+
 \paragraph*{Implementation}
-The program we coding only contains one qubit, it is enough to reflect all the cases could occur. The other qubits used here are auxiliary qubits for $Ran$ operation.
+The program we written here only contains one qubit instead of a sequence of qubits, however, it is enough to reflect all the cases could occur. The other qubits used here are auxiliary qubits for $Ran$ operation.
 \begin{flalign*}
     Alice \overset{def}{=}& Ran[q_1;B_{a}].Ran[q_1;K_{a}].Set_{K_{a}}[q_1].H_{B_{a}}[q_1].\texttt{A2B}!q_1.\\ 
     &\qquad\qquad\qquad b2a?B_{b}.a2b!B_{a}.key_{a}!cmp(K_{a},B_{a},B_{b}).\textbf{nil};\\
