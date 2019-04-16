@@ -162,8 +162,8 @@
 %\ccsdesc[100]{General and reference~General literature}
 %\ccsdesc[100]{General and reference}%TODO mandatory: Please choose ACM 2012 classifications from https://dl.acm.org/ccs/ccs_flat.cfm 
 
-\keywords{Quantum process algebra; bisimulation;
-verification; quantum communication protocols}%TODO mandatory; please add comma-separated list of keywords
+\keywords{Quantum process algebra, Bisimulation,
+Verification, Quantum communication protocols}%TODO mandatory; please add comma-separated list of keywords
 
 \category{}%optional, e.g. invited paper
 
@@ -634,11 +634,11 @@ And if in each call of \textbf{MatchAction}, it call \textbf{MactchDistribution}
 \end{proof}
 
 \section{Experimental Results}
-In this section, we report an implementation of our approach and provide several classical quantum communication protocols described in qCCS as the use cases for our experiment. We show that our approach is able to distinguish the bisimilarity, and we can make improvement by the result of the algorithm.
+In this section, we report an implementation of our approach and provide several classical quantum communication protocols in qCCS as the use cases for our experiment. We show that our approach is able to distinguish the bisimilarity, and several improvements can be made according to the result of the algorithm.
 \subsection{Implementation}
-Our tool is implemented in Python 3.7. Its workflow is illustrated in Fig.~\ref{fig:arch}. The input is a quantum program and its specification, both of them are described in qCCS. Execution of the tool yields a terminal output showing the details of the whole process, including the pLTS generation and the checking algorithm, and the result of the checking by a table mapping each pair of pLTS states to its most general boolean. The tool invokes Z3 solver to verify the most general boolean of the initial state pair. A counterexample will be given if the boolean can be unsatisfied.
+Our tool is implemented in Python 3.7. Its workflow is illustrated in Fig.~\ref{fig:arch}. The input of this tool is a quantum program and its specification described in qCCS. The parser for the qCCS program is also implemented by us using Python. Execution of the tool yields a terminal output showing the details of the whole process, including the pLTS generation and the checking algorithm, and the result of the checking by a table mapping each pair of pLTS states to its most general boolean. The tool invokes Z3 solver to verify the most general boolean of the initial state pair. A counterexample will be given if the boolean can be unsatisfied.
 \paragraph*{pLTS Generation}
-The tool inputs programs codes containing three parts,a description of process behaviors, an initialization of their variables and a set of user-defined quantum gates. Process behaviors are described in qCCS semantics. Processes are separated by semicolons. Quantum gates can be defined through a set of kraus operators, they are also separated by semicolons. The intermediate output of the module is the pLTS which will be used as the input of bisimilarity checking module.
+The tool inputs programs codes containing three parts,a description of process behaviors, an initialization of the variables and a set of user-defined quantum gates. Process behaviors are described using the notation of qCCS syntax, separated by semicolons. Quantum gates can be defined through a set of Kraus operators, they are also separated by semicolons. The intermediate output of the module is the pLTS which will be used as the input of bisimilarity checking module.
 \paragraph*{Bisimulation Checking}
 We implement the previously defined ground bisimlarity checking algorithm to verify the generated pLTSs. The input needs two pLTSs, one for protocol description and another for specification description. They are processed by the pLTS generation module. We start at the initial states of these two pLTSs. The result of the module is also the final result of the tool presenting whether these two pLTSs are bisimilar, always with a set preserving non-bisimilar state pairs.
 \begin{figure}
@@ -664,29 +664,29 @@ Another example brings a non-bisimilarity is on the sixth line of the table, the
 \centering
 \begin{tabular}{@{}m{0pt}@{}
                 >{\centering\arraybackslash}m{3cm}
-                |>{\centering\arraybackslash}m{1.5cm}
+                ||>{\centering\arraybackslash}m{1.5cm}
                 |>{\centering\arraybackslash}m{1cm}
+                |>{\centering\arraybackslash}m{0.8cm}
+                |>{\centering\arraybackslash}m{0.8cm}
                 |>{\centering\arraybackslash}m{1cm}
-                |>{\centering\arraybackslash}m{1cm}
-                |>{\centering\arraybackslash}m{1.5cm}
-                |>{\centering\arraybackslash}m{1cm}}
+                |>{\centering\arraybackslash}m{0.8cm}}
 \hline
-\rule{0pt}{5mm}&\textbf{Program} & \textbf{Variables} & \textbf{Bisim} & \textbf{MN} & \textbf{SN} & \textbf{Size of $N$} & \textbf{Sec} \\
+\rule{0pt}{5mm}&\textbf{Program} & \textbf{Variables} & \textbf{Bisim} & \textbf{MN} & \textbf{SN} & \textbf{$N$} & \textbf{Sec} \\
 \hline
 \hline
-\rule{0pt}{12mm}&Super-dense coding 1 & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$\\$x=1$} & Yes & & & 0 & 2.2 \\
+\rule{0pt}{12mm}&Super-dense coding 1 & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$\\$x=1$} & Yes & 15 & 15 & 0 & 2.2 \\
 \hline
-\rule{0pt}{12mm}&Super-dense coding 2 & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$\\$x=5$} & No & & & - & 2.2 \\
+\rule{0pt}{12mm}&Super-dense coding 2 & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$\\$x=5$} & No & 5 & 12 & - & 2.2 \\
 \hline
-\rule{0pt}{12mm}&Super-dense coding (modified) & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$\\$x=5$} & Yes & & & 0 & 2.5 \\
+\rule{0pt}{12mm}&Super-dense coding (modified) & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$\\$x=5$} & Yes & 15 & 15 & 0 & 2.5 \\
 \hline
-\rule{0pt}{12mm}&Teleportation & \tabincell{c}{$q1=|1\rangle$\\$q2=|0\rangle$\\$q3=|0\rangle$} & Yes & & & 0 & 2.7 \\
+\rule{0pt}{12mm}&Teleportation & \tabincell{c}{$q1=|1\rangle$\\$q2=|0\rangle$\\$q3=|0\rangle$} & Yes & 33 & 15 & 0 & 2.7 \\
 \hline
-\rule{0pt}{10mm}&BB84 & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$} & Yes & & & 304 & 4.7 \\
+\rule{0pt}{10mm}&BB84 & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$} & Yes & 151 & 131 & 304 & 4.7 \\
 \hline
-\rule{0pt}{12mm}&BB84 (with eavesdropper) & \tabincell{c}{$q1=|0\rangle$\\ $q2=|0\rangle$\\$q3=|0\rangle$} & No & & & - & 74.6 \\
+\rule{0pt}{12mm}&BB84 (with eavesdropper) & \tabincell{c}{$q1=|0\rangle$\\ $q2=|0\rangle$\\$q3=|0\rangle$} & No & 1243 & 763 & - & 74.6 \\
 \hline
-\rule{0pt}{12mm}&BB84 (with eavesdropper \& modified) & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$\\$q3=|0\rangle$} & Yes & & & 17272 & 1834 \\
+\rule{0pt}{12mm}&BB84 (with eavesdropper \& modified) & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$\\$q3=|0\rangle$} & Yes & 1179 & 779 & 17272 & 1834 \\
 \hline
 \end{tabular}
 \vspace{1em}
@@ -694,9 +694,7 @@ Another example brings a non-bisimilarity is on the sixth line of the table, the
 \end{table}
 
 \section{Conclusion and Future Works}
-In this paper, we have presented an on-the-fly algorithm verifying strong ground bisimulation for quantum programs in qCCS. Furthermore, we have developed a tool for bisimilarity checking basing on the algorithm. To show its performance, we further made experiments on several quantum communication protocols such as BB84. 
-% The result shows that the algorithm can figure out the non-bisimilarity and help us make improvement on the program. As an illustration, in verifying super-dense coding protocol, we found that the program we coded missed the case that an unexpected input value is given. Furthermore, we ensured that the program after modifying fulfills all the cases.
-The experimental results have showed the algorithm is able to give hints for two kinds of improvement: (1) supplementing the missing cases of the programs; (2) adjusting the parallel behaviours.
+In this paper we have presented an on-the-fly algorithm verifying strong ground bisimulation for quantum programs in qCCS. And then we have developed a tool for bisimilarity checking basing on the algorithm. The input is encoded with the notation of qCCS, which enables us to translate the program to corresponding finite pLTS depending on its operational semantics. We proved our algorithm terminates on checking two finite tree-structural pLTSs and figures out the bisimilarity. To show its performance, we further made experiments on several quantum communication protocols such as BB84. The experimental results have showed the algorithm is able to provide hints for two kinds of improvement: (1) supplementing the missing cases of the programs; (2) adjusting how the parallel behaviours collaborate with each other.
 
 There are still many questions remaining for further study.Firstly, the bisimulation checking may not only several possible inputs which we can enumerate all of them in a short time. One of the solution of that is to introduce the idea of symbolic bisimulation proposed in~\cite{FDY14}. Symbolic bisimulation uses an accumulation of the super-operators instead of a density operator to present the state which allows us to verify the programs with arbitrary inputs. However, the normalizing operation is also unavailable without the density operator, so it becomes a challenge.
 
