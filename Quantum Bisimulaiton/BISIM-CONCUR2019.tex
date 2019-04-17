@@ -698,15 +698,41 @@ After the execution, $Bob's$ qubit $q_3$ has the same state as the qubit $q_1$.
 The program of quantum teleportation protocol can be encoded in qCCS as follows:
 \begin{flalign*}
     Alice \overset{def}{=}& \underline{c}_{A}?q2.\mathcal{CN}[q_1,q_2].\mathcal{H}[q_1].M[q_1,q_2;x].Set^{\Psi}[q_1,q_2].e!x.\textbf{nil};\\
-    Bob \overset{def}{=}& \underline{c}_{B}?q_3.e?x.\sum_{0\leq i\leq 3}(\textbf{if}\ x=i\ \textbf{then}\ \sigma^{i}[q3].\textbf{nil});\\
+    Bob \overset{def}{=}& \underline{c}_{B}?q_3.e?x.\sum_{0\leq i\leq 3}(\textbf{if}\ x=i\ \textbf{then}\ \sigma^{i}[q_3].\textbf{nil});\\
     EPR \overset{def}{=}& Set^{\Psi}[q_1,q_2].\underline{c}_{A}!q_2.\underline{c}_{B}!q_3.\textbf{nil};\\
     Tel \overset{def}{=}& (Alice||Bob||EPR)\setminus \{\underline{c}_{A},\underline{c}_{B},e\}
 \end{flalign*}
 where the operators used are all already declared before. 
 \subparagraph*{Specification.}
-The specification of quantum teleportation protocol can also be described in qCCS. To show the soundness of $Tel$, it suffices to prove that $Tel$ is bisimilar to an swap operation between the first and the thrid qubits, that is  $\mathcal{SWAP}_{1,3}[q_1,q_3]$. The program can be coded as follow:
+The specification of quantum teleportation protocol can also be described in qCCS. To show the soundness of $Tel$, it suffices to prove that $Tel$ is bisimilar to an swap operation between the first and the thrid qubits, that is $\mathcal{SWAP}_{1,3}[q_1,q_3]$. The program can be encoded as follow:
 \begin{flalign*}
     Spec &\overset{def}{=} \tau^{13}.\mathcal{SWAP}[q_1,q_3].\textbf{nil}.
+\end{flalign*}
+\subsection{Quantum Secret Sharing Protocol}
+Quantum Secret Sharing Protocol is first developed by Hillery et al.~\cite{hillery1999quantum}. The problem involves an agent $Alice$ sending information to other two agents $Bob$ and $Charlie$ one of whom is dishonest. It is a classical method which is known as secret sharing that $Alice$ split the information into two parts, then $Bob$ and $Charlie$ need collaboration to get the complete information. It lets the honest one keep the dishonest one from doing damage. A quantum version of it can be realized by a three-qubit maximally entangled state called GHZ state, which has similar property as EPR state. The protocol goes as follows:
+\begin{bracketenumerate}
+    \item $Alice$, $Bob$ and $Charlie$ prepare an GHZ state $(|000\rangle+|111\rangle)/\sqrt{2}_{q_2,q_3,q_4}$ together prior to the following execution. Then they share the qubits, $Alice$ holding $q_2$, $Bob$ holding $q_3$ and $Charlie$ holding $q_4$.
+    \item $Alice$ entangles $q_1$ and $q_2$ applying a $\mathcal{CN}$ operation followed by a $\mathcal{H}$ operation on $q_1$.
+    \item $Alice$ measures $q_1$ and $q_2$ separately and sends the outcomes $m$ and $n$ to $Charlie$.
+    \item $Bob$ also measures $q_3$ and sends the outcome $o$ to $Charlie$.
+    \item Upon receiving the bits $m$, $n$ and $o$, $Charlie$ retrieves the state through applying Pauli operations $\mathcal{X}$ or $\mathcal{Z}$ on $q_4$ according to the value of these bits.
+\end{bracketenumerate}
+After the execution, $Charlie's$ qubit $q_4$ has the same state as the qubit $q_1$.
+\subparagraph*{Implementation.}
+The program of quantum teleportation protocol can be encoded in qCCS as follows:
+\begin{flalign*}
+    Alice \overset{def}{=}& \underline{c}_{A}?q2.\mathcal{CN}[q_1,q_2].\mathcal{H}[q_1].M[q_1;m].M[q_2;n].e!m.f!n.\textbf{nil};\\
+    Bob \overset{def}{=}& \underline{c}_{B}?q_3.\mathcal{H}[q_2].M[q_2;o].g!o.\textbf{nil});\\
+    Charlie \overset{def}{=}& \underline{c}_{C}?q_4.e?m.f?n.g?o.\\
+    &\textbf{if}\ o=1\ \textbf{then}\ \mathcal{Z}[q_4].\textbf{if}\ m=1\ \textbf{then}\ \mathcal{X}[q_4].\textbf{if}\ n=1\ \textbf{then}\ \mathcal{Z}[q_4].\textbf{nil});\\
+    GHZ \overset{def}{=}& Set^{GHZ}[q_2,q_3,q_4].\underline{c}_{A}!q_2.\underline{c}_{B}!q_3.\underline{c}_{C}!q_4.\textbf{nil};\\
+    QSS \overset{def}{=}& (Alice||Bob||Charlie||GHZ)\setminus \{\underline{c}_{A},\underline{c}_{B},\underline{c}_{C},e,f,g\}
+\end{flalign*}
+where the operators used are all already declared before except that $Set^{GHZ}$ is the operation transforming all the inputs into an GHZ state which is similar with $Set^{\Psi}$.
+\subparagraph*{Specification.}
+To show its soundness, we prove that $QSS$ is bisimilar to an swap operation between the first and the fouth qubits, that is $\mathcal{SWAP}_{1,4}[q_1,q_4]$. The program can be encoded as follow:
+\begin{flalign*}
+    Spec &\overset{def}{=} \tau^{24}.\mathcal{SWAP}[q_1,q_4].\textbf{nil}.
 \end{flalign*}
 \subsection{BB84 Quantum Key Distribution Protocol}
 BB84 is the first quantum key distribution protocol developed by Bennett and Brassard in
