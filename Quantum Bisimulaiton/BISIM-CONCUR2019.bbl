@@ -1,0 +1,88 @@
+\begin{thebibliography}{10}
+
+\bibitem{DBLP:journals/tocl/Ardeshir-Larijani18}
+Ebrahim Ardeshir{-}Larijani, Simon~J. Gay, and Rajagopal Nagarajan.
+\newblock Automated equivalence checking of concurrent quantum systems.
+\newblock {\em {ACM} Trans. Comput. Log.}, 19(4):28:1--28:32, 2018.
+\newblock URL: \url{https://dl.acm.org/citation.cfm?id=3231597}.
+
+\bibitem{BB84}
+C.~H. Bennett and G.~Brassard.
+\newblock Quantum cryptography: Public-key distribution and coin tossing.
+\newblock In {\em Proceedings of the IEEE International Conference on Computer,
+  Systems and Signal Processing}, pages 175--179, 1984.
+
+\bibitem{BB93}
+C.H. Bennett, G.~Brassard, C.~Crepeau, R.~Jozsa, A.~Peres, and W.~Wootters.
+\newblock Teleporting an unknown quantum state via dual classical and {EPR}
+  channels.
+\newblock {\em Physical Review Letters}, 70:1895--1899, 1993.
+
+\bibitem{BW92}
+C.H. Bennett and S.J. Wiesner.
+\newblock Communication via one- and two-particle operators on
+  {E}instein-{P}odolsky-{R}osen states.
+\newblock {\em Physical Review Letters}, 69(20):2881--2884, 1992.
+
+\bibitem{DGHM09}
+Y.~Deng, R.~van Glabbeek, M.~Hennessy, and C.~Morgan.
+\newblock Testing finitary probabilistic processes (extended abstract).
+\newblock In {\em Proc. CONCUR'09}, volume 5710 of {\em LNCS}, pages 274--288.
+  Springer, 2009.
+
+\bibitem{DD11}
+Yuxin Deng and Wenjie Du.
+\newblock Logical, metric, and algorithmic characterisations of probabilistic
+  bisimulation.
+\newblock Technical Report CMU-CS-11-110, Carnegie Mellon University, March
+  2011.
+
+\bibitem{DF12}
+Yuxin Deng and Yuan Feng.
+\newblock Open bisimulation for quantum processes.
+\newblock In {\em Proceedings of the 7th IFIP International Conference on
+  Theoretical Computer Science}, volume 7604 of {\em Lecture Notes in Computer
+  Science}, pages 119--133. Springer, 2012.
+
+\bibitem{FDJY07}
+Y.~Feng, R.~Duan, Z.~Ji, and M.~Ying.
+\newblock Probabilistic bisimulations for quantum processes.
+\newblock {\em Information and Computation}, 205(11):1608--1639, 2007.
+
+\bibitem{FDY14}
+Yuan Feng, Yuxin Deng, and Mingsheng Ying.
+\newblock Symbolic bisimulation for quantum processes.
+\newblock {\em ACM Transactions on Computational Logic}, 15(2):1--32, 2014.
+
+\bibitem{FDY11}
+Yuan Feng, Runyao Duan, and Mingsheng Ying.
+\newblock Bisimulation for quantum processes.
+\newblock In {\em Proc. POPL'11}, pages 523--534. ACM, 2011.
+
+\bibitem{DBLP:journals/jcss/FengYY13}
+Yuan Feng, Nengkun Yu, and Mingsheng Ying.
+\newblock Model checking quantum markov chains.
+\newblock {\em J. Comput. Syst. Sci.}, 79(7):1181--1198, 2013.
+\newblock URL: \url{https://doi.org/10.1016/j.jcss.2013.04.002}, \href
+  {http://dx.doi.org/10.1016/j.jcss.2013.04.002}
+  {\path{doi:10.1016/j.jcss.2013.04.002}}.
+
+\bibitem{DBLP:journals/tcs/HennessyL95}
+Matthew Hennessy and Huimin Lin.
+\newblock Symbolic bisimulations.
+\newblock {\em Theor. Comput. Sci.}, 138(2):353--389, 1995.
+\newblock URL: \url{https://doi.org/10.1016/0304-3975(94)00172-F}, \href
+  {http://dx.doi.org/10.1016/0304-3975(94)00172-F}
+  {\path{doi:10.1016/0304-3975(94)00172-F}}.
+
+\bibitem{ccs}
+R.~Milner.
+\newblock {\em Communication and Concurrency}.
+\newblock Prentice-Hall, 1989.
+
+\bibitem{YFDJ09}
+M.~Ying, Y.~Feng, R.~Duan, and Z.~Ji.
+\newblock An algebra of quantum processes.
+\newblock {\em ACM Transactions on Computational Logic}, 10(3):1--36, 2009.
+
+\end{thebibliography}

@@ -1,0 +1,59 @@
+This is BibTeX, Version 0.99d (TeX Live 2016)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: BISIM-CONCUR2019.aux
+The style file: plainurl.bst
+Illegal, another \bibstyle command---line 72 of file BISIM-CONCUR2019.aux
+ : \bibstyle
+ :          {abbrv}
+I'm skipping whatever remains of this command
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+Reallocated global_strs (elt_size=20001) to 20 items from 10.
+Reallocated glb_str_end (elt_size=4) to 20 items from 10.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Database file #1: ref.bib
+Repeated entry---line 30 of file ref.bib
+ : @misc{DF12
+ :           ,
+I'm skipping whatever remains of this entry
+You've used 14 entries,
+            2849 wiz_defined-function locations,
+            729 strings with 7418 characters,
+and the built_in function-call counts, 7091 in all, are:
+= -- 739
+> -- 268
+< -- 7
++ -- 97
+- -- 82
+* -- 426
+:= -- 1024
+add.period$ -- 48
+call.type$ -- 14
+change.case$ -- 82
+chr.to.int$ -- 0
+cite$ -- 14
+duplicate$ -- 209
+empty$ -- 643
+format.name$ -- 82
+if$ -- 1812
+int.to.chr$ -- 0
+int.to.str$ -- 14
+missing$ -- 14
+newline$ -- 76
+num.names$ -- 28
+pop$ -- 133
+preamble$ -- 1
+purify$ -- 69
+quote$ -- 0
+skip$ -- 477
+stack$ -- 0
+substring$ -- 378
+swap$ -- 62
+text.length$ -- 7
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 54
+warning$ -- 0
+while$ -- 47
+width$ -- 16
+write$ -- 168
+(There were 2 error messages)

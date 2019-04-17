@@ -217,8 +217,6 @@ Checker) to verify the correctness of quantum protocols in exponential time, ran
 
 Besides bisimulation, model-checking is another feasible approach verifying the correctness of quantum programs. As an illustration, Feng et al.~\cite{DBLP:journals/jcss/FengYY13} proposed an quantum extension of PCTL and developed a quantum model-checking algorithm basing on the quantum Markov Chains. The algorithm is used for model-checking the correctness of the basic BB84 protocol as a demonstration.
 
-\subparagraph*{Contributions.} 
-
 \section{Preliminaries}
 \label{sec:plts}
 We review the model of probabilistic labelled
@@ -567,8 +565,9 @@ We implement the previously defined ground bisimlarity checking algorithm to ver
 \label{fig:arch}
 \end{figure}
 \subsection{Examples: Quantum Communication Protocols}
-\subparagraph*{Super-dense Coding Protocol.} There are two roles $Alice$ and $Bob$. To simplify the experiment, we only consider the smallest case of the protocol, sending only one qubit. So there is totally one entanglement on two qubits in this example. Besides the Clifford operators, we use a quantum operation $Set^{\Psi}$ to present the generation of EPR state instead of the combination of the quantum gates. The operation elements of $Set^{\Psi}$ is $\{|\beta_{00}\rangle\langle00|,|\beta_{00}\rangle\langle01|,|\beta_{00}\rangle\langle10|,|\beta_{00}\rangle\langle11|\}$. The measurement is according to the computational basis $\{|00\rangle,|01\rangle,|10\rangle,|11\rangle\}$. The specification of the super-dense protocol is defined as $Bob$ sets the 2-qubit variable to the value according to the classical value he received from $Alice$.
+\subparagraph*{Super-dense Coding Protocol.} There are two roles $Alice$ and $Bob$. To simplify the experiment, we only consider the smallest case of the protocol, sending only one qubit. So there is totally one entanglement on two qubits in this example. Besides the Clifford operators, we use a quantum operation $Set^{\Psi}$ to present the generation of EPR state instead of using a combination of the quantum gates. The operation elements of $Set^{\Psi}$ is $\{|\beta_{00}\rangle\langle00|,|\beta_{00}\rangle\langle01|,|\beta_{00}\rangle\langle10|,|\beta_{00}\rangle\langle11|\}$. The measurement is according to the computational basis $\{|00\rangle,|01\rangle,|10\rangle,|11\rangle\}$. The specification of the super-dense protocol is defined as $Bob$ sets the 2-qubit variable to the value according to the classical value he received from $Alice$.
 \subparagraph*{Quantum Teleportation Protocol.} In this example, there are still two roles. The operators we used here is similar with the last example containing Clifford operators, $Set^{\Psi}$ and the measurement according to the computational basis. However, we need one more entanglement and one more qubit even if we just consider the smallest case. As there are more than one entanglements between these qubits, although the measurement is just applied on a part of them, it may also affect the rest qubits. We consider the final result of this protocol is presented on the third qubit, $Bob's$ qubit. It should become the same value of the first qubit. So the specification of that can be presented by applying a \textit{SWAP} operation between the first and the third qubit.
+\subparagraph*{Quantum Secret Sharing.} In this example, there are three roles. The operators used here are almost the operators we have used in teleportation protocol except that we use a quantum operation $Set^{GHZ}$ to present the generation of 3-qubit maximally entangled states. This example is closed to the teleportation example, the difference is that it makes four qubits entangled together. So its specification becomes applying a \textit{SWAP} operation between the first and the fourth qubit.
 \subparagraph*{BB84 Quantum Key Distribution Protocol.} In BB84 protocol, there is no entanglement at all, its method needs generating qubits on different basis and using different measurement method without any contacts in advance with the other side. If someone tries intercepting the information, the qubits might be measured in wrong basis, it brings a possibility that $Alice$ and $Bob$ can be aware of the attack. So the protocol uses one more kind of measurement which is according to the diagonal basis $\{|+\rangle,|-\rangle\}$. In common use case, BB84 will send a sequence of the qubits while qubits will not influence each other. We consider two kinds of result of the communication. First case is that $Alice$ and $Bob$ choose the same measurement then the results they get are also the same. Another case is that they choose different measurements then the result is discarded at this time. In the specification, we get results from the same sequence instead of two result sequence separately. Considering results from both sides is always the same, this operation will not bring any difference.
 \subparagraph*{BB84 Protocol with an Eavesdropper.} This example is an extension of the BB84 example, supposing there is an eavesdropper attending into the communication. There have three roles and the new role $Eve$ also randomly choose the measurement just as what $Alice$ and $Bob$ do. The specification is also similar with the one without an eavesdropper. It is possible that the eavesdropper will be recognized. It is a new result of the program. We conclude these results into three messages: emitting through the channel $alarm$ as the measurement methods are not matched; emitting through the channel $fail$ as the measurement methods are matched while the eavesdropping is recognized; normal emitting as the communication finished without recognizing the eavesdropper.
 \subsection{Experimental Results}
@@ -595,17 +594,23 @@ Another example brings a non-bisimilarity is on the second line from the bottom,
 \rule{0pt}{5mm}&\textbf{Program} & \textbf{Variables} & \textbf{Bisim} & \textbf{MN} & \textbf{SN} & \textbf{$N$} & \textbf{Sec} \\
 \hline
 \hline
-\rule{0pt}{12mm}&Super-dense coding 1 & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$\\$x=1$} & Yes & 15 & 15 & 0 & 2.2 \\
+\rule{0pt}{12mm}&Super-dense coding 1 & \tabincell{c}{$q_1=|0\rangle$\\$q_2=|0\rangle$\\$x=1$} & Yes & 15 & 15 & 0 & 2.2 \\
 \hline
-\rule{0pt}{12mm}&Super-dense coding 2 & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$\\$x=5$} & No & 5 & 12 & - & 2.2 \\
+\rule{0pt}{12mm}&Super-dense coding 2 & \tabincell{c}{$q_1=|0\rangle$\\$q_2=|0\rangle$\\$x=5$} & No & 5 & 12 & - & 2.2 \\
 \hline
-\rule{0pt}{12mm}&Super-dense coding (modified) & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$\\$x=5$} & Yes & 15 & 15 & 0 & 2.5 \\
+\rule{0pt}{12mm}&Super-dense coding (modified) & \tabincell{c}{$q_1=|0\rangle$\\$q_2=|0\rangle$\\$x=5$} & Yes & 15 & 15 & 0 & 2.5 \\
 \hline
-\rule{0pt}{12mm}&Teleportation 1 & \tabincell{c}{$q1=|1\rangle$\\$q2=|0\rangle$\\$q3=|0\rangle$} & Yes & 33 & 15 & 0 & 2.2 \\
+\rule{0pt}{12mm}&Teleportation 1 & \tabincell{c}{$q_1=|1\rangle$\\$q_2=|0\rangle$\\$q_3=|0\rangle$} & Yes & 33 & 15 & 0 & 2.2 \\
 \hline
-\rule{0pt}{15mm}&Teleportation 2 & \tabincell{c}{$q1=\frac{1}{\sqrt{2}}|0\rangle+\frac{1}{\sqrt{2}}|1\rangle$\\$q2=|0\rangle$\\$q3=|0\rangle$} & Yes & 33 & 15 & 0 & 2.2 \\
+\rule{0pt}{12mm}&Teleportation 2 & \tabincell{c}{$q_1=\frac{1}{\sqrt{2}}|0\rangle+\frac{1}{\sqrt{2}}|1\rangle$\\$q_2=|0\rangle$\\$q_3=|0\rangle$} & Yes & 33 & 15 & 0 & 2.2 \\
 \hline
-\rule{0pt}{15mm}&Teleportation 3 & \tabincell{c}{$q1=\frac{\sqrt{3}}{2}|0\rangle+\frac{1}{2}|1\rangle$\\$q2=|0\rangle$\\$q3=|0\rangle$} & Yes & 33 & 15 & 0 & 2.2 \\
+\rule{0pt}{12mm}&Teleportation 3 & \tabincell{c}{$q_1=\frac{\sqrt{3}}{2}|0\rangle+\frac{1}{2}|1\rangle$\\$q_2=|0\rangle$\\$q_3=|0\rangle$} & Yes & 33 & 15 & 0 & 2.2 \\
+\hline
+\rule{0pt}{15mm}&Secret Sharing 1 & \tabincell{c}{$q_1=|1\rangle$\\$q_2=|0\rangle$\\$q_3=|0\rangle$\\$q_4=|0\rangle$} & Yes & 102 & 26 & 0 & 2.6 \\
+\hline
+\rule{0pt}{15mm}&Secret Sharing 2 & \tabincell{c}{$q_1=\frac{1}{\sqrt{2}}|0\rangle+\frac{1}{\sqrt{2}}|1\rangle$\\$q_2=|0\rangle$\\$q_3=|0\rangle$\\$q_4=|0\rangle$} & Yes & 102 & 26 & 0 & 2.5 \\
+\hline
+\rule{0pt}{15mm}&Secret Sharing 3 & \tabincell{c}{$q_1=\frac{\sqrt{3}}{2}|0\rangle+\frac{1}{2}|1\rangle$\\$q_2=|0\rangle$\\$q_3=|0\rangle$\\$q_4=|0\rangle$} & Yes & 102 & 26 & 0 & 2.5 \\
 \hline
 \rule{0pt}{10mm}&BB84 & \tabincell{c}{$q1=|0\rangle$\\$q2=|0\rangle$} & Yes & 151 & 131 & 304 & 4.7 \\
 \hline
@@ -659,7 +664,7 @@ Now we design the program of super-dense coding protocol in qCCS as follows:
     EPR \overset{def}{=}& Set^{\Psi}[q_1,q_2].\underline{c}_{B}!q_2.\underline{e}_{A}!q_1.\textbf{nil};\\
     Sdc \overset{def}{=}& c?x.(Alice||Bob||EPR)\setminus \{\underline{c}_{A},\underline{c}_{B},\underline{e}\}
 \end{flalign*}
-where $\mathcal{CN}$ is the controlled-not operation and $\mathcal{H}$ is the Hadamard operation, $Set^{\Psi}$ is the operation transforming all the inputs into an EPR state $|\beta_{00}\rangle=(|00\rangle+|11\rangle)/\sqrt{2}$, its operation elements are $\{|\beta_{00}\rangle\langle 00|,|\beta_{00}\rangle\langle 01|,|\beta_{00}\rangle\langle 10|,|\beta_{00}\rangle\langle 11|\}$, and $\sigma^{i}$ are Pauli operators  $\sigma^{0}=I,\sigma^{1}=X,\sigma^{2}=Z,\sigma^{3}=Y$. The element set of measurement \textit{M} is $\{|00\rangle\langle 00|,|01\rangle\langle 01|,|10\rangle\langle 10|,|11\rangle\langle 11|\}$.
+where $\mathcal{CN}$ is the controlled-not operation and $\mathcal{H}$ is the Hadamard operation, $Set^{\Psi}$ is the operation transforming all the inputs into an EPR state $|\beta_{00}\rangle=(|00\rangle+|11\rangle)/\sqrt{2}$, its operation elements are $\{|\beta_{00}\rangle\langle 00|,|\beta_{00}\rangle\langle 01|,|\beta_{00}\rangle\langle 10|,|\beta_{00}\rangle\langle 11|\}$, and $\sigma^{i}$ are Pauli operators where $\sigma^{0}=I,\sigma^{1}=X,\sigma^{2}=Z,\sigma^{3}=Y$. The element set of measurement \textit{M} is $\{|00\rangle\langle 00|,|01\rangle\langle 01|,|10\rangle\langle 10|,|11\rangle\langle 11|\}$.
 \subparagraph*{Specification.}
 The specification of super-dense coding protocol can be defined as:
 \begin{flalign*}
