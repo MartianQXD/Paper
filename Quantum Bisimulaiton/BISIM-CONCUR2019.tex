@@ -207,9 +207,20 @@ One important application of quantum process algebras is to formally verify quan
 
 \section{Introduction}
 \label{sec:introduction}
+Process algebras provide a useful formal method for specifying and verifying concurrent systems. Their extensions to the quantum setting have also appeared in the literature. For example, Jorrand and Lalire \cite{JL04,La06} defined the \emph{Quantum Process Algebra} (QPAlg) and presented a branching bisimulation to identify quantum processes with the same branching structure. Gay and Nagarajan~\cite{GN05}  developed \emph{Communicating Quantum Processes} (CQP), for which Davidson~\cite{Da11} established a bisimulation congruence.
+Feng et al. \cite{FDJY07} have proposed a quantum variant of  Milner's CCS \cite{ccs}, called qCCS, and a notion of probabilistic bisimulation for quantum processes, which is then improved to be a general notion of bisimulation that enjoys a congruence property \cite{FDY11}. Later on, motivated by~\cite{San96}, Deng and Feng~\cite{DF12} defined an open bisimulation for quantum processes that makes it possible to separate ground bisimulation and the closedness under super-operator applications, thus providing not only a neater and simpler definition, but also a new technique for proving bisimilarity.
+In order to avoid the problem of instantiating quantum variables by potentially infinitely many quantum states, Feng et al. \cite{FDY14} extended the idea of symbolic bisimulation~\cite{HL95} for value-passing CCS and provided a 
+ symbolic version of open bisimulation for qCCS. They also proposed an algorithm for checking symbolic ground bisimulation.
+ Kubota et al. \cite{KKKKS16}  implemented a software tool to decide bisimilarity of
+qCCS configurations, and used it to check the security of BB84 quantum key distribution protocol~\cite{BB84}.
 
+In the current work, we consider the ground bisimulation proposed in \cite{DF12}. We put forward an on-the-fly algorithm to check if two given processes in qCCS with fixed initial quantum states are ground bisimilar. The algorithm is simpler than the one in \cite{FDY14} because the initial quantum states are determined for the former but can be parametric for the latter. Therefore, it is easier to implement. Moreover, in many applications, we are only interested in the correctness of a quantum protocol with a predetermined input of quantum states. This is especially the case in the design stage of a protocol or in the debugging of a program. 
 
-\subparagraph*{Related Works.} 
+The new algorithm is obtained by adapting the on-the-fly algorithm for checking probabilistic bisimulations \cite{Deng15}, which in turn has its root in similar algorithms
+for checking classical bisimulations \cite{FM90,HL95}. The basic idea is as follows. A quantum process with an initial quantum state forms a configuration. We describe the operational behavour of a configuration as a probabilistic labelled transition system (pLTS), where probabilistic transitions arise naturally because measuring a quantum system can entail a probability distribution of post-measurement quantum systems. The notion of ground bisimulation is a strengthening of probabilistic bisimulation by imposing some constraints on quantum variables and the environment states of processes. Therefore, the skeleton of the algorithm for quantum ground bisimulation resembles to that for probabilistic bisimulaiton.
+We have developed a tool that can check if two given configurations are ground bisimilar. It is useful to validate whether the specification of a protocol is equivalent to an implementation. We have conducted experiments on a few interesting quantum protocols including super-dense coding, teleportation, secret sharing, and the BB84 protocol.
+
+\subparagraph*{Other related Work} 
 The work closest to ours is \cite{DBLP:journals/tocl/Ardeshir-Larijani18}, where Ardeshir-Larijani et al.
 have proposed a quantum variant of CCS \cite{ccs}  to describe quantum protocols. The syntax of that variant is similar to qCCS but its semantics is very different. The behaviour of a concurrent process is a finite tree and an interleaving is a path from the root to a leaf. By interpreting an interleaving as a superoperator \cite{Sel04}, the semantics of a process is a set of superoperators. The equivalence checking between two processes boils down to the equivalence checking between superoperators, which is accomplished by using the stabilizer simulation algorithm given by Aaronson and Gottesman \cite{AG04}. Ardeshir-Larijani et al. have implemented their approach in an equivalence checker in Java and verified several quantum protocols from teleportation to secret sharing. 
 However, they are not able to handle the BB84 quantum key distribution protocol because its correctness cannot be specified as an equivalence between interleavings.
@@ -217,7 +228,7 @@ Our approach is based on ground bisimulation and keeps all the branching behavio
 
 
 
-Besides equivalence checking, based on either superoperators or bisimulations as mentioned above, model-checking is another feasible approach to verify the correctness of quantum programs. For instance, Feng et al.~\cite{FYY13} have proposed an quantum extension of PCTL and developed a quantum model-checking algorithm for quantum Markov Chains. The algorithm is used for model-checking the correctness of the basic BB84 protocol as a demonstration.
+Besides equivalence checking, based on either superoperators or bisimulations as mentioned above, model-checking is another feasible approach to verify the correctness of quantum programs. For instance, Feng et al.~\cite{FYY13} have proposed an quantum extension of PCTL \cite{HJ94} and developed a quantum model-checking algorithm for quantum Markov Chains. The algorithm is used for model-checking the correctness of the basic BB84 protocol.
 
 \section{Preliminaries}
 \label{sec:plts}
