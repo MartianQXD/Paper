@@ -29,6 +29,7 @@
 \usepackage{epstopdf}
 % New definitions
 
+\def\leaveout#1{}
 \def\>{\ensuremath{\rangle}}
 \def\<{\ensuremath{\langle}}
 \def\h{\ensuremath{\mathcal{H}}}
@@ -267,7 +268,11 @@ $\Delta=\sum_{i\in I}p_i\cdot\Delta_i$ with $\sum_{i\in I}p_i=1$.
 
 Let $\aRel\ \subseteq S \times S$ be a relation between states. It induces a special relation $\hat{\aRel}\subseteq S\times\dist{S}$ between states and distributions by letting
 $\hat{\aRel} \define \sset{(s,\pdist{t})\mid s\aRel t}.$
-Then we can use Definition~\ref{def:lift} to lift $\hat{\aRel}$ to be a relation $\lift{(\hat{\aRel})}$ between distributions. For simplicity, we combine the above two lifting operations and directly write $\lift{\aRel}$ for $\lift{(\hat{\aRel})}$ in the sequel, with the intention that a relation between states can be lifted to a relation between distributions via a special application of Definition~\ref{def:lift}. In this particular case, it holds that $\Delta \lift{\aRel} \Theta$ implies $\Theta \lift{(\aRel^{-1})}\Delta$, where $s \aRel t$ iff $t\aRel^{-1} s$ for any $s,t\in S$. This way of lifting relations has elegant mathematical characterisations; see \cite{DD11} for more details.
+Then we can use Definition~\ref{def:lift} to lift $\hat{\aRel}$ to be a relation $\lift{(\hat{\aRel})}$ between distributions. For simplicity, we combine the above two lifting operations and directly write $\lift{\aRel}$ for $\lift{(\hat{\aRel})}$ in the sequel, with the intention that a relation between states can be lifted to a relation between distributions via a special application of Definition~\ref{def:lift}. In this particular case, it holds that $\Delta \lift{\aRel} \Theta$ implies $\Theta \lift{(\aRel^{-1})}\Delta$, where $s \aRel t$ iff $t\aRel^{-1} s$ for any $s,t\in S$. This way of lifting relations has elegant mathematical characterisations; see \cite{Deng15} {%DD11} 
+for more details.
+\begin{proposition}
+
+\end{proposition}
 
 
 \section{Quantum CCS}\label{sec:qccs}
@@ -497,18 +502,19 @@ An auxiliary function \textbf{Act}$(t,u)$ is called in \textbf{Match} to discove
 The other set $W$ is updated in function \textbf{MatchAction}$(\gamma,t,u,W)$. This function discovers next pairs or states or distributions, depending on the type of transitions,  and recursively invokes the function \textbf{Match} or \textbf{MatchDistribution}. The current state pair is added to $W$ when the new functions are invoked.
 
 
-The function \textbf{MatchDistribution}$(\Delta,\Theta,\textit{R})$ is called if we need to compare a pair of state distributions instead of a single pair of states. It returns a boolean value indicating whether the distributions are equivalent. In order to do so, it compares each pair of states from the supports of the two distributions. After checking the bisimilarity of these state pairs, the function generates an equivalence relation of the state pairs not contained in the set $N$ for non-bisimilar state pairs. Another auxiliary function \textbf{Check}$(\Delta,\Theta,\textit{R})$ is used for checking the lifting condition of the bisimulation relation. Besides the lifting condition, we check the disjunction of the returning boolean values from function \textbf{Match}. 
+The function \textbf{MatchDistribution}$(\Delta,\Theta,\textit{R})$ is called if we need to compare a pair of state distributions instead of a single pair of states. It returns a boolean value indicating whether the distributions are equivalent. In order to do so, it compares each pair of states from the supports of the two distributions. After checking the bisimilarity of these state pairs, the function generates an equivalence relation of the state pairs not contained in the set $N$ for non-bisimilar state pairs. Another auxiliary function \textbf{Check}$(\Delta,\Theta,\textit{R})$ is used to check whether $\Delta$ and $\Theta$ are related by the lifted relation $\lift{R}$. Technically, we take advantage of a nice property of the lifting operation: $\Delta\lift{R}\Theta$ if and only if the maximum flow in an appropriately constructed network is $1$ \cite{BEM00, Deng15}. There are standard algorithms for computing the maximum flow in a network; see e.g. \cite{CHM90}.
+Besides the lifting condition, we check the disjunction of the returning boolean values from function \textbf{Match}. 
 %The function returns such result basing on the following definition.
 
+\leaveout{ %227
 \begin{definition}[Lifting Condition]
-
 Let $\textit{R}\subseteq Dist(Con)\times Dist(Con)$ be the (strong) open bisimulation relation between two distributions, then for any $\mu,\nu\in Dist(Con),\ \mu\textit{R}\nu$ can imply that:
 \begin{item}
 \item[(1)] The relation satisfies the lifting condition, that is $\mu=\sum_{i\in I}p_i\textit{C}_i$, for each $i\in I,\ \textit{C}_i\textit{R}\textit{D}_i$ for some $\textit{D}_i$, and $\nu=\sum_{i\in I}p_i\textit{D}_i$.
 \item[(2)] The set $I$ is not an empty set, s.t. $\exists C,D\in Con, \mu(C)>0\wedge\nu(D)>0$.
 \end{item}
 \end{definition}
-
+} %end of leaveout 227
 Now let us the termination and correctness of the algorithm. 
 
 
@@ -522,7 +528,9 @@ In the absence of loops in the pLTSs, the termination of the algorithm is easy t
 Starting from the initial pair of states, the next action to perform will be detected in function \textbf{Match}. Then it invokes function \textbf{MatchAction} to find the next new pair of states and recursively call function \textbf{Match} to check them. Each time function \textbf{MatchAction} calls function \textbf{Match} it adds the current state pair into $W$ at the same time. If we reach the leaf nodes, there is no more action, we only compare the quantum variables used and the state of quantum registers. After that, the function terminates, so do the calls to the other functions. Moreover, if there still exists actions enabled in one pLTS but not in the other, then the two pLTSs are not bisimilar and then the whole algorithm terminates. 
 \end{proof}
 
-Then we consider the correctness of the algorithm. First, we let $(\theta, N)$ to be the return pair of functions, moreover $(\theta_{ij}, N_{ij})$ is the return of the $i\cdot j$-th execution of the function with state pair $(t_i,u_j)$. To simplify the presentation, we use \texttt{R}$(t,u,W,N)$ to mean the following condition is satisfied:
+In order to show the correctness of the algorithm, we need to introduce some notation. 
+%First, we let $(\theta, N)$ to be the return pair of functions, moreover $(\theta_{ij}, N_{ij})$ is the return of the $i\cdot j$-th execution of the function with state pair $(t_i,u_j)$. 
+We use \texttt{R}$(t,u,W,N)$ to mean the following condition is satisfied:
 \begin{itemize}
     \item If $(t',u')\notin N$, then $\forall t'\xrightarrow{\alpha}t'',u'\xrightarrow{\alpha'}u'', (t',u')\notin\{(t,u)\}\cup W$ such that: 
     % \item If $(t',u')\notin N$, then $\forall t'\xrightarrow{\alpha}t'',\exists u'\xrightarrow{\alpha'}u''$ and $(t'',u'')\notin \{(t,u)\}\cup W$ such that: 
@@ -614,7 +622,7 @@ According to the verification conditions of \textbf{March}, as all the \\\textbf
 
 \begin{theorem}[Correctness]
 
-Given two states $t$ and $u$ from two pLTSs, \textbf{Bisim}$(t,u)$ returns \textit{true} if and only if they are bisimilar.
+Given two states $t$ and $u$ from two pLTSs, \textbf{Bisim}$(t,u)$ returns \textit{true} if and only if they are ground bisimilar.
 \end{theorem} 
 \begin{proof}
 We use the definition of bisimulation and the propositions proved above. From the verification condition of \textbf{Match}, we have that if
@@ -706,7 +714,7 @@ Secondly, it is eye-catching that there are too many invisible action $\tau$ con
 
 %% Please use bibtex, 
 
-\bibliographystyle{abbrv}
+%\bibliographystyle{abbrv}
 \bibliography{ref}
 
 \appendix
