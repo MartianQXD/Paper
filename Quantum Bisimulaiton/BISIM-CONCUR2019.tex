@@ -351,7 +351,7 @@ For a process to be legal, we require that
 \end{enumerate}
 The first condition says that a quantum system will not be referenced after it has been sent out. This is a requirement of the quantum no-cloning theorem. The second condition says that parallel composition $\Cpar$ models separate parties that never reference a quantum system simultaneously. 
 
-\begin{figure*}[h]
+\begin{figure*}[t]
 	\[\small\begin{array}{ll}
 	\slinfer[\Rlts{Tau}]{\pair{\tau.P, \rho} \ar{\tau} \pair{P, \rho}}
 	&\linfer[\Rlts{C-Inp}]{v\in\texttt{Real}}{\pair{c?x.P,\rho} \ar{c?v} \pair{P[v/x],\rho}}
@@ -435,7 +435,8 @@ Similar extension applies to $\Delta[f]$ and $\Delta\backslash L$.
 		\item whenever $\CC\ar{\alpha} \Delta$, there is some distribution $\Theta$ with $\CD\dar{\hat{\alpha}}\Theta$ and $\Delta \lift{\aRel} \Theta$.
 	\end{itemize}
 	A relation $\aRel$ is a \emph{ground bisimulation} if both $\aRel$ and
-	$\aRel^{-1}$ are ground simulations. Two configurations are \emph{ground bisimilar} if they are related by some ground bisimulation.
+	$\aRel^{-1}$ are ground simulations. %Two configurations are \emph{ground bisimilar} if they are related by some ground bisimulation. 
+	We denote by $\sim$ the largest ground bisimulation, called \emph{ground bisimilarity}.
 \end{definition}
 
 \section{Algorithm}
@@ -569,9 +570,9 @@ Let the number of nodes reachable from $t$ and $u$ is n. The time complexity of 
  The number of state pairs is at most $n^2$. When a state pair $(t,u)$ is examined, each transition of $t$ is compared with all transitions of $u$ with the same action. Since the pLTSs are assumed to be finite trees, the number of comparisons of transitions does not exceed some constant, say $k$. Each comparison may call the function \textbf{Check} at most once, which requires time $O(n^3/log\ n)$ if we use the maximum network flow algorithm in \cite{CHM90}. As a result, the execution time of \textbf{Bisim}$(t,u)$ is in $O(n^5/log\ n)$.
 \end{proof}
 
-\section{Experimental Results}
+\section{Implementation and Experiments}
 \label{sec:experiment}
-In this section, we report an implementation of our approach and provide several use cases on verifying quantum communication protocols. 
+In this section, we report on an implementation of our approach and provide the experimental results of verifying several quantum communication protocols. 
 \subsection{Implementation}
 We have implemented a ground bisimulation checker based on Algorithm~\ref{alg:bisim} in Python 3.7. The workflow of our tool is sketched in Figure~\ref{fig:arch}. The tool consists of a pLTS generation module and a bisimulation checking module, devoted to modeling and verification, respectively.
 The input of this tool is a specification and an implementation of a quantum protocl, both described as qCCS processes, the definition of user-defined quantum gates  as matrices, as well as an initialisation of classical and quantum variables. Unlike classical variables, the initialisation of all quantum variables, deemed as a quantum register, is accomplished at the same time so to allow for superposition states.
@@ -636,7 +637,8 @@ columns headed by \textbf{Impl} and \textbf{Spec} show the numbers of nodes cont
 \end{table}
 \subsection{Example: BB84 Quantum Key Distribution Protocol}
 \label{sec:ss}
-In this section we formalize the BB84 Quantum Key Distribution Protocol. More examples will be given in Appendix~\ref{sec:examples}.
+In this section we formalise the BB84 Quantum Key Distribution Protocol. Our formalisation follows \cite{DF12}, where a manual analysis of the protocol is provided. Now we use our ground bisimulation checker to perform automatic analysis.
+More examples are given in Appendix~\ref{sec:examples}.
 
 %We display four examples in our experiment: (1) super-dense coding protocol; (2) quantum teleportation protocol; (3) quantum secret sharing; (4) BB84 quantum key kistribution protocol. Below we make a brief introduction to the quantum secret sharing protocol as an illustration. Other examples are given in Appendix~\ref{sec:examples}.
 % \subparagraph*{Super-dense Coding Protocol.} There are two roles $Alice$ and $Bob$ communicate with each other here. To simplify the experiment, we only consider the smallest case of the protocol, sending only one qubit. So there is totally one entanglement on two qubits in this example. Besides the Clifford operators, we use a quantum operation $Set^{\Psi}$ to present the generation of 2-qubit maximally entangled states, EPR states, instead of using a combination of other quantum gates. The measurement used here is according to the computational basis $\{|00\rangle,|01\rangle,|10\rangle,|11\rangle\}$. The specification of the super-dense protocol is defined as $Bob$ sets the 2-qubit variable to the value according to the classical value he received from $Alice$.
@@ -647,8 +649,8 @@ In this section we formalize the BB84 Quantum Key Distribution Protocol. More ex
 %\subsection{BB84 Quantum Key Distribution Protocol}
 BB84 is the first quantum key distribution protocol developed by Bennett and Brassard in
 1984~\cite{BB84}. It provides a provably secure way to create a private key between two partners with a classical authenticated channel and a quantum insecure
-channel between them. The protocol does not make the use of entangled states. It ensures its security through the basic property of quantum mechanics: if the states to be distinguished are not orthogonal, such as $|0\rangle$ and $|+\rangle$, then information gain about a quantum state is only
-possible at the expense of changing the state. Let sender and receiver to be $Alice$ and $Bob$ as defined in previous examples, the basic BB84 protocol with a sequence of qubits $\tilde{q}$ with size $n$ goes as follows:
+channel between them. The protocol does not make use of entangled states. It ensures its security through the basic property of quantum mechanics: if the states to be distinguished are not orthogonal, such as $|0\rangle$ and $|+\rangle$, then information gain about a quantum state is only
+possible at the expense of changing the state. Let the sender and the receiver be $Alice$ and $Bob$, respectively. The basic BB84 protocol with a sequence of qubits $\tilde{q}$ with size $n$ goes as follows:
 \begin{bracketenumerate}
 	\item $Alice$ randomly generates two sequences of bits $\tilde{B}_a$ and $\tilde{K}_a$ using her qubits $\tilde{q}$.
 	\item $Alice$ prepares the state of $\tilde{q}$, such that the \textit{i}th bits of $\tilde{q}$ is $|x_{y}\rangle$ where $x$ and $y$ are the \textit{i}th bits of $\tilde{B}_a$ and $\tilde{K}_a$, and respectively,  $|0_0\rangle=|0\rangle$, $|0_1\rangle=|1\rangle$, $|1_0\rangle=|+\rangle=(|0\rangle+|1\rangle)/\sqrt{2}$ and $|1_1\rangle=|-\rangle=(|0\rangle-|1\rangle)/\sqrt{2}$.
@@ -658,7 +660,7 @@ possible at the expense of changing the state. Let sender and receiver to be $Al
 	\item $Bob$ sends his choice of measurements $\tilde{B}_{b}$ to $Alice$, and after receiving the information, $Alice$ sends her $\tilde{B}_{a}$ to $Bob$.
 	\item $Alice$ and $Bob$ match two sequences of bits $\tilde{B}_{a}$ and $\tilde{B}_{b}$ to determine at which positions the bits are equal. If the bits match, they keep the corresponding bits of $\tilde{K}_a$ and $\tilde{K}_b$. Otherwise, they discard them.
 \end{bracketenumerate}
-After execution the basic BB84 protocol, the remaining bits of $\tilde{K}_a$ and $\tilde{K}_b$ should be the same, provided that the communication channels are prefect and there is no eavesdropper.
+After the execution the basic BB84 protocol, the remaining bits of $\tilde{K}_a$ and $\tilde{K}_b$ should be the same, provided that the communication channels are prefect and there is no eavesdropper.
 
 Then we consider the case that there exists an eavesdropper called $Eve$ taking part in the communication. $Alice$ and $Bob$ also have more behaviours to detect $Eve$. In the BB84 protocol with eavesdropper, let $\tilde{K'}_a$ and $\tilde{K'}_b$ to be the remaining bits of $\tilde{K}_a$ and $\tilde{K}_b$ with size $k$, $Eve$, $Alice$ and $Bob$ proceed as follows:
 \begin{bracketenumerate}
@@ -685,12 +687,12 @@ where there are several special operations:
 	\item $cmp(x,y,z)$ returns $x$ if $y$ and $z$ match, and $\epsilon$, meaning it is empty, if they do not match.
 \end{itemize}
 \subparagraph*{Specification.}
-Its specification can be defined as follow using the same operations:
+Its specification can be defined as follows using the same operations:
 \begin{flalign*}
 BB84_{spec} \overset{def}{=}& Ran[q_1;B_{a}].Ran[q_1;K_{a}].Ran[q_2;B_{b}]\\
 &\qquad\qquad\qquad.(key_{a}!cmp(K_{a},B_{a},B_{b}).\textbf{nil}||cmp(K_{b},B_{a},B_{b}).\textbf{nil}).
 \end{flalign*}
-
+As we can see from the third last row in Table~\ref{tab:result}, our tool confirms that $BB84 \sim BB84_{spec}$, thus the implementation is faithful to the specification.
 \subparagraph*{Implementation with an Eavesdropper.}
 Then we proceed to describe the protocol with an eavesdropper. We extend the processes $Alice$ and $Bob$ with a process for eavesdropper detection.
 \begin{flalign*}
@@ -711,7 +713,7 @@ After that, we give the definition of the eavesdropper:
 \begin{flalign*}
 Eve \overset{def}{=}& \underline{A2E}?q_1.Ran[q_3;B_{e}].M_{B_{e}}[q_1;K_{e}].Set_{K_{e}}[q_1].H_{B_{e}}[q_1].\underline{E2B}!q_1.key_{e}!K_{e}.\textbf{nil}.
 \end{flalign*}
-With the attending of $Eve$, we adjust the communication of $Alice$ and $Bob$:
+With the participation of $Eve$, we adjust the communication of $Alice$ and $Bob$:
 \begin{flalign*}
 Alice\longrightarrow Alice[f_{a}], Bob\longrightarrow Bob[f_{b}]
 \end{flalign*}
@@ -722,23 +724,26 @@ We use a test process to conclude the final result:
 Test \overset{def}{=}& key'_{a}?x.key'_{b}?y.key'_{e}?z.\\
 &(\textbf{if}\ x\neq y\ \textbf{then}\  fail!0.\textbf{nil}\\
 &\ +\ \textbf{if}\ x=y\ \textbf{then}\ key_{e}!z.skey!x.\textbf{nil});\\
-BB84 \overset{def}{=}& (Alice||Bob||Alice'||Bob'||Eve||Test)\setminus C
+BB84' \overset{def}{=}& (Alice||Bob||Alice'||Bob'||Eve||Test)\setminus C
 \end{flalign*}
 where $C=\{a2b,b2a,key_{a},key_{b},\underline{A2E},\underline{E2B},alarm_{a},alarm_{b}\}$.
 \subparagraph*{Specification.}
 The specification of that can be defined as:
 \begin{flalign*}
-Spec \overset{def}{=}& Ran[q_1;B_{a}].Ran[q_1;K_{a}].Ran[q_3;B_{e}].Ran'_{B_{a},B_{e},K_{a}}[q_1;K_{e}].Ran[q_2;K_{b}].\\
+BB84'_{spec} \overset{def}{=}& Ran[q_1;B_{a}].Ran[q_1;K_{a}].Ran[q_3;B_{e}].Ran'_{B_{a},B_{e},K_{a}}[q_1;K_{e}].Ran[q_2;K_{b}].\\
 &Ran'_{B_{e},B_{b},K_{e}}[q_1;K_{b}].Pstr_{}[q_1;x].\\
 &(\textbf{if}\ K_{ab}=K_{ba}\ \textbf{then}\ key_{e}!K_{e}.skey!RemStr(K_{ab},x).\textbf{nil}\\
 &\ + \textbf{if}\ K_{ab}\neq K_{ba}\ \textbf{then}\\
 &\ (\textbf{if}\ K^{x}_{ab}\neq K^{x}_{ba}\ \textbf{then}\ alarm_{a}!0.\textbf{nil}||alarm_{b}!0.\textbf{nil}\\
 &\ +\ \textbf{if}\ K^{x}_{ab}=K^{x}_{ba}\ \textbf{then}\ fail!0.\textbf{nil}))
 \end{flalign*}
-where $K_{ab}=cmp(K_{a},B_{a},B_{b})$,  $K_{ba}=cmp(K_{b},B_{a},B_{b})$, $K^{x}_{ab}=SubStr(K_{ab},x)$, $K^{x}_{ab}=SubStr(K_{ba},x)$. And similar to $Ran$, $Ran'_{x,y,z}[q;v]$ is a special measurement randomly generate the value of $v$ if $x$ and $y$ do not match and give $v$ the value of $z$ if they match.
+where $K_{ab}=cmp(K_{a},B_{a},B_{b})$,  $K_{ba}=cmp(K_{b},B_{a},B_{b})$, $K^{x}_{ab}=SubStr(K_{ab},x)$, $K^{x}_{ab}=SubStr(K_{ba},x)$. And similar to $Ran$, $Ran'_{x,y,z}[q;v]$ is a special measurement that randomly generates the value of $v$ if $x$ and $y$ do not match and give $v$ the value of $z$ if they match.
+
+We see from the second last row in Table~\ref{tab:result} that in this case our tool gives a negative verification result, i.e. $BB84' \not\sim BB84'_{spec}$. In other words, the implemention $BB84'$ is unsatisfactory. Some modification is needed to make it behave the same as the specification.
 
 \subparagraph*{Improved BB84 Protocol with an Eavesdropper.}
-As the reason why the problem occurred is that the operation $alarm$ is not concluded in $Test$ and the implementation have more behaviours than what the specification requires. So we only refine the program of implementation, adding a message communication with $Test$:
+After carefully examining the behaviour of the process $BB84'$, we find that the problem lies in the operation $alarm$. It is not included in $Test$ and the implementation has more behaviours than what the specification requires. 
+We fix the bug by adding a message communication with $Test$ and thus obtain the following refined version of implementation:
 \begin{flalign*}
 Alice' \overset{def}{=}& key_{a}?K'_{a}.Pstr_{K'_{a}}[q_1;x].a2b!x.a2b!SubStr(K'_{a},x).b2a?K''_{b}.\\
 &(\textbf{if}\ SubStr(K'_{a},x)=K''_{b}\ \textbf{then}\ key'_{a}!RemStr(K'_{a},x).\textbf{nil} \\
@@ -750,6 +755,7 @@ Test \overset{def}{=}& key'_{a}?x.key'_{b}?y.key'_{e}?z.\\
 &(\textbf{if}\ x\neq y\ \textbf{then}\  fail!0.\textbf{nil}\ +\ \textbf{if}\ x=y\ \textbf{then}\ key_{e}!z.skey!x.\textbf{nil})\\
 &+\ msg_{a}?x.msg_{b}?y.key'_{e}?z.alarm!0.\textbf{nil}.
 \end{flalign*}
+The last row in Table~\ref{tab:result} tells us that the above modification of the implementation is indeed correct.
 
 \subsection{Experimental Results}
 We conducted experiments on four quantum communication protocols and a few variants of them.  
