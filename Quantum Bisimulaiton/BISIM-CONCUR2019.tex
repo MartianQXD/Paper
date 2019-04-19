@@ -211,24 +211,26 @@ Process algebras provide a useful formal method for specifying and verifying con
 Feng et al. \cite{FDJY07} have proposed a quantum variant of  Milner's CCS \cite{ccs}, called qCCS, and a notion of probabilistic bisimulation for quantum processes, which is then improved to be a general notion of bisimulation that enjoys a congruence property \cite{FDY11}. Later on, motivated by~\cite{San96}, Deng and Feng~\cite{DF12} defined an open bisimulation for quantum processes that makes it possible to separate ground bisimulation and the closedness under super-operator applications, thus providing not only a neater and simpler definition, but also a new technique for proving bisimilarity.
 In order to avoid the problem of instantiating quantum variables by potentially infinitely many quantum states, Feng et al. \cite{FDY14} extended the idea of symbolic bisimulation~\cite{HL95} for value-passing CCS and provided a 
  symbolic version of open bisimulation for qCCS. They also proposed an algorithm for checking symbolic ground bisimulation.
- Kubota et al. \cite{KKKKS16}  implemented a software tool to decide bisimilarity of
-qCCS configurations, and used it to check the security of BB84 quantum key distribution protocol~\cite{BB84}.
+ 
 
 In the current work, we consider the ground bisimulation proposed in \cite{DF12}. We put forward an on-the-fly algorithm to check if two given processes in qCCS with fixed initial quantum states are ground bisimilar. The algorithm is simpler than the one in \cite{FDY14} because the initial quantum states are determined for the former but can be parametric for the latter. Therefore, it is easier to implement. Moreover, in many applications, we are only interested in the correctness of a quantum protocol with a predetermined input of quantum states. This is especially the case in the design stage of a protocol or in the debugging of a program. 
 
 The new algorithm is obtained by adapting the on-the-fly algorithm for checking probabilistic bisimulations \cite{Deng15}, which in turn has its root in similar algorithms
 for checking classical bisimulations \cite{FM90,HL95}. The basic idea is as follows. A quantum process with an initial quantum state forms a configuration. We describe the operational behavour of a configuration as a probabilistic labelled transition system (pLTS), where probabilistic transitions arise naturally because measuring a quantum system can entail a probability distribution of post-measurement quantum systems. The notion of ground bisimulation is a strengthening of probabilistic bisimulation by imposing some constraints on quantum variables and the environment states of processes. Therefore, the skeleton of the algorithm for quantum ground bisimulation resembles to that for probabilistic bisimulaiton.
-We have developed a tool that can check if two given configurations are ground bisimilar. It is useful to validate whether the specification of a protocol is equivalent to an implementation. We have conducted experiments on a few interesting quantum protocols including super-dense coding, teleportation, secret sharing, and the BB84 protocol.
+We have developed a tool that can check if two given configurations are ground bisimilar. It is useful to validate whether the specification of a protocol is equivalent to an implementation. We have conducted experiments on a few interesting quantum protocols including super-dense coding, teleportation, secret sharing, and in particular the BB84 quantum key distribution protocol \cite{BB84}.
 
 \subparagraph*{Other related Work} 
-The work closest to ours is \cite{DBLP:journals/tocl/Ardeshir-Larijani18}, where Ardeshir-Larijani et al.
-have proposed a quantum variant of CCS \cite{ccs}  to describe quantum protocols. The syntax of that variant is similar to qCCS but its semantics is very different. The behaviour of a concurrent process is a finite tree and an interleaving is a path from the root to a leaf. By interpreting an interleaving as a superoperator \cite{Sel04}, the semantics of a process is a set of superoperators. The equivalence checking between two processes boils down to the equivalence checking between superoperators, which is accomplished by using the stabilizer simulation algorithm given by Aaronson and Gottesman \cite{AG04}. Ardeshir-Larijani et al. have implemented their approach in an equivalence checker in Java and verified several quantum protocols from teleportation to secret sharing. 
+ Ardeshir-Larijani et al. \cite{AL18} proposed a quantum variant of CCS \cite{ccs}  to describe quantum protocols. The syntax of that variant is similar to qCCS but its semantics is very different. The behaviour of a concurrent process is a finite tree and an interleaving is a path from the root to a leaf. By interpreting an interleaving as a superoperator \cite{Sel04}, the semantics of a process is a set of superoperators. The equivalence checking between two processes boils down to the equivalence checking between superoperators, which is accomplished by using the stabilizer simulation algorithm given by Aaronson and Gottesman \cite{AG04}. Ardeshir-Larijani et al. have implemented their approach in an equivalence checker in Java and verified several quantum protocols from teleportation to secret sharing. 
 However, they are not able to handle the BB84 quantum key distribution protocol because its correctness cannot be specified as an equivalence between interleavings.
 Our approach is based on ground bisimulation and keeps all the branching behaviour of a concurrent process. Our algorithm of checking ground bisimulations is influenced by the on-the-fly algorithm of Hennessy and Lin for value-passing CCS \cite{HL95} and inspired by the probabilistic bisimulation checking algorithm of Baier et al. \cite{BEM00}.
 
+Kubota et al. \cite{KKKKS16}  implemented a semi-automated tool to check a notion of symbolic bisimulations and  used it to verify the equivalence of BB84  and another quantum key distribution protocol based on entanglement distillation \cite{SP00}. There are two main differences between their work and ours. (1) Their tool is based on equational reasoning and thus requires a user to provide equations while our tool is fully automatic. (2) Their semantic interpretation of measurement is different and entails a kind of linear-time semantics for quantum processes that ignores the timepoints of the occurrences of probabilistic branches. However, we use a branching-time semantics. For instance, the occurrence of a measurement before or after a visible action is significant for our semantics but not for the semantics proposed in \cite{KKKKS16}.
 
+Besides equivalence checking, based on either superoperators or bisimulations as mentioned above, model-checking is another feasible approach to verify quantum protocols. For instance, Gay et al. developed the QMC model checker \cite{GNP08}.
+Feng et al. implemented  the tool QPMC \cite{FHTZ15} to model check quantum programs and protocols. There are other approaches for verifying quantum systems. Abramsky and Coecke \cite{AC04} proposed a categorical semantics for quantum protocols. Quantomatic \cite{Kis11} is a semi-automated tool based on graph rewriting. Ying \cite{Yin16} established the quantum Hoare logic, which has been implemented in a theorem prover \cite{LLWYZ16}.
 
-Besides equivalence checking, based on either superoperators or bisimulations as mentioned above, model-checking is another feasible approach to verify the correctness of quantum programs. For instance, Feng et al.~\cite{FYY13} have proposed an quantum extension of PCTL \cite{HJ94} and developed a quantum model-checking algorithm for quantum Markov Chains. The algorithm is used for model-checking the correctness of the basic BB84 protocol.
+The rest of the paper is structured as follows. In Section~\ref{sec:plts}, we introduce the formal model
+of probabilistic labelled transition systems. In Section~\ref{sec:qccs} we recall the syntax and semantics of the quantum process algebra qCCS. In Section~\ref{sec:algorithm} we present an algorithm for checking ground bisimulations. In Section~\ref{sec:experiment} we report the implementation of the algorithm and some experimental results on verifying a few quantum communication protocols. Finally, we conclude in Section~\ref{sec:con} and discuss some future work.
 
 \section{Preliminaries}
 \label{sec:plts}
@@ -292,9 +294,7 @@ Let $\aRel\ \subseteq S \times S$ be a relation between states. It induces a spe
 $\hat{\aRel} \define \sset{(s,\pdist{t})\mid s\aRel t}.$
 Then we can use Definition~\ref{def:lift} to lift $\hat{\aRel}$ to be a relation $\lift{(\hat{\aRel})}$ between distributions. For simplicity, we combine the above two lifting operations and directly write $\lift{\aRel}$ for $\lift{(\hat{\aRel})}$ in the sequel, with the intention that a relation between states can be lifted to a relation between distributions via a special application of Definition~\ref{def:lift}. In this particular case, it holds that $\Delta \lift{\aRel} \Theta$ implies $\Theta \lift{(\aRel^{-1})}\Delta$, where $s \aRel t$ iff $t\aRel^{-1} s$ for any $s,t\in S$. This way of lifting relations has elegant mathematical characterisations; see \cite{Deng15} %{DD11} 
 for more details.
-\begin{proposition}
 
-\end{proposition}
 
 
 \section{Quantum CCS}\label{sec:qccs}
@@ -441,7 +441,8 @@ Similar extension applies to $\Delta[f]$ and $\Delta\backslash L$.
 \section{Algorithm}
 \label{sec:algorithm}
 In this section, we present an on-the-fly algorithm to check if two configurations are ground bisimilar.
-For convenience, we will only consider pLTSs with finite tree structures. On the one hand, this makes the algorithm easier to describe and analyse. On the other hand, our main motivation of this work is to verify quantum communication protocols and, to the best of our knowledge, almost all of them can be specified by qCCS processes without recursion.
+For convenience, we will only consider pLTSs with finite tree structures. On the one hand, this makes the algorithm easier to describe and analyse. On the other hand, our main motivation of this work is to verify quantum communication protocols and, to the best of our knowledge, almost all of them can be specified by qCCS processes without recursion. 
+Other verification tools such as those in \cite{KKKKS16,AL18} also adop this design choice; they disallow recursion in their modelling language.
 Modifying the algorithm to deal with pLTSs with loops is possible, with an increased (but still polynomial) time complexity.
 
 \begin{algorithm}[htbp]
@@ -572,10 +573,17 @@ Let the number of nodes reachable from $t$ and $u$ is n. The time complexity of 
 \label{sec:experiment}
 In this section, we report an implementation of our approach and provide several use cases on verifying quantum communication protocols. 
 \subsection{Implementation}
-We have implemented a ground bisimulation checker basing on the on-the-fly algorithm above in Python 3.7. The workflow of out tool is sketched in Figure~\ref{fig:arch}. The input of this tool is a quantum program together with a specification for it which are all described in qCCS. Execution of the tool yields a terminal output showing the final verification result with some running informations. The tool consists of a pLTS generation module and a bisimulation checking module, devoted to modeling and verifying respectively.
-\subparagraph*{pLTS Generation Module.}
-The pLTS generation module acts as a data processing module before the verification task. The generation procedure has two steps. First the input qCCS program will be translated into an AST (abstract syntax tree) by a parser. The parser for the qCCS program is produced in Python 3.7 by us. Attaching to the main program, there are another two parts of program information: (1) an initialization of the variables; (2) a set of user-defined quantum gates. And then the AST will be trasformed to the pLTS according to qCCS operational semantics.
-\subparagraph*{Bisimulation Checking Module.} The main module of our tool is the bisimulation checking module which implements the ground bisimilarity checking algorithm we defined above. To simplify the processing, the verification always starts at the initial states of two generated pLTSs. The execution result presents whether these two pLTSs are bisimilar attached with a set of non-bisimilar state pairs and a set of bisimilar state pairs.
+We have implemented a ground bisimulation checker based on Algorithm~\ref{alg:bisim} in Python 3.7. The workflow of our tool is sketched in Figure~\ref{fig:arch}. The tool consists of a pLTS generation module and a bisimulation checking module, devoted to modeling and verification, respectively.
+The input of this tool is a specification and an implementation of a quantum protocl, both described as qCCS processes, the definition of user-defined quantum gates  as matrices, as well as an initialisation of classical and quantum variables. Unlike classical variables, the initialisation of all quantum variables, deemed as a quantum register, is accomplished at the same time so to allow for superposition states.
+The final output of the tool is a result indicating whether the specification and the implementation, under the same initial states, are bisimilar, together with a set of bisimilar state pairs and  a set of non-bisimilar state pairs.
+%
+%\subparagraph*{pLTS Generation Module.}
+
+The pLTS generation module acts as a preprocessing unit before the verification task. It first translates the input qCCS processes  into two abstract syntax trees (ASTs) by a parser. Then the ASTs are transformed into two pLTSs according to the operational semantics given in Figure~\ref{fig:opsem}, using the user-defined gates and the initial values of variables.
+%
+%\subparagraph*{Bisimulation Checking Module.} 
+The  bisimulation checking module  implements the ground bisimilarity checking algorithm we defined in the last section. It checks whether the initial states of the two generated pLTSs are bisimilar. 
+%The execution result presents whether these two pLTSs are bisimilar attached with a set of non-bisimilar state pairs and a set of bisimilar state pairs.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{images/architecture.eps}
@@ -585,7 +593,7 @@ The pLTS generation module acts as a data processing module before the verificat
 \begin{table}[htbp]
 \centering
 \begin{tabular}{@{}m{0pt}@{}
-                >{\centering\arraybackslash}m{2cm}
+                >{\centering\arraybackslash}m{2.3cm}
                 ||>{\centering\arraybackslash}m{3cm}
                 |>{\centering\arraybackslash}m{1cm}
                 |>{\centering\arraybackslash}m{0.8cm}
@@ -624,8 +632,7 @@ The pLTS generation module acts as a data processing module before the verificat
 \end{tabular}
 \vspace{1em}
 \caption{Experimental Results. The
-columns headed by \textbf{Impl} and \textbf{Spec} show the number of nodes contained in the generated pLTSs of implementation and specification. Column $N$ shows the size of the non-bisimilar pairs set $N$. Column $B$ shows the size of the bisimilar pairs set $B$. Column \textbf{SEC} shows verification
-runtimes of the tool, times are in milliseconds.}\label{tab:result}  
+columns headed by \textbf{Impl} and \textbf{Spec} show the numbers of nodes contained in the generated pLTSs of the implementations and specifications. Column $N$ shows the sizes of the sets of non-bisimilar state pairs  and Column $B$ shows the sizes of the sets of bisimilar state pairs. Column \textbf{SEC} shows the time cost of the verification in milliseconds.}\label{tab:result}  
 \end{table}
 \subsection{Examples: Quantum Communication Protocols}
 We display four examples in our experiment:(1)Super-dense Coding Protocol; (2)Quantum Teleportation Protocol; (3)Quantum Secret Sharing; (4)BB84 Quantum Key Distribution Protocol. Firstly, we make a brief introduction about them. More details about them, including qCCS presentations are presented in Appendix~\ref{sec:examples}. 
@@ -636,7 +643,7 @@ We display four examples in our experiment:(1)Super-dense Coding Protocol; (2)Qu
 \subparagraph*{BB84 Protocol with an Eavesdropper.} This example is an extension of the BB84 example, supposing there is an eavesdropper attending into the communication. There have three roles and the new role $Eve$ also randomly choose the measurement just as what $Alice$ and $Bob$ do. The specification is also similar with the one without an eavesdropper. It is possible that the eavesdropper will be recognized. It is a new result of the program. We conclude these results into three messages: emitting through the channel $alarm$ as the measurement methods are not matched; emitting through the channel $fail$ as the measurement methods are matched while the eavesdropping is recognized; normal emitting as the communication finished without recognizing the eavesdropper.
 \subsection{Experimental Results}
 We conducted experiments on those quantum communication protocols and obtained the results  on a macOS machine with an Intel Core i7 2.5 GHz processor and 16GB of RAM.
-\subparagraph*{Experimental Results and Improvement.}Table~\ref{tab:result} provides a summary of our experimental results over those four examples. In each case, we report the bisimilarity, the number of nodes in two pLTSs, the number of non-bisimilar and bisimilar states pair in $N$, $B$ and the runtime of our checking algorithm (not including the pLTS generation part).
+\subparagraph*{Experimental Results and Improvement.}Table~\ref{tab:result} provides a summary of our experimental results over those four examples. In each case, we report the bisimilarity, the number of nodes in two pLTSs, the numbers of non-bisimilar and bisimilar state pairs in $N$ and $B$, as well as the verification time of our algorithm (excluding the pLTS generation part).
 
 We verify the super-dense coding with two different initial valuations of variable $x$ in the first two lines. In the case $x=1$, we can check that protocol and its specification are bisimilar. However, in the case $x=5$, when none of the four branches is chosen, they are not bisimilar because of the different length of the trace. The result shows that the program misses the solution for the valuation out of the expected scale. We improve the program through adding a new branch solving all the unexpected value. The result of the improved program is presented on the third line. 
 
@@ -645,8 +652,9 @@ We also verify the teleportation with several different initial valuations of qu
 Another example brings a non-bisimilarity is on the second line from the bottom, which is the BB84 protocol considering the eavesdropper. $Alice$ and $Bob$ will make an alert if their measurement methods are not matched. The parallelism between the final test process and them leads to the process continues behaving some actions. That is not what the specification exactly describes. To improve this program, we modify the behavior, move the alert to the test process. $Alice$ and $Bob$ only send messages when they find they use different measurements. As a result, on the last line of the table, we find the program is bisimilar with the specification.
 \subparagraph*{Discussion.} Not all the cases of Table~\ref{tab:result} present the size of the non-bisimilar states set $N$, as the checking algorithm has terminated at an early point. Furthermore, to ensure the bisimilarity between program with a large set of states and its specification requires much more time, over tens of times more than the runtime of checking non-bisimilarity. However, the runtime of finding two pLTSs are non-bisimilar is not that long enables us to try making improvement in an acceptable time waiting feedback.
 
-\section{Conclusion and Future Works}
-In this paper we have presented an on-the-fly algorithm verifying strong ground bisimulation for quantum programs in qCCS. And then we have developed a tool for bisimilarity checking basing on the algorithm. The input is encoded with the notation of qCCS, which enables us to translate the program to corresponding finite pLTS depending on its operational semantics. We proved our algorithm terminates on checking two finite tree-structural pLTSs and figures out the bisimilarity. To show its performance, we further made experiments on several quantum communication protocols such as BB84. The experimental results have showed the algorithm is able to provide hints for two kinds of improvement: (1) supplementing the missing cases of the programs; (2) adjusting how the parallel behaviours collaborate with each other.
+\section{Conclusion and Future Works}\label{sec:con}
+We have presented an on-the-fly algorithm to check ground bisimulation for quantum processes in qCCS. 
+We then developed a tool to verify quantum communication protocols. The input is encoded with the notation of qCCS, which enables us to translate the program to corresponding finite pLTS depending on its operational semantics. We proved our algorithm terminates on checking two finite tree-structural pLTSs and figures out the bisimilarity. To show its performance, we further made experiments on several quantum communication protocols such as BB84. The experimental results have showed the algorithm is able to provide hints for two kinds of improvement: (1) supplementing the missing cases of the programs; (2) adjusting how the parallel behaviours collaborate with each other.
 
 There are still many questions remaining for further study.Firstly, the bisimulation checking may not only several possible inputs which we can enumerate all of them in a short time. One of the solution of that is to introduce the idea of symbolic bisimulation proposed in~\cite{FDY14}. Symbolic bisimulation uses an accumulation of the super-operators instead of a density operator to present the state which allows us to verify the programs with arbitrary inputs. However, the normalizing operation is also unavailable without the density operator, so it becomes a challenge.
 
