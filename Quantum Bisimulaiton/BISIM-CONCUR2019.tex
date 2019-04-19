@@ -790,8 +790,114 @@ For example, the behavioural equivalence considered in the current work is a str
 \bibliography{ref}
 
 \appendix
+\section{Correctness of Algorithm~\ref{alg:bisim}}
+\label{sec:correctness}
+% \begin{lemma}
+% 	Todo: prove that we can ensure in such case, the trace is  longer than any other trace from another side or unmatched with them.
+% \end{lemma}
+% \begin{theorem}[Early termination]
+% 	If the algorithm reaches a leaf state of the tree-like pLTS while the state of the other pLTS is not a leaf state, then these two pLTSs are not bisimilar.
+% \end{theorem}
+% \begin{proof}
+% 	We consider it on the aspect of the length of the traces. From the structure of the algorithm, each time \textbf{MatchAction} is called \textbf{Act} will be called before it. So we can ensure that two states have the same action to behave. There exists the trace that
+% 	\[T = \langle t_0,\rho\rangle\xrightarrow{\gamma_0}...\xrightarrow{\gamma_i}\langle t_i,\rho\rangle\text{ and }U = \langle u_0,\sigma\rangle\xrightarrow{\gamma_0}...\xrightarrow{\gamma_i}\langle u_i,\sigma\rangle.\]
+% 	Let $|T|=|U|=n$, if one of these states $u_i$ is not a leaf, then there has a longer trace $|U'|=n+1$. As there is no loop contained, the trace $|T'|=n+1$ does not exist, so we can not find a trace has the same length as that one. According to the definition of the bisimulation, these two pLTS should not satisfy it.
+% \end{proof}
 
-\section{Examples in qCCS}
+In this section we give a detailed proof of the  correctness of the algorithm. To simplify the presentation, we use \texttt{R}$(t,u,W,N)$ to mean the following condition is satisfied:
+\begin{itemize}
+	\item If $(t',u')\notin N\wedge t'\xrightarrow{\alpha}t''\wedge u'\xrightarrow{\alpha'}u'', (t',u')\notin\{(t,u)\}\cup W\wedge$: 
+	% \item If $(t',u')\notin N$, then $\forall t'\xrightarrow{\alpha}t'',\exists u'\xrightarrow{\alpha'}u''$ and $(t'',u'')\notin \{(t,u)\}\cup W$ such that: 
+	\begin{itemize}
+		\item if $\alpha\equiv c!e\wedge\alpha'\equiv c!e'$ with $e=e'$, then $(t'',u'')\notin W\wedge(t'',u'')\notin N\implies t''\sim u''$.
+		\item let $t''\equiv \Delta'$ and $u''\equiv \Theta'$, if $\alpha\equiv \tau\wedge\alpha'\equiv \tau$, then $\exists t'_i\in \lceil\Delta'\rceil, u'_j\in \lceil\Theta'\rceil,\ (t'_i,u'_j)\notin W\wedge(t'_i,u'_j)\notin N\implies t'_i\sim u'_j$.
+		\item otherwise $\alpha=\alpha'$, then  $(t'',u'')\notin W\wedge(t'',u'')\notin N\implies t''\sim u''$.
+	\end{itemize}
+\end{itemize}
+
+\begin{lemma}\label{lem:n_merge}
+	If $N_1\cap N_2=\emptyset$ then \texttt{R}$(t,u,W,N_1)$ and \texttt{R}$(t,u,W,N_2)$ $implies$ \texttt{R}$(t,u,W,N_1\cup N_2)$.
+\end{lemma}
+\begin{proof}
+	Straightforward from the definition of \texttt{R}.
+\end{proof}
+
+We define the verification conditions of our three matching functions.
+\begin{definition}\label{def:match}
+	\textbf{Match}$(t,u,W)$ is \textit{true} if the following conditions ar satisfied:
+	\begin{itemize}
+		\item(C1) $W\cap N=\emptyset$ and
+		\begin{itemize}
+			\item if $(t,u)\in W$, then $(t,u)\notin N$,
+			\item if $(t,u)\notin W$, then either $\theta=true\wedge(t,u)\notin N$ or $\theta=false\wedge(t,u)\in N$.
+		\end{itemize}
+		\item(C2) $\texttt{R}(t,u,W,N)$.
+	\end{itemize}
+	Let \textbf{Bisim}$(t,u)=$\textbf{Match}$(t,u,\emptyset)$.
+\end{definition}
+
+\begin{definition}\label{def:matchaction}
+	\textbf{MatchAction}$(\gamma,t,u,W)$ is \textit{true} if all the following conditions are satisfied:
+	\begin{itemize}
+		\item(M1) $W\cap N=\emptyset$, $(t,u)\notin W$ and $(t,u)\notin N$.
+		\item(M2) $\texttt{R}(t,u,W,N)$.
+		\item(M3) $\forall t\xrightarrow{\alpha}t', \exists u\xrightarrow{\alpha'}u'$, $(t',u')\notin \{(t,u)\}\cup W$ and 
+		\begin{itemize}
+			\item if $\alpha\equiv a$ (including $c?x$) then $\alpha'\equiv a$ and $(t',u')\notin W\wedge(t',u')\notin N\implies t'\sim u'$.
+			\item if $\alpha\equiv c!e$ then $\alpha'\equiv c!e'$ with $e=e'$ and $(t',u')\notin W\wedge(t',u')\notin N\implies t'\sim u'$.
+			\item let $t'\equiv \Delta$ and $u'\equiv \Theta$, if $\alpha\equiv \tau$ then $\alpha'\equiv \tau$, $\forall t_i\in \lceil\Delta\rceil, u_j\in \lceil\Theta\rceil,\ (t_i,u_j)\notin W\wedge(t_i,u_j)\notin N\implies t_i\sim u_j$.
+		\end{itemize}
+	\end{itemize}
+\end{definition}
+
+\begin{definition}\label{def:matchdistribution}
+	\textbf{MatchDistribution}$(\Delta,\Theta,W)$ is \textit{true} if the following conditions are satisfied:
+	\begin{itemize}
+		\item(D1) $W\cap N=\emptyset$, $\forall t_i\in \lceil\Delta\rceil, u_j\in \lceil\Theta\rceil,\ (t_i,u_j)\notin W$ and $\exists (t_i,u_j)\notin N$.
+		% and $(t_i,u_j)\notin N\implies t_i\sim u_j$
+		\item(D2) Let $t\xrightarrow{\alpha}\Delta, u\xrightarrow{\alpha'}\Theta$, $\texttt{R}(t,u,W,N)$.
+	\end{itemize}
+\end{definition}
+
+\begin{proposition}Let $\textbf{MatchAction}_\gamma(\gamma,t,u,W)$ is the execution of \textbf{MatchAction} with action $\gamma$.
+	If $\textbf{MatchAction}_\gamma(\gamma,t,u,W)$ is $true$ for each action $\gamma$ then \textbf{Match}$(t,u,W)$ is also $true$, where it returns $\theta=\bigwedge_\gamma\theta_\gamma$ and $N=\bigcup_\gamma N_\gamma$.
+\end{proposition}
+\begin{proof}
+	The only time point that $(t,u)$ is added into $W$ is during the execution of \textbf{MatchAction}, then according to the Definition~\ref{def:matchaction}, we have $W\cap N=\emptyset$. Since the verified pLTS is a finite tree, if they reach the leaf states of the pLTSs, there should have $\theta=true$ and $N=\emptyset$, at the same time it satisfies that $(t,u)\notin W\wedge(t,u)\notin N$. Furthermore, we have $t\sim u$ in such case. According to the structure of the function, $(t,u)$ will be added in to $N$ if $\theta$ is false. Overall, $C1$ is satisfied.
+	
+	From condition (M2) and (M3), \texttt{R}$(t,u,W,N_{\gamma})$ exists. According to Lemma~\ref{lem:n_merge}, we have the condition that \texttt{R}$(t,u,W,\bigcup_{\gamma}N_{\gamma})$, it satisfies $C2$.
+\end{proof}
+
+\begin{proposition} Suppose $(t,u)\notin W$.
+	If \textbf{Match}$(t_i,u_j,W\cup\{(t,u)\})$ is $true$ for all actions $\gamma\neq\tau$ where exists transitions $(t\xrightarrow{\gamma}t_i$, $u\xrightarrow{\gamma}u_j)$ or \textbf{MatchDistribution}$(\Delta_i,\Theta_j,W\cup\{(t,u)\})$ is $true$ for all actions $\gamma=\tau$ where exists transitions $(t\xrightarrow{\tau}\Delta_i,u\xrightarrow{\tau}\Theta_j)$ then\\
+	\textbf{MatchAction}$(\gamma,t,u,W\cup\{(t,u)\})$ is $true$ where
+	$\theta=\bigwedge_i(\bigvee_j\theta_{ij})\wedge\bigwedge_j(\bigvee_i\theta_{ij})$, $N=\bigcup N_{ij}$.
+\end{proposition}
+\begin{proof}
+	From the structure of \textbf{MatchAction}, $(t,u)$ does not exist in $W$, and $(t,u)$ can not be added into $N$ here. So the first condition is satisfied.
+	
+	To show $(M2)$ and $(M3)$, we first consider the case where $(t_i,u_j)$ are already the leafs of the finite trees. If $\theta_{ij}=qv(t_i)=qv(u_j)\wedge(tr_{\overline{qv(u_i)}}\rho_i)=tr_{\overline{qv(u_j)}}(\sigma_j)$ is $true$, we have $(t_i,u_j)\notin N_{ij}$ and $N_{ij}=\emptyset$. So there is $t_i\sim u_j$.
+	
+	If it is not the leaf node, by $(C2)$, we have \texttt{R}$(t_i,u_j,\{(t,u)\}\cup W,N_{ij})$. Since  $N=\bigcup_{ij}N_{ij}$, we get if actions match $(t''_i,u''_j)\notin W\wedge(t''_i,u''_j)\notin N\implies t''_i\sim u''_j$. By definition of the bisimulation, $(M3)$ is satisfied. So we also get if actions match $(t'_i,u'_j)\notin W\wedge(t'_i,u'_j)\notin N\implies t'_i\sim u'_j$. If $\theta$ is true, as $\theta=\bigwedge_i(\bigvee_j\theta_{ij})\wedge\bigwedge_j(\bigvee_i\theta_{ij})$, so there exists $\theta_{ij}$ which is $true$, then there is $(t_i,u_j)\notin N_{ij}$. Similarly, by definition of the bisimulation, $(M2)$ is also satisfied.
+	% If $\theta$ is true, as $\theta=\bigwedge_i(\bigvee_j\theta_{ij})\wedge\bigwedge_j(\bigvee_i\theta_{ij})$, so there exists $\theta_{ij}$ which is $true$, then there is $(t_i,u_j)\notin N_{ij}$. 
+	% In the case $\theta$ is false, $(t,u)\in N$ has already distinguished the non-bisimilarity.
+	
+	The final case we need consider is the distribution $(\Delta,\Theta)$ instead of a node. If $\theta$ is true, then $\theta_{ij}$ returned from \textbf{Check} should also be $true$. So there must exist \textbf{Match} returns $true$ support the relation that $(t_i,u_j)\notin N\implies t_i\sim u_j$.
+\end{proof}
+
+\begin{proposition}
+	Suppose $\forall t_i\in\lceil\Delta\rceil,u_j\in\lceil\Theta\rceil , (t_i,u_j)\notin W$.
+	If \textbf{Match}$(t_i,u_j,W)$ is $true$ then \textbf{MatchDistribution}$(\Delta,\Theta,W)$ is $true$ where $\Delta$ and $\Theta$ satisfy the condition for lifting condition, $\theta=\textbf{Check}(\Delta,\Theta,\textit{R})\wedge\bigvee_{ij}\theta_{ij}$  and $N=\bigcup_{ij}N_{ij}$.
+\end{proposition}
+\begin{proof}
+	According to the verification conditions of \textbf{March}, as all the \\\textbf{Match}$(t_i,u_j,W)$ have been finished before we get $R$ and call \textbf{Check}. If $\Delta\sim \Theta$, then we have $(t_i,u_j)\notin N\implies t_i\sim u_j$.
+\end{proof}
+
+\noindent\textbf{Proof of Theorem~\ref{thm:correctness}.} 
+From the verification condition of \textbf{Match}, we have that if \textbf{Bisim}$(t,u)=$\textbf{Match}$(t,u,\emptyset)$ returns $(true, N)$, we guarantee the bisimilarity $t\sim u$.
+\hfill\qed
+
+\section{Examples}
 \label{sec:examples}
 \subsection{Super-dense Coding Protocol}
 Super-dense coding is proposed by Bennett and Wiesner in 1992~\cite{BW92}. It is a quantum communication protocol allowing two classical bits to be encoded in one qubit during a transmission, so it needs only one quantum channel. Such advantage bases on the use of a maximally
@@ -912,110 +1018,4 @@ where we have inserted some harmless $\tau$ transitions ($\tau^{24}$ stands for 
 
 
 
-\section{Proving Correctness of the Ground Algorithm}
-\label{sec:correctness}
-% \begin{lemma}
-% 	Todo: prove that we can ensure in such case, the trace is  longer than any other trace from another side or unmatched with them.
-% \end{lemma}
-% \begin{theorem}[Early termination]
-% 	If the algorithm reaches a leaf state of the tree-like pLTS while the state of the other pLTS is not a leaf state, then these two pLTSs are not bisimilar.
-% \end{theorem}
-% \begin{proof}
-% 	We consider it on the aspect of the length of the traces. From the structure of the algorithm, each time \textbf{MatchAction} is called \textbf{Act} will be called before it. So we can ensure that two states have the same action to behave. There exists the trace that
-% 	\[T = \langle t_0,\rho\rangle\xrightarrow{\gamma_0}...\xrightarrow{\gamma_i}\langle t_i,\rho\rangle\text{ and }U = \langle u_0,\sigma\rangle\xrightarrow{\gamma_0}...\xrightarrow{\gamma_i}\langle u_i,\sigma\rangle.\]
-% 	Let $|T|=|U|=n$, if one of these states $u_i$ is not a leaf, then there has a longer trace $|U'|=n+1$. As there is no loop contained, the trace $|T'|=n+1$ does not exist, so we can not find a trace has the same length as that one. According to the definition of the bisimulation, these two pLTS should not satisfy it.
-% \end{proof}
-
-In this appendix, we consider the correctness of the algorithm. To simplify the presentation, we use \texttt{R}$(t,u,W,N)$ to mean the following condition is satisfied:
-\begin{itemize}
-    \item If $(t',u')\notin N\wedge t'\xrightarrow{\alpha}t''\wedge u'\xrightarrow{\alpha'}u'', (t',u')\notin\{(t,u)\}\cup W\wedge$: 
-    % \item If $(t',u')\notin N$, then $\forall t'\xrightarrow{\alpha}t'',\exists u'\xrightarrow{\alpha'}u''$ and $(t'',u'')\notin \{(t,u)\}\cup W$ such that: 
-    \begin{itemize}
-        \item if $\alpha\equiv c!e\wedge\alpha'\equiv c!e'$ with $e=e'$, then $(t'',u'')\notin W\wedge(t'',u'')\notin N\implies t''\sim u''$.
-        \item let $t''\equiv \Delta'$ and $u''\equiv \Theta'$, if $\alpha\equiv \tau\wedge\alpha'\equiv \tau$, then $\exists t'_i\in \lceil\Delta'\rceil, u'_j\in \lceil\Theta'\rceil,\ (t'_i,u'_j)\notin W\wedge(t'_i,u'_j)\notin N\implies t'_i\sim u'_j$.
-        \item otherwise $\alpha=\alpha'$, then  $(t'',u'')\notin W\wedge(t'',u'')\notin N\implies t''\sim u''$.
-    \end{itemize}
-\end{itemize}
-
-\begin{lemma}\label{lem:n_merge}
-If $N_1\cap N_2=\emptyset$ then \texttt{R}$(t,u,W,N_1)$ and \texttt{R}$(t,u,W,N_2)$ $implies$ \texttt{R}$(t,u,W,N_1\cup N_2)$.
-\end{lemma}
-\begin{proof}
-Straightforward from the definition of \texttt{R}.
-\end{proof}
-
-We define the verification conditions of our three matching functions.
-\begin{definition}\label{def:match}
-\textbf{Match}$(t,u,W)$ is \textit{true} if the following conditions ar satisfied:
-\begin{itemize}
-    \item(C1) $W\cap N=\emptyset$ and
-    \begin{itemize}
-        \item if $(t,u)\in W$, then $(t,u)\notin N$,
-        \item if $(t,u)\notin W$, then either $\theta=true\wedge(t,u)\notin N$ or $\theta=false\wedge(t,u)\in N$.
-    \end{itemize}
-    \item(C2) $\texttt{R}(t,u,W,N)$.
-\end{itemize}
-Let \textbf{Bisim}$(t,u)=$\textbf{Match}$(t,u,\emptyset)$.
-\end{definition}
-
-\begin{definition}\label{def:matchaction}
-\textbf{MatchAction}$(\gamma,t,u,W)$ is \textit{true} if all the following conditions are satisfied:
-\begin{itemize}
-    \item(M1) $W\cap N=\emptyset$, $(t,u)\notin W$ and $(t,u)\notin N$.
-    \item(M2) $\texttt{R}(t,u,W,N)$.
-    \item(M3) $\forall t\xrightarrow{\alpha}t', \exists u\xrightarrow{\alpha'}u'$, $(t',u')\notin \{(t,u)\}\cup W$ and 
-    \begin{itemize}
-        \item if $\alpha\equiv a$ (including $c?x$) then $\alpha'\equiv a$ and $(t',u')\notin W\wedge(t',u')\notin N\implies t'\sim u'$.
-        \item if $\alpha\equiv c!e$ then $\alpha'\equiv c!e'$ with $e=e'$ and $(t',u')\notin W\wedge(t',u')\notin N\implies t'\sim u'$.
-        \item let $t'\equiv \Delta$ and $u'\equiv \Theta$, if $\alpha\equiv \tau$ then $\alpha'\equiv \tau$, $\forall t_i\in \lceil\Delta\rceil, u_j\in \lceil\Theta\rceil,\ (t_i,u_j)\notin W\wedge(t_i,u_j)\notin N\implies t_i\sim u_j$.
-    \end{itemize}
-\end{itemize}
-\end{definition}
-
-\begin{definition}\label{def:matchdistribution}
-\textbf{MatchDistribution}$(\Delta,\Theta,W)$ is \textit{true} if the following conditions are satisfied:
-\begin{itemize}
-    \item(D1) $W\cap N=\emptyset$, $\forall t_i\in \lceil\Delta\rceil, u_j\in \lceil\Theta\rceil,\ (t_i,u_j)\notin W$ and $\exists (t_i,u_j)\notin N$.
-    % and $(t_i,u_j)\notin N\implies t_i\sim u_j$
-    \item(D2) Let $t\xrightarrow{\alpha}\Delta, u\xrightarrow{\alpha'}\Theta$, $\texttt{R}(t,u,W,N)$.
-\end{itemize}
-\end{definition}
-
-\begin{proposition}Let $\textbf{MatchAction}_\gamma(\gamma,t,u,W)$ is the execution of \textbf{MatchAction} with action $\gamma$.
-If $\textbf{MatchAction}_\gamma(\gamma,t,u,W)$ is $true$ for each action $\gamma$ then \textbf{Match}$(t,u,W)$ is also $true$, where it returns $\theta=\bigwedge_\gamma\theta_\gamma$ and $N=\bigcup_\gamma N_\gamma$.
-\end{proposition}
-\begin{proof}
-The only time point that $(t,u)$ is added into $W$ is during the execution of \textbf{MatchAction}, then according to the Definition~\ref{def:matchaction}, we have $W\cap N=\emptyset$. Since the verified pLTS is a finite tree, if they reach the leaf states of the pLTSs, there should have $\theta=true$ and $N=\emptyset$, at the same time it satisfies that $(t,u)\notin W\wedge(t,u)\notin N$. Furthermore, we have $t\sim u$ in such case. According to the structure of the function, $(t,u)$ will be added in to $N$ if $\theta$ is false. Overall, $C1$ is satisfied.
-
-From condition (M2) and (M3), \texttt{R}$(t,u,W,N_{\gamma})$ exists. According to Lemma~\ref{lem:n_merge}, we have the condition that \texttt{R}$(t,u,W,\bigcup_{\gamma}N_{\gamma})$, it satisfies $C2$.
-\end{proof}
-
-\begin{proposition} Suppose $(t,u)\notin W$.
-If \textbf{Match}$(t_i,u_j,W\cup\{(t,u)\})$ is $true$ for all actions $\gamma\neq\tau$ where exists transitions $(t\xrightarrow{\gamma}t_i$, $u\xrightarrow{\gamma}u_j)$ or \textbf{MatchDistribution}$(\Delta_i,\Theta_j,W\cup\{(t,u)\})$ is $true$ for all actions $\gamma=\tau$ where exists transitions $(t\xrightarrow{\tau}\Delta_i,u\xrightarrow{\tau}\Theta_j)$ then\\
-\textbf{MatchAction}$(\gamma,t,u,W\cup\{(t,u)\})$ is $true$ where
-$\theta=\bigwedge_i(\bigvee_j\theta_{ij})\wedge\bigwedge_j(\bigvee_i\theta_{ij})$, $N=\bigcup N_{ij}$.
-\end{proposition}
-\begin{proof}
-From the structure of \textbf{MatchAction}, $(t,u)$ does not exist in $W$, and $(t,u)$ can not be added into $N$ here. So the first condition is satisfied.
-
-To show $(M2)$ and $(M3)$, we first consider the case where $(t_i,u_j)$ are already the leafs of the finite trees. If $\theta_{ij}=qv(t_i)=qv(u_j)\wedge(tr_{\overline{qv(u_i)}}\rho_i)=tr_{\overline{qv(u_j)}}(\sigma_j)$ is $true$, we have $(t_i,u_j)\notin N_{ij}$ and $N_{ij}=\emptyset$. So there is $t_i\sim u_j$.
-
-If it is not the leaf node, by $(C2)$, we have \texttt{R}$(t_i,u_j,\{(t,u)\}\cup W,N_{ij})$. Since  $N=\bigcup_{ij}N_{ij}$, we get if actions match $(t''_i,u''_j)\notin W\wedge(t''_i,u''_j)\notin N\implies t''_i\sim u''_j$. By definition of the bisimulation, $(M3)$ is satisfied. So we also get if actions match $(t'_i,u'_j)\notin W\wedge(t'_i,u'_j)\notin N\implies t'_i\sim u'_j$. If $\theta$ is true, as $\theta=\bigwedge_i(\bigvee_j\theta_{ij})\wedge\bigwedge_j(\bigvee_i\theta_{ij})$, so there exists $\theta_{ij}$ which is $true$, then there is $(t_i,u_j)\notin N_{ij}$. Similarly, by definition of the bisimulation, $(M2)$ is also satisfied.
-% If $\theta$ is true, as $\theta=\bigwedge_i(\bigvee_j\theta_{ij})\wedge\bigwedge_j(\bigvee_i\theta_{ij})$, so there exists $\theta_{ij}$ which is $true$, then there is $(t_i,u_j)\notin N_{ij}$. 
-% In the case $\theta$ is false, $(t,u)\in N$ has already distinguished the non-bisimilarity.
-
-The final case we need consider is the distribution $(\Delta,\Theta)$ instead of a node. If $\theta$ is true, then $\theta_{ij}$ returned from \textbf{Check} should also be $true$. So there must exist \textbf{Match} returns $true$ support the relation that $(t_i,u_j)\notin N\implies t_i\sim u_j$.
-\end{proof}
-
-\begin{proposition}
-Suppose $\forall t_i\in\lceil\Delta\rceil,u_j\in\lceil\Theta\rceil , (t_i,u_j)\notin W$.
-If \textbf{Match}$(t_i,u_j,W)$ is $true$ then \textbf{MatchDistribution}$(\Delta,\Theta,W)$ is $true$ where $\Delta$ and $\Theta$ satisfy the condition for lifting condition, $\theta=\textbf{Check}(\Delta,\Theta,\textit{R})\wedge\bigvee_{ij}\theta_{ij}$  and $N=\bigcup_{ij}N_{ij}$.
-\end{proposition}
-\begin{proof}
-According to the verification conditions of \textbf{March}, as all the \\\textbf{Match}$(t_i,u_j,W)$ have been finished before we get $R$ and call \textbf{Check}. If $\Delta\sim \Theta$, then we have $(t_i,u_j)\notin N\implies t_i\sim u_j$.
-\end{proof}
-
-\noindent\textbf{Proof of Theorem~\ref{thm:correctness}.} 
-From the verification condition of \textbf{Match}, we have that if \textbf{Bisim}$(t,u)=$\textbf{Match}$(t,u,\emptyset)$ returns $(true, N)$, we guarantee the bisimilarity $t\sim u$.
-\hfill\qed
 \end{document}
