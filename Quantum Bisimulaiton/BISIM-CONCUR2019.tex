@@ -27,6 +27,14 @@
 \usepackage{graphicx}
 \usepackage{color}
 \usepackage{epstopdf}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=black,      
+    urlcolor=blue,
+    citecolor=black
+}
 % New definitions
 
 \def\leaveout#1{}
@@ -585,6 +593,9 @@ The pLTS generation module acts as a preprocessing unit before the verification 
 %\subparagraph*{Bisimulation Checking Module.} 
 The  bisimulation checking module  implements the ground bisimilarity checking algorithm we defined in the last section. It checks whether the initial states of the two generated pLTSs are bisimilar. 
 %The execution result presents whether these two pLTSs are bisimilar attached with a set of non-bisimilar state pairs and a set of bisimilar state pairs.
+
+The tool is available from \url{https://github.com/MartianQXD/QBisim}. It has already prepared codes of the examples we used in directories \textsl{examples}.
+
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{images/architecture.eps}
@@ -690,11 +701,34 @@ where there are several special operations:
 Its specification can be defined as follows using the same operations:
 \begin{flalign*}
 BB84_{spec} \overset{def}{=}& Ran[q_1;B_{a}].Ran[q_1;K_{a}].Ran[q_2;B_{b}]\\
-&\qquad\qquad\qquad.(key_{a}!cmp(K_{a},B_{a},B_{b}).\textbf{nil}||cmp(K_{b},B_{a},B_{b}).\textbf{nil}).
+&\qquad\qquad\qquad.(key_{a}!cmp(K_{a},B_{a},B_{b}).\textbf{nil}||cmp(K_{a},B_{a},B_{b}).\textbf{nil}).
 \end{flalign*}
+
+\subparagraph*{Inputs.}
+For the implementation, we need declare following variables and operators in the inputs attaching the qCCS program.
+\begin{itemize}
+    \item The classical bits are named $B_a$, $K_a$ for $Alice$ and $B_b$, $K_b$ for $Bob$.
+    \item The qubits are declared together as a vector $|q_1,q_2\rangle$. It always need a initial value, we can set it to be $|00\rangle$ in this example.
+\end{itemize}
+There are some functions in the protocol composed by several operators. All these operators require declarations in the inputs. 
+\begin{itemize}
+    \item The operator $Ran$ here is composed by two operators $Set_{+}$, $Set_{0}$ and a measurement $M_{0,1}$. 
+    \item $Set_{K}$ needs $Set_{0}$ and $Set_{1}$.
+    \item $H_{B}$ needs Hadamard gate $\mathcal{H}$.
+    \item $M_{B}$ needs one more kind of measurement $M_{+,-}$
+\end{itemize}
+The function $cmp$ is treated as an internal function which has already been declared, so it is not declared in the inputs.
+
+For the specification, we only declare the classical bits $B_a$, $B_b$, $K_a$, qubits $q_1$, $q_2$ and the operators for $Ran$. The variables and operators declared here are the same as those in the inputs of the implementation.
+
+The generated pLTSs are too large to present, we do not illustrate it here, so do the sets of non-bisimilar and bisimilar state pairs. 
+
 As we can see from the third last row in Table~\ref{tab:result}, our tool confirms that $BB84 \sim BB84_{spec}$, thus the implementation is faithful to the specification.
+
+Then we proceed to describe the protocol with an eavesdropper. 
+
 \subparagraph*{Implementation with an Eavesdropper.}
-Then we proceed to describe the protocol with an eavesdropper. We extend the processes $Alice$ and $Bob$ with a process for eavesdropper detection.
+We extend the processes $Alice$ and $Bob$ with a process for eavesdropper detection.
 \begin{flalign*}
 Alice' \overset{def}{=}& key_{a}?K'_{a}.Pstr_{K'_{a}}[q_1;x].a2b!x.a2b!SubStr(K'_{a},x).b2a?K''_{b}.\\
 &(\textbf{if}\ SubStr(K'_{a},x)=K''_{b}\ \textbf{then}\ key'_{a}!RemStr(K'_{a},x).\textbf{nil} \\
@@ -727,7 +761,7 @@ Test \overset{def}{=}& key'_{a}?x.key'_{b}?y.key'_{e}?z.\\
 BB84' \overset{def}{=}& (Alice||Bob||Alice'||Bob'||Eve||Test)\setminus C
 \end{flalign*}
 where $C=\{a2b,b2a,key_{a},key_{b},\underline{A2E},\underline{E2B},alarm_{a},alarm_{b}\}$.
-\subparagraph*{Specification.}
+\subparagraph*{Specification with an Eavesdropper.}
 The specification of that can be defined as:
 \begin{flalign*}
 BB84'_{spec} \overset{def}{=}& Ran[q_1;B_{a}].Ran[q_1;K_{a}].Ran[q_3;B_{e}].Ran'_{B_{a},B_{e},K_{a}}[q_1;K_{e}].Ran[q_2;K_{b}].\\
@@ -739,6 +773,16 @@ BB84'_{spec} \overset{def}{=}& Ran[q_1;B_{a}].Ran[q_1;K_{a}].Ran[q_3;B_{e}].Ran'
 \end{flalign*}
 where $K_{ab}=cmp(K_{a},B_{a},B_{b})$,  $K_{ba}=cmp(K_{b},B_{a},B_{b})$, $K^{x}_{ab}=SubStr(K_{ab},x)$, $K^{x}_{ab}=SubStr(K_{ba},x)$. And similar to $Ran$, $Ran'_{x,y,z}[q;v]$ is a special measurement that randomly generates the value of $v$ if $x$ and $y$ do not match and give $v$ the value of $z$ if they match.
 
+\subparagraph*{More Input.}
+For the implementation, we need declare more variables in the inputs as there are more roles attending in the communication.
+\begin{itemize}
+    \item The classical bits named $K'_a$, $K''_a$ for $Alice$ are used for storing the result of processing the sequence. The $K'_b$, $K''_b$ for $Bob$ do the same work.
+    \item The classical bits for $Eve$ are named $B_e$ and $K_e$.
+    \item The classical bits named $x$, $y$, $z$ are declared to store the remaining string.
+    \item The qubits declared together now are extended into a longer vector $|q_1,q_2,q_3\rangle$. We set it to be $|000\rangle$ in this example.
+\end{itemize}
+Similar with function $cmp$, $SubStr$ and $RemStr$ are already declared inside of the tool. 
+For the specification, we do not declare the bits $K'_a$, $K''_a$, $K'_b$, $K''_b$, we declare $K_{ab}$, $K_{ba}$, $K^x_{ab}$ and $K^x_{ba}$ instead. Certainly, we still need declare $B_e$ and $K_e$.
 We see from the second last row in Table~\ref{tab:result} that in this case our tool gives a negative verification result, i.e. $BB84' \not\sim BB84'_{spec}$. In other words, the implemention $BB84'$ is unsatisfactory. Some modification is needed to make it behave the same as the specification.
 
 \subparagraph*{Improved BB84 Protocol with an Eavesdropper.}
