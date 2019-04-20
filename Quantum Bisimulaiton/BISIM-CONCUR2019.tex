@@ -1155,6 +1155,43 @@ The pLTSs generated in this example is too large (102 nodes and 26 nodes), so we
 
 From the results of Table~\ref{tab:result},  we find that the programs are bisimilar with their specifications of all the three different valuations of $q_1$.
 
+\section{Matrix Presentation of Quantum Operators}
+We have frequently used Hadamard operator, controlled-not operator and Pauli operators in our examples. Indeed they have certain schematic symbols and matrix presentations which have already been used for a long time. Here we list them together below.
+
+$$\mathcal{H} = 
+\begin{bmatrix}
+   \frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}}\\
+   \frac{1}{\sqrt{2}} & -\frac{1}{\sqrt{2}}
+\end{bmatrix}
+\hspace{5em}
+\mathcal{CN} = 
+\begin{bmatrix}
+   1 & 0 & 0 & 0\\
+   0 & 1 & 0 & 0\\
+   0 & 0 & 0 & 1\\
+   0 & 0 & 1 & 0
+\end{bmatrix}
+$$
+$$\textbf{Pauli-X} = 
+\begin{bmatrix}
+   0 & 1\\
+   1 & 0
+\end{bmatrix}
+\hspace{5em}
+\textbf{Pauli-Y} = 
+\begin{bmatrix}
+   0 & -i\\
+   i & 0
+\end{bmatrix}
+\hspace{5em}
+\textbf{Pauli-Z} = 
+\begin{bmatrix}
+   1 & 0\\
+   0 & -1
+\end{bmatrix}
+$$
+However, the other quantum operations such as $Set^{\Psi}$, $Set^{GHZ}$, $Set^{i}$, etc. here cannot be presented in matrix. We present them through the operator-sum presentation~\cite{NC00} with a set of Kraus operators.
+
 
 
 \end{document}
