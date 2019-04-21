@@ -762,7 +762,7 @@ As to the input, we need to declare more variables for $BB84'$ as there are more
     \item The classical bits named $x$, $y$, $z$ are declared to store the remaining string.
     \item The qubits are declared together to be a longer vector $|q_1,q_2,q_3\rangle$. We set it to be $|000\rangle$ in this example.
 \end{itemize}
-Similar to function $cmp$, the functions $SubStr$ and $RemStr$ are already declared inside the tool. 
+Similar to the function $cmp$, the functions $SubStr$ and $RemStr$ are already declared inside the tool. 
 
 For the specification $BB84'_{spec}$, we declare the bits $K_{ab}$, $K_{ba}$, $K^x_{ab}$ and $K^x_{ba}$. Certainly, we still need to declare $B_e$ and $K_e$.
 
@@ -795,13 +795,13 @@ Table~\ref{tab:result} provides a summary of our experimental results obtained o
 % In the case of the secret sharing protocol introduced in Section~\ref{sec:ss}, we  experiment with three different inputs by varying the value of the qubit $q_1$. The qubits $q_2$, $q_3$ and $q_4$ are used to generate a GHZ state despite. The different inputs turn out to have no influence on the outputs. This is what we expect because the correctness of the protocol should always be kept for arbitrary inputs in this protocol. The structures of the two generated pLTSs are  not affected by different input values either.
 
 In Table~\ref{tab:result} there are cases where negative verification results are obtained. One of them is already discussed in Section~\ref{sec:ss}. We now comment on the other case.
-We verify the super-dense coding protocol with two different initial values of variable $x$ in the first two rows. If $x=1$, we can check that the implementation behave the same as the specification. However, if $x=5$, the behaviour of the implementation differs from that of the specification, and they are even not trace equivalent.  See Appendix~\ref{sec:sdc} for more discussion and the improvement of the formal modelling.
+We verify the super-dense coding protocol with two different initial values of variable $x$ in the first two rows. If $x=1$, we can check that the implementation behaves the same as the specification. However, if $x=5$, the behaviour of the implementation differs from that of the specification, and they are even not trace equivalent. See Appendix~\ref{sec:sdc} for more discussion and the improvement of the formal modelling.
 
 % We also verify the teleportation with several different initial valuations of qubits. The input qubits are used to generate the EPR state or other fixed value in other examples, what is different from this example. The qubit $q_1$ in the inputs decides the final state of the qubit $q_3$. We can find that there is no difference between the result information from different inputs.
 
 %Another example whose outcome is non-bisimilarity is on the second last line in Table~\ref{tab:result}, which is the naive BB84 protocol with an eavesdropper. As shown in the last line of the table, we modified implementation is bisimilar to the specification.
 
-Not all the cases in Table~\ref{tab:result} give the size of the set $N$ of non-bisimilar states pairs, as the bisimulation checking algorithm may immediately terminate once a negative verification result is obtained, i.e. the two initial states are not bisimilar. 
+Not all the cases in Table~\ref{tab:result} give the size of the set $N$ of non-bisimilar state pairs, as the bisimulation checking algorithm may immediately terminate once a negative verification result is obtained, i.e. the two initial states are not bisimilar. 
 
 \section{Conclusion and Future Work}\label{sec:con}
 We have presented an on-the-fly algorithm to check ground bisimulation for quantum processes in qCCS. Based on the algorithm, we have developed a tool to verify quantum communication protocols modelled as qCCS processes without recursion.  We have carried out experiments on several non-trivial quantum communication protocols from super-dense coding to key distribution and found the tool helpful.
