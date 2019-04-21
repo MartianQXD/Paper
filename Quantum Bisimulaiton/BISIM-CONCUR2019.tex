@@ -724,7 +724,7 @@ The function $cmp$ is treated as an in-built function, so there is no need to de
 For the specification $BB84_{spec}$, we only declare the classical bits $B_a$, $B_b$, $K_a$, qubits $q_1$, $q_2$ and the operator  $Ran$. The variables and operators declared here are the same as those in the input of the implementation.
 
 \subparagraph*{Output.}
-Taking the input discussed above, the tool first generates two pLTSs, with over 130 states for each of them, and then runs the ground bisimulation checking algorithm. As we can see from the third last row in Table~\ref{tab:result}, our tool confirms that $BB84 \sim BB84_{spec}$, thus the implementation is faithful to the specification. In the output of the tool, there is an enumeration of 304 pairs of  non-bisimilar states and 414 pairs of bisimilar states. The pLTSs and the state pairs can be found in \cite{QBisim}.
+Taking the input discussed above, the tool first generates two pLTSs, with over 130 states for each of them, and then runs the ground bisimulation checking algorithm. As we can see from the third last row in Table~\ref{tab:result}, our tool confirms that $\langle BB84, \rho_0\rangle \sim \langle BB84_{spec}, \rho_0\rangle$, where $\rho_0$ denotes the initial state of the quantum register, thus the implementation is faithful to the specification. In the output of the tool, there is an enumeration of 304 pairs of  non-bisimilar states and 414 pairs of bisimilar states. The pLTSs and the state pairs can be found in \cite{QBisim}.
 
 
 
@@ -788,7 +788,7 @@ Similar to function $cmp$, the functions $SubStr$ and $RemStr$ are already decla
 
 For the specification $BB84'_{spec}$, we declare the bits $K_{ab}$, $K_{ba}$, $K^x_{ab}$ and $K^x_{ba}$. Certainly, we still need to declare $B_e$ and $K_e$.
 
-We see from the second last row in Table~\ref{tab:result} that in this case our tool gives a negative verification result, i.e. $BB84' \not\sim BB84'_{spec}$. In other words, the implemention $BB84'$ is unsatisfactory. Some modification is needed to make it behave the same as the specification.
+We see from the second last row in Table~\ref{tab:result} that in this case our tool gives a negative verification result, i.e. $\langle BB84',\rho_0\rangle \not\sim \langle BB84'_{spec},\rho_0\rangle$. In other words, the implemention $BB84'$ is unsatisfactory. Some modification is needed to make it behave the same as the specification.
 
 \subparagraph*{Improved BB84 Protocol with an Eavesdropper.}
 After carefully examining the behaviour of the process $BB84'$, we find that the problem lies in the fact that $Alice'$ and $Bob'$ have excessive freedom to trigger alarms. The implementation has more behaviours than what the specification requires. 
@@ -945,6 +945,7 @@ We define the verification conditions of our three matching functions.
 From the verification condition of \textbf{Match}, we have that if \textbf{Bisim}$(t,u)=$\textbf{Match}$(t,u,\emptyset)$ returns $(true, N)$, we guarantee the bisimilarity $t\sim u$.
 \hfill\qed
 
+\leaveout{ %954
 \begin{figure} [htbp]
 \begin{minipage}{0.1\linewidth}
   \centerline{\includegraphics[width=1.05cm]{images/Sdc-1.pdf}}
@@ -985,12 +986,13 @@ From the verification condition of \textbf{Match}, we have that if \textbf{Bisim
 \caption{Generated pLTSs. $Sdc$ is super-dense coding protocol. $Sdc_{spec}$ is the specification of super-dense coding protocol. $Tele$ is teleportation protocol. $Tele_{spec}$ is the specification of teleportation protocol.}
 \label{fig:sdc+tele}
 \end{figure}
+} %endof leaveout 954
 
 \section{Examples}
 \label{sec:examples}
 \subsection{Super-dense Coding Protocol}
-Super-dense coding is proposed by Bennett and Wiesner in 1992~\cite{BW92}. It is a quantum communication protocol allowing two classical bits to be encoded in one qubit during a transmission, so it needs only one quantum channel. Such advantage bases on the use of a maximally
-entangled state, EPR state. An EPR state can be transformed into all the four kinds of EPR states through an one-qubit operation, and these EPR states are mutually orthogonal. 
+Super-dense coding is proposed by Bennett and Wiesner in 1992~\cite{BW92}. It is a quantum communication protocol allowing two classical bits to be encoded in one qubit during a transmission, so it needs only one quantum channel. Such advantage is based on the use of a maximally
+entangled state, EPR state. An EPR state can be transformed into all the four kinds of EPR states through a 1-qubit operation, and these EPR states are mutually orthogonal. 
 \subparagraph*{Protocol.}
 We suppose the sender and the receiver of the communication are $Alice$ and $Bob$, then the protocol goes as follows:
 \begin{bracketenumerate}
@@ -1000,9 +1002,9 @@ We suppose the sender and the receiver of the communication are $Alice$ and $Bob
     \item $Bob$ applies a controlled-not operation on $q_1,q_2$ and a Hadamard operation on $q_1$ to remove the entanglement.
     \item $Bob$ measures $q_1$ and $q_2$ to get the value $x$.
 \end{bracketenumerate}
-After the execution of the protocol above, $Bob$ gets the value $x$ which $Alice$ wants to send. Considering $x$ could be presented in a two-bit string, the protocol exactly transmits two classical bits of information by sending one qubit from $Alice$ to $Bob$.
+After the execution of the protocol above, $Bob$ gets the value $x$ which $Alice$ wants to send. Note that $x$ could be represented in a two-bit string. The protocol exactly transmits two classical bits of information by sending one qubit from $Alice$ to $Bob$.
 \subparagraph*{Implementation.}
-Now we design the program of super-dense coding protocol in qCCS as follows:
+We model the super-dense coding protocol in qCCS as follows:
 \begin{flalign*}
     Alice \overset{def}{=}& \underline{c}_{A}?q_1.\sum_{0\leq  i\leq 3}(\textbf{if}\ x=i\ \textbf{then}\ \sigma^{i}[q_1].\underline{e}!q_1.\textbf{nil});\\
     Bob \overset{def}{=}& \underline{c}_{B}?q_2.\underline{e}?q_1.CN[q_1,q_2].H[q_1].M[q_1,q_2;x].d!x.\textbf{nil};\\
@@ -1011,34 +1013,35 @@ Now we design the program of super-dense coding protocol in qCCS as follows:
 \end{flalign*}
 where $CN$ is the controlled-not operation and $H$ is the Hadamard operation, $Set^{\Psi}$ is the operation transforming all the inputs into an EPR state $|\beta_{00}\rangle=(|00\rangle+|11\rangle)/\sqrt{2}$, its operation elements are $\{|\beta_{00}\rangle\langle 00|,|\beta_{00}\rangle\langle 01|,|\beta_{00}\rangle\langle 10|,|\beta_{00}\rangle\langle 11|\}$, and $\sigma^{i}$ are Pauli operators where $\sigma^{0}=I,\sigma^{1}=X,\sigma^{2}=Z,\sigma^{3}=Y$. The element set of measurement \textit{M} is $\{|00\rangle\langle 00|,|01\rangle\langle 01|,|10\rangle\langle 10|,|11\rangle\langle 11|\}$.
 \subparagraph*{Specification.}
-The specification of super-dense coding protocol can be defined as:
+The specification of the protocol can be defined as:
 \begin{flalign*}
     Sdc_{spec} \overset{def}{=}& c?x.\tau^{11}.\sum_{i=0}^{3}(\textbf{if}\ x=i\ \textbf{then}\ Set^{i}[q_1,q_2].d!x.\textbf{nil})
 \end{flalign*}
-where $Set^{i}$ is the operation transforming the current state into the state decided by the value of $i$ like $Set^{\Psi}$.
-\subparagraph*{Inputs.}
-Together with the program in qCCS, we also declare following variables and operators in the input of the implementation program.
+where $Set^{i}$ is the operation of transforming the current state into the state decided by the value of $i$ like $Set^{\Psi}$.
+\subparagraph*{Input.}
+Associated with the specification $Sdc$ are the following variables and operators that need to be declared.
 \begin{itemize}
-    \item The classical bit is named $x$. It stores the value $Alice$ wants to send. We test the program with different value of $x$.
-    \item The qubits used are declared as a vector $|q_1,q_2\rangle$. They are used for generating the EPR state here, so we can choose arbitrary value indeed. Here we set them to $|00\rangle$.
-    \item The operation transforming arbitrary state into the EPR state is defined as $Set^{\Psi}$. 
-    \item The controlled-not operation is defined as $\mathcal{CN}$.
-    \item The Hadamard operation is defined as $\mathcal{H}$.
-    \item The Pauli operations are defined as $\sigma^0,\sigma^1,\sigma^2,\sigma^3$ separately.
-    \item The measurement is defined as $M$ with its elements.
+    \item The classical bit is named $x$. It stores the value $Alice$ wants to send. We test the program with different values of $x$.
+    \item The qubits are declared as a vector $|q_1,q_2\rangle$. They are used for generating the EPR state here. Without loss of generality, we set them to be $|00\rangle$.
+    \item The operation of transforming $|00\rangle$ into the EPR state is defined as $Set^{\Psi}$. 
+    \item The controlled-not operation is defined as $CN$.
+    \item The Hadamard operation is defined as $H$.
+    \item The Pauli operations are defined as $\sigma^0,\sigma^1,\sigma^2$ and $\sigma^3$.
+    \item The measurement is defined as $M$ with its operation elements.
 \end{itemize}
-Then for the specification program, we declare a set of variables and operators slightly different.
-\begin{itemize}
-    \item The classical bit named $x$ storing the value $Alice$ wants to send is still required.
-    \item The qubits used are declared as a vector $|q_1,q_2\rangle$, they can be set to arbitrary value. Here we set them to $|00\rangle$.
-    \item The operation transforming arbitrary state into $|00\rangle$ (resp. $|01\rangle$, $|10\rangle$, $|11\rangle$) is defined as $Set^{0}$ (resp. $Set^{1}$, $Set^{2}$, $Set^{3}$).
-\end{itemize}
-\subparagraph*{Generated pLTSs.}
-The generated pLTSs of the super-dense coding example is illustrated in Figure~\ref{fig:sdc+tele}(a)-Figure~\ref{fig:sdc+tele}(d). If $x=1$, the length of the paths from both sides are 15. However, if $x=5$, the length of the paths from both sides are different.
 
-We see from the first two lines of Table~\ref{tab:result}, not all the inputs can get a positive verification results. Although in the case $x=1$, we can check that protocol and its specification are bisimilar. In the case $x=5$, when none of the four branches is chosen, the tool found them non-bisimilar because of the different length of the trace which has been already showed in their pLTSs. To correct it, some modifications are needed on both implementation and specification.
+For the specification $Sdc_{spec}$, we declare the following set of variables and operators.
+\begin{itemize}
+    \item The classical bit named $x$ is still required to store the value $Alice$ wants to send.
+    \item The qubits are declared as a vector $|q_1,q_2\rangle$. We set them to be $|00\rangle$.
+    \item The operation of transforming an arbitrary state into $|00\rangle$ (resp. $|01\rangle$, $|10\rangle$, $|11\rangle$) is defined as $Set^{0}$ (resp. $Set^{1}$, $Set^{2}$, $Set^{3}$).
+\end{itemize}
+%\subparagraph*{Generated pLTSs.}
+%The generated pLTSs of the super-dense coding example is illustrated in Figure~\ref{fig:sdc+tele}(a)-Figure~\ref{fig:sdc+tele}(d). If $x=1$, the length of the paths from both sides are 15. However, if $x=5$, the length of the paths from both sides are different.
+
+We see from the first two lines of Table~\ref{tab:result} that not all the inputs can get a positive verification result. In the case $x=1$, we can check that $\langle Sdc,\rho_0\rangle \sim \langle Sdc_{spec},\rho_0\rangle$, where $\rho_0$ is the initial state of the quantum variables. In the case $x=5$,  none of the four branches can be chosen, then the tool find that  $\langle Sdc,\rho_0\rangle \not\sim \langle Sdc_{spec},\rho_0\rangle$. To correct it, some modifications are needed on both the implementation and the specification.
 \subparagraph*{Improved Super-dense Coding Protocol.}
-We improve the program through adding an extra solution for the value $i\neq 1,2,3,4$. We send a message alarming we have encountered such case and skip all the rest operations. The new program of $Sdc$ is:
+We improve the above qCCS programs by considering the case $i\neq 1,2,3,4$. In such case we send an alarming message and skip all the rest of operations. The new specification $Sdc'$ is defined below:
 \begin{flalign*}
     Alice \overset{def}{=}& \underline{c}_{A}?q_1.(\sum_{0\leq  i\leq 3}(\textbf{if}\ x=i\ \textbf{then}\ \sigma^{i}[q_1].\underline{e}!q_1.\textbf{nil})\ \\
     & +\ \textbf{if}\ \neg\bigvee_{0\leq  i\leq 3} x=i\ \textbf{then}\ c_{C}!msg.\textbf{nil});\\
@@ -1046,50 +1049,48 @@ We improve the program through adding an extra solution for the value $i\neq 1,2
     EPR \overset{def}{=}& Set^{\Psi}[q_1,q_2].\underline{c}_{B}!q_2.\underline{c}_{A}!q_1.\textbf{nil};\\
     Sdc \overset{def}{=}& c?x.(Alice||Bob||EPR)\setminus \{\underline{c}_{A},\underline{c}_{B},c_{C},\underline{e}\}.
 \end{flalign*}
-And we adjust the specification as the program has a new branch, so it is defined as:
+We adjust the specification to add a new branch, so as to get $Sdc'_{spec}$:
 \begin{flalign*}
     Sdc_{spec} \overset{def}{=}& c?x.\tau^{11}.\sum_{i=0}^{3}(\textbf{if}\ x=i\ \textbf{then}\ Set^{i}[q_1,q_2].d!x.\textbf{nil})\\
     &\ +\ \textbf{if}\ \neg\bigvee_{0\leq  i\leq 3} x=i\  \textbf{then}\ Set^{\Psi}[q_1,q_2].d!x.\textbf{nil}).
 \end{flalign*}
 
-We can find that the improved programs becomes bisimilar in Table~\ref{tab:result}.
+The improved modelling processes are indeed bisimilar, as can be seen in Table~\ref{tab:result}.
 \subsection{Quantum Teleportation Protocol}
-Quantum teleportation~\cite{BB93} is one of the most important protocols in quantum information theory. It teleports an unknown quantum state by only sending classical information, so it just requires a classical communications channel. It makes the use of the maximally entangled states that the post-measurement state can be known from the result of partial measurement for a set of entangled states. 
+Quantum teleportation~\cite{BB93} is one of the most important protocols in quantum information theory. It teleports an unknown quantum state by only sending classical information, so it just requires a classical communication channel. It makes use of a maximally entangled state. 
+%The post-measurement state can be known from the result of partial measurement for a set of entangled states. 
 \subparagraph*{Protocol.}
-Let sender and receiver to be $Alice$ and $Bob$ as defined in super-dense coding example, the quantum teleportation protocol goes as follows:
+Let the sender and the receiver  be $Alice$ and $Bob$, respectively. The quantum teleportation protocol goes as follows:
 \begin{bracketenumerate}
     \item $Alice$ and $Bob$ prepare an EPR state $|\beta_{00}\rangle_{q_2,q_3}$ together. Then they share the qubits, $Alice$ holding $q_2$ and $Bob$ holding $q_3$.
     \item To transmit qubit $q_1$, $Alice$ applies a $CN$ operation on $q_1$ and $q_2$ followed by a $H$ operation on $q_1$.
     \item $Alice$ measures $q_1$ and $q_2$ and sends the outcome $x$ to $Bob$.
-    \item $Bob$ applies corresponding $\sigma^{x}$ operation on his qubit $q_3$ to recover the original state of $q_1$.
+    \item When $Bob$ receives $x$, he applies the  corresponding $\sigma^{x}$ operation on his qubit $q_3$ to recover the original state of $q_1$.
 \end{bracketenumerate}
 After the execution, $Bob's$ qubit $q_3$ has the same state as the qubit $q_1$.
 \subparagraph*{Implementation.}
-The program of quantum teleportation protocol can be encoded in qCCS as follows:
+We provide below an implementation of the  quantum teleportation protocol:
 \begin{flalign*}
     Alice \overset{def}{=}& \underline{c}_{A}?q2.CN[q_1,q_2].H[q_1].M[q_1,q_2;x].Set^{\Psi}[q_1,q_2].e!x.\textbf{nil};\\
     Bob \overset{def}{=}& \underline{c}_{B}?q_3.e?x.\sum_{0\leq i\leq 3}(\textbf{if}\ x=i\ \textbf{then}\ \sigma^{i}[q_3].\textbf{nil});\\
     EPR \overset{def}{=}& Set^{\Psi}[q_1,q_2].\underline{c}_{A}!q_2.\underline{c}_{B}!q_3.\textbf{nil};\\
     Tel \overset{def}{=}& (Alice||Bob||EPR)\setminus \{\underline{c}_{A},\underline{c}_{B},e\}
 \end{flalign*}
-where the operators used are all already declared before. 
+where the operators used here are all already declared before. 
 \subparagraph*{Specification.}
-The specification of quantum teleportation protocol can also be described in qCCS. To show the soundness of $Tel$, it suffices to prove that $Tel$ is bisimilar to an swap operation between the first and the thrid qubits, that is $SWAP_{1,3}[q_1,q_3]$. The program can be encoded as follow:
+The specification of the protocol can also be described in qCCS. To show the soundness of $Tel$, it suffices to prove that $Tel$ is bisimilar to an swap operation between the first and the thrid qubits, that is $SWAP_{1,3}[q_1,q_3]$. The specification is thus easy.
 \begin{flalign*}
-    Spec &\overset{def}{=} \tau^{13}.SWAP[q_1,q_3].\textbf{nil}.
+    Tel_{spec} &\overset{def}{=} \tau^{13}.SWAP[q_1,q_3].\textbf{nil}.
 \end{flalign*}
-\subparagraph*{Inputs.}
-Some the operators defined in the inputs are the same as those defined in the super-dense coding example, so we do not repeat them. And we need declare following variables in the input of the implementation.
+\subparagraph*{Input.}
+Some of the operators defined in the input are the same as those  in the super-dense coding example, so we do not repeat them. We need to declare the following variables associated with the implementation.
 \begin{itemize}
-    \item The classical bits $x$ is declared here for storing the measurement result of qubits $q_1$, $q_2$.
-    \item The qubits are declared together as a vector $|q_1,q_2,q_3\rangle$. The values of the last two qubits are arbitrary as they will be transformed into EPR state later. However the first qubit $q_1$ is which $Alice$ wants to teleport. We set it to be $|\psi00\rangle$ and test the program in different value of $|\psi\rangle$.
+    \item The classical bits $x$ is declared here  to store the measurement result of qubits $q_1$, $q_2$.
+    \item The qubits are declared together as a vector $|q_1,q_2,q_3\rangle$. The first qubit $q_1$ is what $Alice$ wants to teleport.  The values of the last two qubits are arbitrary as they will be transformed into an EPR state later. We set the quantum register to be $|\psi00\rangle$ and test the processes with different values of $|\psi\rangle$.
 \end{itemize}
-The specification program declare the same set of variables. And only one operation $\mathcal{SWAP}_{1,3}$ is defined in the input.
+The specification $Tel_{spec} $ declares the same set of variables. And only one operation $\mathcal{SWAP}_{1,3}$ is defined in the input.
 
-\subparagraph*{Generated pLTSs.}
-The generated pLTSs of the teleportation example is illustrated in Figure~\ref{fig:sdc+tele}(e) and Figure~\ref{fig:sdc+tele}(f). The implementation pLTS has four branches while the specification pLTS has one branch. The length of all the paths of them are 15. The pLTSs of other valuations of $x$ are all the same as these.
-
-We see from the results of Table~\ref{tab:result}, the programs are checked bisimilar with all the three different valuations of $q_1$.
+We see from the Table~\ref{tab:result} that $Tel$ and $Tel_{spec}$ hebave the same with all the three different values of $q_1$.
 %\subsection{Quantum Secret Sharing Protocol}
 %Quantum Secret Sharing Protocol is first developed by Hillery et al.~\cite{hillery1999quantum}. The problem involves an agent $Alice$ sending information to other two agents $Bob$ and $Charlie$ one of whom is dishonest. It is a classical method which is known as secret sharing that $Alice$ split the information into two parts, then $Bob$ and $Charlie$ need collaboration to get the complete information. It lets the honest one keep the dishonest one from doing damage. A quantum version of it can be realized by a three-qubit maximally entangled state called GHZ state, which has similar property as EPR state. The protocol goes as follows:
 %\begin{bracketenumerate}
@@ -1117,7 +1118,7 @@ We see from the results of Table~\ref{tab:result}, the programs are checked bisi
 %    Spec &\overset{def}{=} \tau^{24}.SWAP[q_1,q_4].\textbf{nil}.
 %\end{flalign*}
 \subsection{Quantum Secret Sharing Protocol}
-Quantum secret sharing protocol was proposed by Hillery et al.~\cite{hillery1999quantum}. The problem involves an agent $Alice$ sending information to other two agents $Bob$ and $Charlie$, one of whom is dishonest. It is a classical method which is known as secret sharing that $Alice$ split the information into two parts, then $Bob$ and $Charlie$ need collaboration to get the complete information. The idea is to let the honest one keep the dishonest one from doing damage. A quantum version of it can be realized by a three-qubit maximally entangled state called GHZ state, which has similar property as EPR state. 
+Quantum secret sharing protocol was proposed by Hillery et al.~\cite{hillery1999quantum}. The problem involves an agent $Alice$ sending information to other two agents $Bob$ and $Charlie$, one of whom is dishonest. It is a classical method which is known as secret sharing that $Alice$ split the information into two parts, then $Bob$ and $Charlie$ need to collaborate to get the complete information. The idea is to let the honest one keep the dishonest one from misbehaving. A quantum version of it can be realised by a three-qubit maximally entangled state called GHZ state, which has similar property as EPR states. 
 \subparagraph*{Protocol.}
 The protocol goes as follows:
 \begin{bracketenumerate}
@@ -1138,25 +1139,24 @@ Charlie \overset{def}{=}& \underline{c}_{C}?q_4.e?m.f?n.g?o.\\
 GHZ \overset{def}{=}& Set^{GHZ}[q_2,q_3,q_4].\underline{c}_{A}!q_2.\underline{c}_{B}!q_3.\underline{c}_{C}!q_4.\textbf{nil};\\
 QSS \overset{def}{=}& (Alice||Bob||Charlie||GHZ)\setminus \{\underline{c}_{A},\underline{c}_{B},\underline{c}_{C},e,f,g\}
 \end{flalign*}
-where the operators used are all already declared before except that $Set^{GHZ}$ is the operation transforming all the inputs into a GHZ state.
+where the operators used are all already declared before except that $Set^{GHZ}$ is the operation transforming all the input into a GHZ state.
 \subparagraph*{Specification.}
 To show the above implementation is correct, we prove that $QSS$ is bisimilar to a swap operation between the first and the fouth qubits, that is $SWAP_{1,4}[q_1,q_4]$. The specification can be written as follow:
 \begin{flalign*}
-Spec &\overset{def}{=} \tau^{24}.SWAP[q_1,q_4].\textbf{nil}.
+QSS_{spec} &\overset{def}{=} \tau^{24}.SWAP[q_1,q_4].\textbf{nil}.
 \end{flalign*}
-where we have inserted some harmless $\tau$ transitions ($\tau^{24}$ stands for a series of $24$ $\tau$-transitions) because in ground bisimulations $\tau$-actions are not abstracted away. We will investigate this relaxation and  weak ground bisimulations in the future. 
-\subparagraph*{Inputs.}
-In the input of the implementation, the secret sharing protocol also need to define the Clifford operations and Pauli operations presented before. And there are other variables and operations we need to declare.
+where we have inserted some harmless $\tau$ transitions ($\tau^{24}$ stands for a series of $24$ $\tau$-transitions) because in ground bisimulations $\tau$-actions are not abstracted away. 
+%We will investigate this relaxation and  weak ground bisimulations in the future. 
+\subparagraph*{Input.}
+In the input of the implementation, we also need to define the Clifford operations and Pauli operations presented before. Other variables and operations are declared as follows.
 \begin{itemize}
-    \item The classical bits $m$, $n$ and $o$ are declared for storing the measurement result of qubits $q_1$, $q_2$ and $q_3$.
-    \item The qubits are declared together as a vector $|q_1,q_2,q_3,q_4\rangle$. Similar with the teleportation example, the values of the last three qubits are arbitrary as they will be transformed into GHZ state later. And the first qubit $q_1$ will be set to several different value to test the programs.
-    \item The operation transforming arbitrary state into the GHZ state is defined as $Set^{GHZ}$.
+    \item The classical bits $m$, $n$ and $o$ are declared to store the measurement result of qubits $q_1$, $q_2$ and $q_3$.
+    \item The qubits are declared together as a vector $|q_1,q_2,q_3,q_4\rangle$. Similar to the teleportation example, the values of the last three qubits are arbitrary as they will be transformed into a GHZ state later. And the first qubit $q_1$ will be set to several different values to test the implementation.
+    \item The operation of transforming an arbitrary state into the GHZ state is defined as $Set^{GHZ}$.
 \end{itemize}
-The specification program declare the same set of variables. The only operation required is defined as $\mathcal{SWAP}_{1,4}$.
+The specification process declares the same set of variables. The only operation required is defined as $\mathcal{SWAP}_{1,4}$.
 
-The pLTSs generated in this example is too large (102 nodes and 26 nodes), so we do not present them here.
-
-From the results of Table~\ref{tab:result},  we find that the programs are bisimilar with their specifications of all the three different valuations of $q_1$.
+We can see from Table~\ref{tab:result} that the implementation behaves the same as the specification for all the three different values of $q_1$.
 
 \section{Matrix Presentation of Quantum Operators}
 We have frequently used Hadamard operator, controlled-not operator and Pauli operators in our examples. Indeed they have certain schematic symbols and matrix presentations which have already been used for a long time. Here we list them together below.
