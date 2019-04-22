@@ -916,7 +916,7 @@ We define the verification conditions of our three matching functions.
 	If $\textbf{MatchAction}_\gamma(\gamma,t,u,W)$ is $true$ for each action $\gamma$ then \textbf{Match}$(t,u,W)$ is also $true$, and it returns $\theta=\bigwedge_\gamma\theta_\gamma$ and $N=\bigcup_\gamma N_\gamma$.
 \end{proposition}
 \begin{proof}
-	The only time point that $(t,u)$ is added into $W$ is during the execution of \textbf{MatchAction}, then according to the Definition~\ref{def:matchaction}, we have $W\cap N=\emptyset$. Since the verified pLTS is a finite tree, if they reach the leaf states of the pLTSs, there should be $\theta=true$, $N=\emptyset$ and $B=\{(t,u)\}$, at the same time $(t,u)\notin W\wedge(t,u)\notin N\wedge(t,u)\in B$. Furthermore, we have $t\sim u$ in such case. According to the structure of the function, $(t,u)$ will be added into $N$ if $\theta$ is false and $B$ if $\theta$ is true. As a result, $C1$ is satisfied.
+	The only time point that $(t,u)$ is added into $W$ is during the execution of \textbf{MatchAction}, then according to the Definition~\ref{def:matchaction}, we have $W\cap N=\emptyset$ and $W\cap B=\emptyset$. Since the verified pLTS is a finite tree, if they reach the leaf states of the pLTSs, there should be $\theta=true$, $N=\emptyset$ and $B=\{(t,u)\}$, at the same time $(t,u)\notin W\wedge(t,u)\notin N\wedge(t,u)\in B$. Furthermore, we have $t\sim u$ in such case. According to the structure of the function, $(t,u)$ will be added into $N$ if $\theta$ is false and $B$ if $\theta$ is true. As a result, $C1$ is satisfied.
 	
 	From conditions (M2) and (M3), \texttt{R}$(t,u,W,N_{\gamma},B_{\gamma})$ exists. According to Lemma~\ref{lem:n_merge}, we have the condition that \texttt{R}$(t,u,W,\bigcup_{\gamma}N_{\gamma},\bigcup_{\gamma}B_{\gamma})$, and then $C2$ is satisfied.
 \end{proof}
@@ -925,7 +925,7 @@ We define the verification conditions of our three matching functions.
 W\cup\{(t,u)\})$ is $true$ for all actions $\gamma=\tau$ when there exist transitions $(t\xrightarrow{\tau}\Delta_i,u\xrightarrow{\tau}\Theta_j)$. Then \textbf{MatchAction}$(\gamma,t,u,W\cup\{(t,u)\})$ is $true$ and $\theta=\bigwedge_i(\bigvee_j\theta_{ij})\wedge\bigwedge_j(\bigvee_i\theta_{ij})$, $N=\bigcup N_{ij}$.
 \end{proposition}
 \begin{proof}
-	From the structure of \textbf{MatchAction}, $(t,u)$ does not exist in $W$, and $(t,u)$ can not be added into $N$ here. So the first condition is satisfied.
+	From the structure of \textbf{MatchAction}, $(t,u)$ does not exist in $W$, and $(t,u)$ can not be added into $N$ or $B$ here. So the first condition is satisfied.
 	
 	To show $(M2)$ and $(M3)$, we first consider the case where $(t_i,u_j)$ are already the leaves of the finite trees. If $\theta_{ij}=qv(t_i)=qv(u_j)\wedge(tr_{\overline{qv(u_i)}}\rho_i)=tr_{\overline{qv(u_j)}}(\sigma_j)$ is $true$, we have $(t_i,u_j)\in B_{ij}$ and $N_{ij}=\emptyset$. As there is no more outgoing transitions, we have $t_i\sim u_j$.
 	
@@ -1053,15 +1053,15 @@ We see from the first two lines of Table~\ref{tab:result} that not all the input
 \subparagraph*{Improved Super-dense Coding Protocol.}
 We improve the above qCCS programs by considering the case $i\neq 1,2,3,4$. In such case we send an alarming message and skip all the rest of operations. The new specification $Sdc'$ is defined below:
 \begin{flalign*}
-    Alice \overset{def}{=}& \underline{c}_{A}?q_1.(\sum_{0\leq  i\leq 3}(\textbf{if}\ x=i\ \textbf{then}\ \sigma^{i}[q_1].\underline{e}!q_1.\textbf{nil})\ \\
+    Alice' \overset{def}{=}& \underline{c}_{A}?q_1.(\sum_{0\leq  i\leq 3}(\textbf{if}\ x=i\ \textbf{then}\ \sigma^{i}[q_1].\underline{e}!q_1.\textbf{nil})\ \\
     & +\ \textbf{if}\ \neg\bigvee_{0\leq  i\leq 3} x=i\ \textbf{then}\ c_{C}!msg.\textbf{nil});\\
-    Bob \overset{def}{=}& \underline{c}_{B}?q_2.(\underline{e}?q_1.CN[q_1,q_2].H[q_1].M[q_1,q_2;x].d!x.\textbf{nil}\ +\ c_{C}?msg.\tau^{8}.d!x.\textbf{nil});\\
+    Bob' \overset{def}{=}& \underline{c}_{B}?q_2.(\underline{e}?q_1.CN[q_1,q_2].H[q_1].M[q_1,q_2;x].d!x.\textbf{nil}\ +\ c_{C}?msg.\tau^{8}.d!x.\textbf{nil});\\
     EPR \overset{def}{=}& Set^{\Psi}[q_1,q_2].\underline{c}_{B}!q_2.\underline{c}_{A}!q_1.\textbf{nil};\\
-    Sdc \overset{def}{=}& c?x.(Alice||Bob||EPR)\setminus \{\underline{c}_{A},\underline{c}_{B},c_{C},\underline{e}\}.
+    Sdc' \overset{def}{=}& c?x.(Alice||Bob||EPR)\setminus \{\underline{c}_{A},\underline{c}_{B},c_{C},\underline{e}\}.
 \end{flalign*}
 We adjust the specification to add a new branch, so as to get $Sdc'_{spec}$:
 \begin{flalign*}
-    Sdc_{spec} \overset{def}{=}& c?x.\tau^{11}.\sum_{i=0}^{3}(\textbf{if}\ x=i\ \textbf{then}\ Set^{i}[q_1,q_2].d!x.\textbf{nil})\\
+    Sdc'_{spec} \overset{def}{=}& c?x.\tau^{11}.(\sum_{i=0}^{3}(\textbf{if}\ x=i\ \textbf{then}\ Set^{i}[q_1,q_2].d!x.\textbf{nil})\\
     &\ +\ \textbf{if}\ \neg\bigvee_{0\leq  i\leq 3} x=i\  \textbf{then}\ Set^{\Psi}[q_1,q_2].d!x.\textbf{nil}).
 \end{flalign*}
 
@@ -1128,7 +1128,7 @@ We see from  Table~\ref{tab:result} that $Tel$ and $Tel_{spec}$ hebave the same 
 %    Spec &\overset{def}{=} \tau^{24}.SWAP[q_1,q_4].\textbf{nil}.
 %\end{flalign*}
 \subsection{Quantum Secret Sharing Protocol}
-Quantum secret sharing protocol was proposed by Hillery et al.~\cite{hillery1999quantum}. The problem involves an agent $Alice$ sending information to other two agents $Bob$ and $Charlie$, one of whom is dishonest. It is a classical method which is known as secret sharing that $Alice$ split the information into two parts, then $Bob$ and $Charlie$ need to collaborate to get the complete information. The idea is to let the honest one keep the dishonest one from misbehaving. A quantum version of it can be realised by a three-qubit maximally entangled state called GHZ state, which has similar property as EPR states. 
+Quantum secret sharing protocol is proposed by Hillery et al.~\cite{hillery1999quantum}. The problem involves an agent $Alice$ sending information to other two agents $Bob$ and $Charlie$, one of whom is dishonest. It is a classical method which is known as secret sharing that $Alice$ splits the information into two parts, then $Bob$ and $Charlie$ need to collaborate to get the complete information. The idea is to let the honest one keep the dishonest one from misbehaving. A quantum version of it can be realised by a three-qubit maximally entangled state called GHZ state, which has similar property as EPR states. 
 \subparagraph*{Protocol.}
 The protocol goes as follows:
 \begin{bracketenumerate}
