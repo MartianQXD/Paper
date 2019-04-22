@@ -502,12 +502,12 @@ Modifying the algorithm to deal with pLTSs with loops is possible, with an incre
 In Algorithm~\ref{alg:bisim}, the main function is \textbf{Bisim}$(t,u)$. It initialises the start state pair $(t,u)$, the set $W$ for visited state pairs, which is empty initially, and then searches for a bisimulation based on that initialisation. 
 %The difference between it and that in the previous work in several aspects.
 The algorithm keeps updating three sets: the above mentioned $W$, the set $N$ for non-bisimilar state pairs and the set $B$ for bisimilar state pairs. The function \textbf{Match}$(t,u,W)$ invokes a depth-first traversal to match a pair of 
-states $(t,u)$ with all their possible behaviors. There are three possibilities that two states are deemed non-bisimilar:  (1) one state has a transition that the other cannot match, (2) they do have have the same set of free quantum variables, or (3) the density operators corresponding to their quantum registers are different. If one of the three cases takes places, we add the state pair into $N$. Otherwise these two states are bisimilar, then we add the state pair into $B$.
+states $(t,u)$ with all their possible behaviors. There are three possibilities that two states are deemed non-bisimilar:  (1) one state has a transition that the other cannot match, (2) they do not have the same set of free quantum variables, or (3) the density operators corresponding to their quantum registers are different. If one of the three cases takes place, we add the state pair into $N$. Otherwise these two states are bisimilar, then we add the state pair into $B$.
 
 An auxiliary function \textbf{Act}$(t,u)$ is called in \textbf{Match} to discover the next action that both $t$ and $u$ can perform. If the two states have no more action to do then the function returns an empty set. If only one of them has no more action to do then the two states are immediately declared to be non-bisimilar. 
 %It makes the algorithm more efficient as it terminates at an early time point if those pLTSs are indeed not bisimilar. Next we prove why we can ensure that.
 
-The other set $W$ is updated in function \textbf{MatchAction}$(\gamma,t,u,W)$. This function discovers next pairs or states or distributions, depending on the type of transitions,  and recursively invokes the function \textbf{Match} or \textbf{MatchDistribution}. The current state pair is added to $W$ when the new functions are invoked.
+The other set $W$ is updated in function \textbf{MatchAction}$(\gamma,t,u,W)$. This function discovers next pairs of states or distributions, depending on the type of transitions,  and recursively invokes the function \textbf{Match} or \textbf{MatchDistribution}. The current state pair is added to $W$ when the new functions are invoked.
 
 
 
