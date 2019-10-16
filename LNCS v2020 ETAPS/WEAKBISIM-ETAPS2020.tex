@@ -3,7 +3,7 @@
 % Version 2.20 of 2017/10/04
 %
 \RequirePackage{amsmath}
-\documentclass[runningheads]{llncs}
+\documentclass[a4paper,runningheads]{llncs}
 %
 %This is a template for producing LIPIcs articles. 
 %See lipics-manual.pdf for further information.
@@ -415,7 +415,7 @@ $\Delta\Cpar P$ is the distribution defined by:
 \end{array}\right.\]
 Similar extension applies to $\Delta[f]$ and $\Delta\backslash L$.
 
-Suppose there is a configuration $\CC=\langle P,\rho\rangle$, the partial trace over system $P$ at such state can be defined as $tr_{qv(P)}(\rho)$. Then we give the definition of the bisimulation relation and bisimilarity. 
+Suppose there is a configuration $\CC=\langle P,\rho\rangle$, the partial trace over system $P$ at such moment can be defined as $tr_{qv(P)}(\rho)$. Then we give the definition of the bisimulation relation and bisimilarity. 
 
 \begin{definition}[\cite{DF12}]
 	A relation $\aRel\ \subseteq \Con\times\Con$ is a \emph{ground simulation} if
@@ -433,7 +433,7 @@ Suppose there is a configuration $\CC=\langle P,\rho\rangle$, the partial trace 
 \label{sec:algorithm}
 We present an on-the-fly algorithm to check if two configurations are ground weak bisimilar. 
 
-The algorithm updates two tables $NonBisim$, $Bisim$ to keep the verification results. When the algorithm terminates, $Bisim$ should contain all the state pairs satisfy the bisimulation relation.
+The algorithm updates two tables $NonBisim$, $Bisim$ to record the verification results. When the algorithm terminates, $Bisim$ should contain all the state pairs satisfy the bisimulation relation.
 
 The function $\textbf{Bisim}(t,u)$, as what shown in Algorithm~\ref{alg:weak_bisim}, is the main function of the algorithm, which attempts to find the smallest bisimulation containing the pair $(t,u)$. It initialises $Bisim$ and a set named $Visited$ to store the visited pairs, then calls the function $\textbf{Match}$ to search for a bisimulation. The function \textbf{Match}$(t,u,Visited)$ invokes a depth-first traversal to match a pair of states $(t,u)$ with all their possible behaviours. The set $Visited$ is updated before the traversal for detecting the loops. We also match the behaviours of $(t,u)$ from another direction as we are checking a symmetric relation. A pair of states is deemed non-bisimilar in three cases:
 \begin{itemize}
@@ -574,6 +574,7 @@ Given two states $t$ and $u$ from two pLTSs, \textbf{WeakBisimulation(t,u)} alwa
 The algorithm starts with the empty sets $NonBisim$ and $Bisim$. The next action to perform will be detected in \textbf{Match}. Then it invokes function \textbf{MatchAction} to find the next new pair of states and recursively call function \textbf{Match} to check them. Each time the state pair is checked not bisimilar in function \textbf{Match}, it adds the state pair into $NonBisim$. Meanwhile, if it is also contained in the $Assumed$, the algorithm restarts a new execution of \textbf{Bisim}. Let variable $k$ denote the number of executions of \textbf{Bisim}, and $NonBisim_{k}$ be the set $NonBisim$ at the end of $\textbf{Bisim}_{k}$. From the structure of algorithm described before, we know $NonBisim_{k}\subseteq NonBisim_{k+1}$. As the system we considered contains finite states, there exists $n$ that $\textbf{Bisim}_{n}$ is the last execution of $\textbf{Bisim}$ and $\forall k<n, NonBisim_{k}\subseteq NonBisim_{n}$.
 
 At the execution of $\textbf{Bisim}_{n}$, no more exceptions will be raised. Each time \textbf{Match} executes with $t,u$ as its parameters, we will add $(t,u)$ into $Visited$ at the same time. Furthermore, if we reach the leaf nodes, there is no more action, we only compare the quantum variables used and the state of quantum registers. Since the system is finite, there will be no more state pairs can be added into $Visited$. From the structure of \textbf{Close}, the function $Match$ will not be invoked again.  Then the whole algorithm terminates.
+\qed
 \end{proof}
 
 \begin{theorem}[Correctness]\label{thm:correctness}
@@ -589,6 +590,7 @@ Then we discuss the final return of the $\textbf{Bisim}_{n}$. If the return is $
     \item $tr_{qv(t)}(\rho)=tr_{qv(u)}(\sigma)$.
 \end{itemize}
 The algorithm adds pairs into $Assumed_{n}$, if it is detected contained in $Visited_{n}$ in \textbf{MatchAction}. It implies that $Assumed_{n}\subseteq Visited_{n}$. Furthermore, as there no wrong assumption detected we have $Assumed_{n}\subseteq Bisim_{n}$ which implies that $Bisim_{n}=Assumed_{n}\cup Bisim_{n}$. So $Bisim_{n}$ constitutes a bisimulation relation containing the root state pair $(t, u)$.
+\qed
 \end{proof}
 
 At the end of this section, we analyse the time complexity of the algorithm.
@@ -598,6 +600,7 @@ Let the number of nodes reachable from $t$ and $u$ be n. The time complexity of 
 \end{theorem}
 \begin{proof}
 The number of state pairs is at most $n^2$. The number of state pairs examined in the $k$th execution of \textbf{Bisim} is at most $O(n^2-k)$. Therefore, the total number of state pairs examined is as most $O(n^2+(n^2-1)+...+1)=O(n^4)$. Since the pLTSs are assumed to be finite trees, the number of comparisons of transitions does not exceed some constant. Moreover, each comparison may call the function \textbf{LP} at most once, where constructing of the flow network and solving the linear programming problem are both polynomial in $n$ if we use the algorithm in~\cite{TH15}. As a result, the whole algorithm is also polynomial in $n$.
+\qed
 \end{proof}
 
 \section{Implementation and Experiments}
@@ -941,7 +944,9 @@ Not all the cases in Table~\ref{tab:weak_result} give the size of the set $NonBi
 We have presented an on-the-fly algorithm to check ground bisimulation for quantum processes in qCCS. Based on the algorithm, we have developed a tool to verify quantum communication protocols modelled as qCCS processes without recursion. The behavioural equivalence considered in the previous work is a strong notion of ground bisimulation with all actions visible. In current work, our algorithm verifies a weak notion of bisimulation that abstracts away invisible actions. We have carried out experiments on several non-trivial quantum communication protocols from super-dense coding to key distribution and found the tool helpful.
 
 As to future work, there are several interesting problems remain to be addressed.
-For example, there is a problem with the current work is to compare quantum processes with predetermined states of quantum registers. Indeed, there are occasions where one would expect two processes to be equivalent for arbitrary initial states. It is infeasible to enumerate all those states. Then the symbolic bisimulations proposed in~\cite{FDY14} will be useful. We are considering to implement the algorithm for symbolic ground bisimulation, and then tackle the more challenging symbolic open bisimulation, both proposed in that work. Another problem may stay in the experiment of Section~\ref{sec:ss}. The example tested one qubit instead of a sequence of qubits because of more qubits leading to exponential growth of the runtime.
+For example, there is a problem with the current work is to compare quantum processes with predetermined states of quantum registers. Indeed, there are occasions where one would expect two processes to be equivalent for arbitrary initial states. It is infeasible to enumerate all those states. Then the symbolic bisimulations proposed in~\cite{FDY14} will be useful. We are considering to implement the algorithm for symbolic ground bisimulation, and then tackle the more challenging symbolic open bisimulation, both proposed in that work. 
+
+Another problem may stay in the experiment of Section~\ref{sec:ss} where for convenience of the experiment we only consider the case that there is one qubit instead of a sequence of qubits which presents the security showed in the origin paper~\cite{BB84}. Several previous works~\cite{Mayers98,LC99,SP00} suppose a stronger eavesdropper who is able to make any operation permitted by quantum mechanic to manipulate the sequence of the qubits as a single entity when attacking the communication. A sequence of qubits is inevitably required when checking the protocol in such case. The difficulty in checking whether the protocol is secure under the joint attack is in more qubits leading to exponential growth of the runtime.
 %
 % ---- Bibliography ----
 %
@@ -1072,6 +1077,7 @@ Given two states $t$ and $u$ from two pLTSs, \textbf{Bisimulation(t,u)} always t
 The algorithm starts with the empty sets $NonBisim$ and $Bisim$. The next action to perform will be detected in \textbf{Match}. Then it invokes function \textbf{MatchAction} to find the next new pair of states and recursively call function \textbf{Match} to check them. Each time the state pair is checked not bisimilar in function \textbf{Match}, it adds the state pair into $NonBisim$. Meanwhile, if it is also contained in the $Assumed$, the algorithm restarts a new execution of \textbf{Bisim}. Let variable $k$ denote the number of executions of \textbf{Bisim}, and $NonBisim_{k}$ be the set $NonBisim$ at the end of $\textbf{Bisim}_{k}$. From the structure of algorithm described before, we know $NonBisim_{k}\subseteq NonBisim_{k+1}$. As the system we considered contains finite states, there exists $n$ that $\textbf{Bisim}_{n}$ is the last execution of $\textbf{Bisim}$ and $\forall k<n, NonBisim_{k}\subseteq NonBisim_{n}$.
 
 At the execution of $\textbf{Bisim}_{n}$, no more exceptions will be raised. Each time \textbf{Match} executes with $t,u$ as its parameters, we will add $(t,u)$ into $Visited$ at the same time. Furthermore, if we reach the leaf nodes, there is no more action, we only compare the quantum variables used and the state of quantum registers. Since the system is finite, there will be no more state pairs can be added into $Visited$. From the structure of \textbf{Close}, the function $Match$ will not be invoked again.  Then the whole algorithm terminates.
+\qed
 \end{proof}
 
 \begin{theorem}[Correctness]\label{thm:strong_alg_correctness}
@@ -1079,6 +1085,7 @@ Given two states $t$ and $u$ from two pLTSs, \textbf{Bisim}$(t,u)$ returns \text
 \end{theorem} 
 \begin{proof}
 The proof of the correctness is similar to that in~\cite{HL95}. Since our algorithm is not symbolic, our treatement of boolean constraints is easier. On the other hand, we need to deal with probability distributions and have an extra procedure \textbf{MatchDistribution} to check if two distributions are related by a lifted relation.
+\qed
 \end{proof}
 
 At the end of this section, we analyse the time complexity of the algorithm.
@@ -1088,6 +1095,7 @@ Let the number of nodes reachable from $t$ and $u$ be n. The time complexity of 
 \end{theorem}
 \begin{proof}
 The number of state pairs is at most $n^2$. The number of state pairs examined in the $k$th execution of \textbf{Bisim} is at most $O(n^2-k)$. Therefore, the total number of state pairs examined is as most $O(n^2+(n^2-1)+...+1)=O(n^4)$. Since the pLTSs are assumed to be finite trees, the number of comparisons of transitions does not exceed some constant. Each comparison may call the function \textbf{Check} at most once, which requires time $O(n^3/\log{n})$ if we use the maximum network flow algorithm in \cite{CHM90}. As a result, the execution time of \textbf{Bisim}$(t,u)$ is in $O(n^7/\log{n})$.
+\qed
 \end{proof}
 
 \subsection{Experimental Results}\label{sec:strong_bisim_exper}
