@@ -431,9 +431,7 @@ Suppose there is a configuration $\CC=\langle P,\rho\rangle$, the partial trace 
 
 \section{Algorithm}
 \label{sec:algorithm}
-We present an on-the-fly algorithm to check if two configurations are ground weak bisimilar. 
-
-The algorithm updates two tables $NonBisim$, $Bisim$ to record the verification results. When the algorithm terminates, $Bisim$ should contain all the state pairs satisfy the bisimulation relation.
+We present an on-the-fly algorithm to check if two configurations are ground weak bisimilar shown in Algorithm~\ref{alg:weak_bisim}. The algorithm updates two tables $NonBisim$ and $Bisim$ to record the verification results. When the algorithm terminates, $Bisim$ should contain all the state pairs which satisfy the bisimulation relation.
 
 The function $\textbf{Bisim}(t,u)$, as what shown in Algorithm~\ref{alg:weak_bisim}, is the main function of the algorithm, which attempts to find the smallest bisimulation containing the pair $(t,u)$. It initialises $Bisim$ and a set named $Visited$ to store the visited pairs, then calls the function $\textbf{Match}$ to search for a bisimulation. The function \textbf{Match}$(t,u,Visited)$ invokes a depth-first traversal to match a pair of states $(t,u)$ with all their possible behaviours. The set $Visited$ is updated before the traversal for detecting the loops. We also match the behaviours of $(t,u)$ from another direction as we are checking a symmetric relation. A pair of states is deemed non-bisimilar in three cases:
 \begin{itemize}
@@ -441,11 +439,10 @@ The function $\textbf{Bisim}(t,u)$, as what shown in Algorithm~\ref{alg:weak_bis
     \item the set of free quantum variables of them are different;
     \item the density operator of them corresponding to their quantum registers are different.
 \end{itemize}
-The first case is checked by $\textbf{MatchAction}$, the others are done in $\textbf{Match}$. We add the pair of states to $NonBisim$ if one of above cases has occurred, otherwise it will be stored in $Bisim$.
+The first case is checked by $\textbf{MatchAction}(\alpha,t,u,Visited)$ described in Algorithm~\ref{alg:weak_bisim} which checks the equivalence of states through comparing their transitions. It recursively discovers the next equivalent state pairs between the target states of the transitions. The others are done in $\textbf{Match}$. We add the pair of states to $NonBisim$ if one of above cases has occurred, otherwise it will be stored in $Bisim$.
 
+The set $Visited$ is updated when $\textbf{Match}$ is invoked so that each configuration pairs is checked at most once.
 An auxiliary function \textbf{Act}$(t)$ is invoked in \textbf{Match} to discover the next action that $t$ can perform. If $t$ have no more action to do the function will return an empty set.
-
-The set $Visited$ is updated in $\textbf{MatchAction}(\alpha,t,u,Visited)$ described in Algorithm~\ref{alg:weak_bisim} which checks the equivalence of states through comparing their transitions. It recursively discovers the next equivalent state pairs between the target states of the transitions.
 
 We refer to~\cite{TH15}, where an algorithm is designed to check the condition of the symmetric relation that ``If $t\overset{\alpha}{\longmapsto}\Delta$ then there exists $u$ such that $u\overset{\alpha}{\mapstochar\Longrightarrow}_{c}\Theta$ and $\Delta~\lift{\aRel}~\Theta$'' in $\textbf{MatchAction}(\alpha,t,u,Visited)$. The condition can be checked in polynomial time by transforming it to be solving a linear programming problem. 
 
@@ -508,8 +505,8 @@ To deal with loops, when the pair to match is already contained in $Visited$ it 
 \State $Bisim$ := $\emptyset$
 \State $Visited$ := $\emptyset$
 \State $Assumed$ := $\emptyset$
-\State \} \textbf{catch WrongAssumptionException} $\Rightarrow$ \textbf{Bisim}($t, u$)
 \State \textbf{return} \textbf{Match}(\textit{t,u,Visited})
+\State \} \textbf{catch WrongAssumptionException} $\Rightarrow$ \textbf{Bisim}($t, u$)
 \EndFunction
 \State
 \Function{\textbf{Match}}{$t,u,Visited$}\Comment{$t=\langle P,\rho\rangle\ and\ u=\langle Q,\sigma\rangle$}
@@ -946,7 +943,7 @@ We have presented an on-the-fly algorithm to check ground bisimulation for quant
 As to future work, there are several interesting problems remain to be addressed.
 For example, there is a problem with the current work is to compare quantum processes with predetermined states of quantum registers. Indeed, there are occasions where one would expect two processes to be equivalent for arbitrary initial states. It is infeasible to enumerate all those states. Then the symbolic bisimulations proposed in~\cite{FDY14} will be useful. We are considering to implement the algorithm for symbolic ground bisimulation, and then tackle the more challenging symbolic open bisimulation, both proposed in that work. 
 
-Another problem may stay in the experiment of Section~\ref{sec:ss} where for convenience of the experiment we only consider the case that there is one qubit instead of a sequence of qubits which presents the security showed in the origin paper~\cite{BB84}. Several previous works~\cite{Mayers98,LC99,SP00} suppose a stronger eavesdropper who is able to make any operation permitted by quantum mechanic to manipulate the sequence of the qubits as a single entity when attacking the communication. A sequence of qubits is inevitably required when checking the protocol in such case. The difficulty in checking whether the protocol is secure under the joint attack is in more qubits leading to exponential growth of the runtime.
+Another problem may stay in the experiment of Section~\ref{sec:ss} where for convenience of the experiment we only consider the case that there is one qubit instead of a sequence of qubits which presents the security showed in the origin paper~\cite{BB84}. While more general cases, mentioned in several previous works~\cite{Mayers98,LC99,SP00}, suppose a stronger eavesdropper who is able to make any operation permitted by quantum mechanic to manipulate the sequence of the qubits as a single entity when attacking the communication. So when we check the protocol in such case we inevitably need to deal with a sequence of qubits. The difficulty in checking whether the protocol is secure under the joint attack is in more qubits leading to exponential growth of the runtime.
 %
 % ---- Bibliography ----
 %
