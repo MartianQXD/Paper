@@ -444,9 +444,9 @@ The first case is checked by $\textbf{MatchAction}(\alpha,t,u,Visited)$ describe
 The set $Visited$ is updated when $\textbf{Match}$ is invoked so that each configuration pairs is checked at most once.
 An auxiliary function \textbf{Act}$(t)$ is invoked in \textbf{Match} to discover the next action that $t$ can perform. If $t$ have no more action to do the function will return an empty set.
 
-We refer to~\cite{TH15}, where an algorithm is designed to check the condition of the symmetric relation that ``If $t\overset{\alpha}{\longmapsto}\Delta$ then there exists $u$ such that $u\overset{\alpha}{\mapstochar\Longrightarrow}_{c}\Theta$ and $\Delta~\lift{\aRel}~\Theta$'' in $\textbf{MatchAction}(\alpha,t,u,Visited)$. The condition can be checked in polynomial time by transforming it to be solving a linear programming problem. 
+We refer to~\cite{TH15}, where an algorithm is designed to check the condition of the symmetric relation that ``If $t\overset{\alpha}{\longmapsto}\Delta$ then there exists $u$ such that $u\overset{\alpha}{\mapstochar\Longrightarrow}_{c}\Theta$ and $\Delta~\lift{\aRel}~\Theta$'', which is the key component for checking in the function $\textbf{MatchAction}(\alpha,t,u,Visited)$. The condition can be checked in polynomial time by transforming it to be solving a linear programming problem. 
 
-Let $T$ be the set of transitions we may use when resolving the nondeterministic choices in a weak combined transition, $S$ be the set of states involved in these transitions, and $R$ be the equivalence relation of the states. We construct a flow network with $T$ as follow.
+Let $T$ be the set of transitions we may use when resolving the nondeterministic choices in a weak combined transition, $S$ be the set of states involved in these transitions, and $R$ be the equivalence relation of the states. We construct a flow network with $S$ and $T$ as follow.
 
 Let $\vartriangle$ and $\blacktriangledown$ be vertices that represent the source and the sink of the network respectively. The set of vertices $V$ is
 \begin{equation*}
@@ -489,9 +489,9 @@ Given the transition $\mu\xmapsto{\alpha}\psi$, we check the condition if the fo
     \end{aligned}
 \end{equation*}
 
-Intuitively, the fourth constraint is referred to as the flow-conservation constraints. Constraints 5,6,7 establish the relation between the source state and the result distribution. In \textbf{MatchAction}, We introduce a predicate $\textbf{LP}(\psi,T,\alpha,R)$ which is true if and only if the linear problem has a solution. We invoke the function \textbf{Close} to construct equivalence relation $R$ between $S$ and the states contains in the target distribution.
+Intuitively, the fourth constraint is referred to as the flow-conservation constraints. Constraints 5,6,7 establish the relation between the source state and the result distribution. In \textbf{MatchAction}, We introduce a predicate $\textbf{LP}(\psi,T,\alpha,R)$ which is true if and only if the linear programming problem has a solution. We invoke the function \textbf{Close}$(t,u,Visited)$ to construct an equivalence relation $R$ between the states from the target distribution and the weak transitions behaving the action asked.
 
-To deal with loops, when the pair to match is already contained in $Visited$ it will be supposed to be bisimilar and added to $Assumed$ (Line 40-41). If the pair is checked to be not bisimilar later, it will be added to $NonBisim$ and raise a wrong assumption exception (Line 15-17) to make the checking process restart at the root state pair. \textbf{Bisim}$(t, u)$ renews the set $Bisim$ and $Visited$ to remove the pairs checked under the wrong assumption and together with their results (Line 4). 
+To deal with loops, when the algorithm detects that the pair to be matched is already contained in $Visited$, that configuration pair will be assumed to be bisimilar temporary and recorded in $Assumed$ (Line 40-41). If the configuration pair is checked to be not bisimilar later, it will be added to $NonBisim$ and raise a wrong assumption exception (Line 15-17) in to make the whole checking process restart at the root state pair. \textbf{Bisim}$(t, u)$ renews the set $Bisim$ and $Visited$ to remove the pairs checked under the wrong assumption and together with their results (Line 4). 
 
 \begin{breakablealgorithm}
 \caption{Checking Weak Bisimulation}
@@ -602,7 +602,7 @@ The number of state pairs is at most $n^2$. The number of state pairs examined i
 
 \section{Implementation and Experiments}
 \label{sec:experiment}
-In this section, we report on an implementation of our approach and provide the experimental results of verifying several quantum communication protocols. 
+In this section, we report on an implementation of our approach and provide the experimental results of the verification of several quantum communication protocols. 
 
 \begin{figure}[htbp]
 \centering
@@ -612,7 +612,7 @@ In this section, we report on an implementation of our approach and provide the 
 \end{figure}
 
 \subsection{Implementation}
-We have implemented both strong and weak ground bisimulation checkers in Python 3.7. The algorithm checking strong bisimulation is in Appendix~\ref{sec:strong_bisim}. The workflow of our tool is sketched in Figure~\ref{fig:arch}. The tool consists of a pLTS generation module and a bisimulation checking module, devoted to modeling and verification, respectively.
+We have implemented both strong and weak ground bisimulation checkers in Python 3.7. The algorithm for checking strong bisimulation is shown in Appendix~\ref{sec:strong_bisim}. The workflow of our tool is sketched in Figure~\ref{fig:arch}. The tool consists of a pLTS generation module and a bisimulation checking module, devoted to modeling and verification, respectively.
 The input of this tool is a specification and an implementation of a quantum protocol, both described as qCCS processes, the definition of user-defined operators (some of them are shown in  Appendix~\ref{sec:appc}), as well as an initialisation of classical and quantum variables. Unlike classical variables, the initialisation of all quantum variables, deemed as a quantum register, is accomplished at the same time so to allow for superposition states.
 The final output of the tool is a result indicating whether the specification and the implementation, are bisimilar under the same initial states. The algorithm also stores the bisimilar state pairs and non-bisimilar state pairs in two tables.
 %
@@ -629,8 +629,7 @@ where we also provide all the examples for the experiments to be discussed in Se
 %It has already prepared codes of the examples we used in directories \textsl{examples}.
 
 \subsection{Super-dense Coding Protocol}\label{sec:sdc}
-To illustrate the use of our tool,
-we formalise the super-dense coding protocol. Our formalisation follows \cite{FDY14}, where a manual analysis of the protocol is provided. Now we perform automatic verification via the ground bisimulation checker.
+We formalise the super-dense coding protocol. Our formalisation follows \cite{FDY14} to illustrate the use of our tool, where a manual analysis of the protocol is provided. Now we perform automatic verification via the ground bisimulation checker.
 More examples are given in Appendix~\ref{sec:examples}.
 
 Super-dense coding is proposed by Bennett and Wiesner in 1992~\cite{BW92}. It is a quantum communication protocol allowing two classical bits to be encoded in one qubit during a transmission, so it needs only one quantum channel. Such advantage is based on the use of a maximally
@@ -943,7 +942,7 @@ We have presented an on-the-fly algorithm to check ground bisimulation for quant
 As to future work, there are several interesting problems remain to be addressed.
 For example, there is a problem with the current work is to compare quantum processes with predetermined states of quantum registers. Indeed, there are occasions where one would expect two processes to be equivalent for arbitrary initial states. It is infeasible to enumerate all those states. Then the symbolic bisimulations proposed in~\cite{FDY14} will be useful. We are considering to implement the algorithm for symbolic ground bisimulation, and then tackle the more challenging symbolic open bisimulation, both proposed in that work. 
 
-Another problem may stay in the experiment of Section~\ref{sec:ss} where for convenience of the experiment we only consider the case that there is one qubit instead of a sequence of qubits which presents the security showed in the origin paper~\cite{BB84}. While more general cases, mentioned in several previous works~\cite{Mayers98,LC99,SP00}, suppose a stronger eavesdropper who is able to make any operation permitted by quantum mechanic to manipulate the sequence of the qubits as a single entity when attacking the communication. So when we check the protocol in such case we inevitably need to deal with a sequence of qubits. The difficulty in checking whether the protocol is secure under the joint attack is in more qubits leading to exponential growth of the runtime.
+Another problem may stay in the experiment of Section~\ref{sec:ss} where for convenience of the experiment we only consider the case that there is one qubit instead of a sequence of qubits which presents the security shown in the origin paper~\cite{BB84}. While more general cases, mentioned in several previous works~\cite{Mayers98,LC99,SP00}, suppose a stronger eavesdropper who is able to make any operation permitted by quantum mechanic to manipulate the sequence of the qubits as a single entity when attacking the communication. So when we check the protocol in such case we inevitably need to deal with a sequence of qubits. The difficulty in checking whether the protocol is secure under the joint attack is in more qubits leading to exponential growth of the runtime.
 %
 % ---- Bibliography ----
 %
