@@ -218,11 +218,9 @@ Verification \and Quantum communication protocols.}
 \section{Introduction}
 \label{sec:introduction}
 Process algebras provide a useful formal method for specifying and verifying concurrent systems. Their extensions to the quantum setting have also appeared in the literature. For example, Jorrand and Lalire \cite{JL04,La06} defined the \emph{Quantum Process Algebra} (QPAlg) and presented a branching bisimulation to identify quantum processes with the same branching structure. Gay and Nagarajan~\cite{GN05}  developed \emph{Communicating Quantum Processes} (CQP), for which Davidson~\cite{Da11} established a bisimulation congruence.
-Feng et al. \cite{FDJY07} have proposed a quantum variant of  Milner's CCS \cite{ccs}, called qCCS, and a notion of probabilistic bisimulation for quantum processes, which is then improved to be a general notion of bisimulation that enjoys a congruence property \cite{FDY11}. Later on, motivated by~\cite{San96}, Deng and Feng~\cite{DF12} defined an open bisimulation for quantum processes that makes it possible to separate ground bisimulation and the closedness under super-operator applications, thus providing not only a neater and simpler definition, but also a new technique for proving bisimilarity.
-In order to avoid the problem of instantiating quantum variables by potentially infinitely many quantum states, Feng et al. \cite{FDY14} extended the idea of symbolic bisimulation~\cite{HL95} for value-passing CCS and provided a 
- symbolic version of open bisimulation for qCCS. They also proposed an algorithm for checking symbolic ground bisimulation.
+Feng et al. \cite{FDJY07} have proposed a quantum variant of Milner's CCS \cite{ccs}, called qCCS, and a notion of probabilistic bisimulation for quantum processes, which is then improved to be a general notion of bisimulation that enjoys a congruence property \cite{FDY11}. Later on, motivated by~\cite{San96}, Deng and Feng~\cite{DF12} defined an open bisimulation for quantum processes that makes it possible to separate ground bisimulation and the closedness under super-operator applications, thus providing not only a neater and simpler definition, but also a new technique for proving bisimilarity.
+In order to avoid the problem of instantiating quantum variables by potentially infinitely many quantum states, Feng et al. \cite{FDY14} extended the idea of symbolic bisimulation~\cite{HL95} for value-passing CCS and provided a symbolic version of open bisimulation for qCCS. They also proposed an algorithm for checking symbolic ground bisimulation.
  
-
 In the current work, we consider the ground bisimulation proposed in \cite{DF12}. We put forward an on-the-fly algorithm to check if two given processes in qCCS with fixed initial quantum states are ground bisimilar. The algorithm is simpler than the one in \cite{FDY14} because the initial quantum states are determined for the former but can be parametric for the latter. Moreover, in many applications, we are only interested in the correctness of a quantum protocol with a predetermined input of quantum states. This is especially the case in the design stage of a protocol or in the debugging of a program. Meanwhile the algorithm can check the weak bisimulation where all internal actions are abstracted away by solving a linear programming problem.
 
 The new algorithm is obtained by adapting the on-the-fly algorithm for checking probabilistic bisimulations \cite{Deng15}, which in turn has its root in similar algorithms
@@ -239,8 +237,8 @@ Kubota et al. \cite{KKKKS16}  implemented a semi-automated tool to check a notio
 Besides equivalence checking, based on either superoperators or bisimulations as mentioned above, model checking is another feasible approach to verify quantum protocols. For instance, Gay et al. developed the QMC model checker \cite{GNP08}.
 Feng et al. implemented  the tool QPMC \cite{FHTZ15} to model check quantum programs and protocols. There are also other approaches for verifying quantum systems. Abramsky and Coecke \cite{AC04} proposed a categorical semantics for quantum protocols. Quantomatic \cite{Kis11} is a semi-automated tool based on graph rewriting. Ying \cite{Yin16} established a quantum Hoare logic, which has been implemented in a theorem prover \cite{LLWYZ16}.
 
-The rest of the paper is structured as follows. %In Section~\ref{sec:plts}, we introduce the formal model of probabilistic labelled transition systems. 
-In Section~\ref{sec:qccs} we recall the syntax and semantics of the quantum process algebra qCCS. In Section~\ref{sec:algorithm} we present an algorithm for checking ground bisimulations. In Section~\ref{sec:experiment} we report the implementation of the algorithm and some experimental results on verifying a few quantum communication protocols. Finally, we conclude in Section~\ref{sec:con} and discuss some future work.
+The rest of the paper is structured as follows. %In Sect.~\ref{sec:plts}, we introduce the formal model of probabilistic labelled transition systems. 
+In Sect.~\ref{sec:qccs} we recall the syntax and semantics of the quantum process algebra qCCS. In Sect.~\ref{sec:algorithm} we present an algorithm for checking weak ground bisimulations. In Sect.~\ref{sec:experiment} we report the implementation of the algorithm and some experimental results on verifying a few quantum communication protocols. Finally, we conclude in Sect.~\ref{sec:con} and discuss some future work.
 
 
 \section{Quantum CCS}\label{sec:qccs}
@@ -475,19 +473,17 @@ and the set of edges $E$ is
 \end{equation*}
 
 Given the transition $\mu\xmapsto{\alpha}\psi$, we check the condition if the following linear programming problem has a solution.
-\begin{equation*}
-    \begin{aligned}
-    & max\sum\nolimits_{(u,v)\in E}-f_{u,v} &\\
-    s.t. & &\\
-    & f_{u,v}\ge0 & \text{for each }(u,v)\in E\\
-    & f_{\vartriangle,s_0}=1 &\\
-    & f_{v_{R,\blacktriangledown}}=\psi(v) & \text{for each }v\in S\\
-    & \sum\nolimits_{(u,v)\in E}f_{u,v}-\sum\nolimits_{(v,w)\in E}f_{v,w}=0 & \text{for each }v\in V\setminus\{\vartriangle,\blacktriangledown\}\\
-    & f_{v^{tr},v'}-\rho(v')\cdot f_{v,v^{tr}}=0 & \text{for each }tr=v\xmapsto{\tau}\rho\in T\text{ and }v'\in\lceil\rho\rceil\\
-    & f_{v_{\alpha}^{tr},v'_{\alpha}}-\rho(v'_{\alpha})\cdot f_{v,v_{\alpha}^{tr}}=0 & \text{for each }tr=v\xmapsto{\alpha}\rho\in T\text{ and }v'_{\alpha}\in\lceil\rho\rceil\\
-    & f_{v_{\alpha}^{tr},v'_{\alpha}}-\rho(v'_{\alpha})\cdot f_{v_{\alpha},v_{\alpha}^{tr}}=0 & \text{for each }tr=v_{\alpha}\xmapsto{\tau}\rho\in T\text{ and }v'_{\alpha}\in\lceil\rho\rceil\\
-    \end{aligned}
-\end{equation*}
+\begin{flalign*}
+    & max\sum\nolimits_{(u,v)\in E}-f_{u,v} &&\\
+    s.t. & &&\\
+    & f_{u,v}\ge0 && \text{for each }(u,v)\in E\\
+    & f_{\vartriangle,s_0}=1 &&\\
+    & f_{v_{R,\blacktriangledown}}=\psi(v) && \text{for each }v\in S\\
+    & \sum\nolimits_{(u,v)\in E}f_{u,v}-\sum\nolimits_{(v,w)\in E}f_{v,w}=0 && \text{for each }v\in V\setminus\{\vartriangle,\blacktriangledown\}\\
+    & f_{v^{tr},v'}-\rho(v')\cdot f_{v,v^{tr}}=0 && \text{for each }tr=v\xmapsto{\tau}\rho\in T\text{ and }v'\in\lceil\rho\rceil\\
+    & f_{v_{\alpha}^{tr},v'_{\alpha}}-\rho(v'_{\alpha})\cdot f_{v,v_{\alpha}^{tr}}=0 && \text{for each }tr=v\xmapsto{\alpha}\rho\in T\text{ and }v'_{\alpha}\in\lceil\rho\rceil\\
+    & f_{v_{\alpha}^{tr},v'_{\alpha}}-\rho(v'_{\alpha})\cdot f_{v_{\alpha},v_{\alpha}^{tr}}=0 && \text{for each }tr=v_{\alpha}\xmapsto{\tau}\rho\in T\text{ and }v'_{\alpha}\in\lceil\rho\rceil\\
+\end{flalign*}
 
 Intuitively, the fourth constraint is referred to as the flow-conservation constraints. Constraints 5,6,7 establish the relation between the source state and the result distribution. In \textbf{MatchAction}, We introduce a predicate $\textbf{LP}(\psi,T,\alpha,R)$ which is true if and only if the linear programming problem has a solution. We invoke the function \textbf{Close}$(t,u,Visited)$ to construct an equivalence relation $R$ between the states from the target distribution and the weak transitions behaving the action asked.
 
@@ -612,9 +608,9 @@ In this section, we report on an implementation of our approach and provide the 
 \end{figure}
 
 \subsection{Implementation}
-We have implemented both strong and weak ground bisimulation checkers in Python 3.7. The algorithm for checking strong bisimulation is shown in Appendix~\ref{sec:strong_bisim}. The workflow of our tool is sketched in Figure~\ref{fig:arch}. The tool consists of a pLTS generation module and a bisimulation checking module, devoted to modeling and verification, respectively.
-The input of this tool is a specification and an implementation of a quantum protocol, both described as qCCS processes, the definition of user-defined operators (some of them are shown in  Appendix~\ref{sec:appc}), as well as an initialisation of classical and quantum variables. Unlike classical variables, the initialisation of all quantum variables, deemed as a quantum register, is accomplished at the same time so to allow for superposition states.
-The final output of the tool is a result indicating whether the specification and the implementation, are bisimilar under the same initial states. The algorithm also stores the bisimilar state pairs and non-bisimilar state pairs in two tables.
+We have implemented both strong and weak ground bisimulation checkers, written in Python 3.7. The algorithm for checking strong bisimulation is shown in Appendix~\ref{sec:strong_bisim}. The workflow of our tool is sketched in Figure~\ref{fig:arch}. The tool consists of a pLTS generation module and a bisimulation checking module, devoted to modeling and verification, respectively.
+The tool inputs a specification and an implementation of a quantum protocol, both described as qCCS processes, the definition of user-defined operators (some of them are shown in  Appendix~\ref{sec:appc}), as well as an initialisation of classical and quantum variables. Unlike classical variables, the initialisation of all quantum variables, deemed as a quantum register, is accomplished at the same time so to allow for superposition states.
+The final output of the tool is a result indicating whether the specification and the implementation are bisimilar under the same initial states. The algorithm records the bisimilar pairs and non-bisimilar pairs, i.e., the bisimulation relation is figured out in the traversal of configuration pairs.
 %
 %\subparagraph*{pLTS Generation Module.}
 
@@ -654,7 +650,7 @@ The modeling of super-dense coding protocol in qCCS follows \cite{FDY14}:
 \end{flalign*}
 where $CN$ is the controlled-not operation and $H$ is the Hadamard operation, $Set^{\Psi}$ is the operation transforming all the inputs into an EPR state $|\beta_{00}\rangle=(|00\rangle+|11\rangle)/\sqrt{2}$, its operation elements are $\{|\beta_{00}\rangle\langle 00|,|\beta_{00}\rangle\langle 01|,|\beta_{00}\rangle\langle 10|,|\beta_{00}\rangle\langle 11|\}$, and $\sigma^{i}$ are Pauli operators where $\sigma^{0}=I,\sigma^{1}=X,\sigma^{2}=Z,\sigma^{3}=Y$. The element set of measurement \textit{M} is $\{|00\rangle\langle 00|,|01\rangle\langle 01|,|10\rangle\langle 10|,|11\rangle\langle 11|\}$.
 \paragraph{Specification.}
-The specification of the protocol can be defined as:
+The specification of the protocol asks the process to return 2 qubit according to the value of classical bits it received. So it can be defined as:
 \begin{flalign*}
     % Sdc_{spec} \overset{def}{=}& c?x.\tau^{11}.\sum_{i=0}^{3}(\textbf{if}\ x=i\ \textbf{then}\ Set^{i}[q_1,q_2].d!x.\textbf{nil})
     Sdc_{spec} \overset{def}{=}& c?x.\sum_{i=0}^{3}(\textbf{if}\ x=i\ \textbf{then}\ Set^{i}[q_1,q_2].d!x.\textbf{nil})
@@ -920,13 +916,13 @@ Table~\ref{tab:weak_result} provides a summary of our experimental results obtai
 columns headed by \textbf{Impl} and \textbf{Spec} show the numbers of nodes contained in the generated pLTSs of the implementations and specifications, respectively. Column \textbf{N} shows the sizes of the sets of non-bisimilar state pairs  and Column \textbf{B} shows the sizes of the sets of bisimilar state pairs. Column \textbf{ms} shows the time cost of the verification in milliseconds.}\label{tab:weak_result}
 \end{table}
 
-In each case, we report the final outcome (whether an implementation is equivalent to its specification), the number of nodes in two pLTSs, the numbers of non-bisimilar and bisimilar state pairs in $NonBisim$ and $Bisim$, respectively, as well as the verification time of our weak ground bisimulation checking algorithm. The time cost excludes the part of pLTS generation which takes around 1 second in all the examples.
+In each case, we report the final outcome (whether an implementation is equivalent to its specification), the number of nodes in two pLTSs, the numbers of non-bisimilar and bisimilar state pairs in $NonBisim$ and $Bisim$, respectively, as well as the verification time of our weak ground bisimulation checking algorithm. The time cost shown in the table excludes the part of pLTS generation which takes around 1 second in all the examples.
 
 % In the case of the secret sharing protocol introduced in Section~\ref{sec:ss}, we  experiment with three different inputs by varying the value of the qubit $q_1$. The qubits $q_2$, $q_3$ and $q_4$ are used to generate a GHZ state despite. The different inputs turn out to have no influence on the outputs. This is what we expect because the correctness of the protocol should always be kept for arbitrary inputs in this protocol. The structures of the two generated pLTSs are  not affected by different input values either.
 
 % In Table~\ref{tab:weak_result} there are cases where negative verification results are obtained. One of them is already discussed in Section~\ref{sec:ss}. We now comment on the other case.
 % We verify the super-dense coding protocol with two different initial values of variable $x$ in the first two rows. If $x=1$, we can check that the implementation behaves the same as the specification. However, if $x=5$, the behaviour of the implementation differs from that of the specification, and they are even not trace equivalent. See Appendix~\ref{sec:sdc} for more discussion and the improvement of the formal modelling.
-In Table~\ref{tab:weak_result} there are cases where negative verification results are obtained. Some of them are already discussed in Section~\ref{sec:sdc} and~\ref{sec:ss}. We now comment on the other case.
+It can be seen in Table~\ref{tab:weak_result} there exists the cases where negative verification results are obtained. Some of them are already discussed in Section~\ref{sec:sdc}. We now comment on the other case.
 % We verify the super-dense coding protocol with two different initial values of variable $x$ in the first two rows. If $x=1$, we can check that the implementation behaves the same as the specification. However, if $x=5$, the behaviour of the implementation differs from that of the specification, and they are even not trace equivalent. See Appendix~\ref{sec:sdc} for more discussion and the improvement of the formal modelling.
 
 We also verify the other protocols make the use of the entanglement such as teleportation protocol and quantum secrect sharing protocol. There is a part of input qubits are used to generate the EPR state which is actually free of input. We can find that there is no difference between the result information from different initial valuations of qubits.
@@ -937,12 +933,12 @@ Besides BB84 protocol, we make experiments on other quantum key distribution pro
 Not all the cases in Table~\ref{tab:weak_result} give the size of the set $NonBisim$ of non-bisimilar state pairs, as the bisimulation checking algorithm may immediately terminate once a negative verification result is obtained, i.e. the two initial states are not bisimilar. 
 
 \section{Conclusion and Future Work}\label{sec:con}
-We have presented an on-the-fly algorithm to check ground bisimulation for quantum processes in qCCS. Based on the algorithm, we have developed a tool to verify quantum communication protocols modelled as qCCS processes without recursion. The behavioural equivalence considered in the previous work is a strong notion of ground bisimulation with all actions visible. In current work, our algorithm verifies a weak notion of bisimulation that abstracts away invisible actions. We have carried out experiments on several non-trivial quantum communication protocols from super-dense coding to key distribution and found the tool helpful.
+We have presented an on-the-fly algorithm to check ground bisimulation for quantum processes in qCCS. We have developed a tool to verify quantum communication protocols basing on the algorithm. The behavioural equivalence considered in the previous work is a strong notion of ground bisimulation with all actions visible. In current work, our algorithm verifies a weak notion of bisimulation that abstracts away invisible actions. We have carried out experiments on several non-trivial quantum communication protocols from super-dense coding to key distribution and found the tool helpful.
 
 As to future work, there are several interesting problems remain to be addressed.
 For example, there is a problem with the current work is to compare quantum processes with predetermined states of quantum registers. Indeed, there are occasions where one would expect two processes to be equivalent for arbitrary initial states. It is infeasible to enumerate all those states. Then the symbolic bisimulations proposed in~\cite{FDY14} will be useful. We are considering to implement the algorithm for symbolic ground bisimulation, and then tackle the more challenging symbolic open bisimulation, both proposed in that work. 
 
-Another problem may stay in the experiment of Section~\ref{sec:ss} where for convenience of the experiment we only consider the case that there is one qubit instead of a sequence of qubits which presents the security shown in the origin paper~\cite{BB84}. While more general cases, mentioned in several previous works~\cite{Mayers98,LC99,SP00}, suppose a stronger eavesdropper who is able to make any operation permitted by quantum mechanic to manipulate the sequence of the qubits as a single entity when attacking the communication. So when we check the protocol in such case we inevitably need to deal with a sequence of qubits. The difficulty in checking whether the protocol is secure under the joint attack is in more qubits leading to exponential growth of the runtime.
+Another problem may stay in the experiment of Sect.~\ref{sec:ss} where for convenience of the experiment we only consider the case that there is one qubit instead of a sequence of qubits which presents the security shown in the origin paper~\cite{BB84}. While more general cases, mentioned in several previous works~\cite{Mayers98,LC99,SP00}, suppose a stronger eavesdropper who is able to make any operation permitted by quantum mechanic to manipulate the sequence of the qubits as a single entity when attacking the communication. So when we check the protocol in such case we inevitably need to deal with a sequence of qubits. The difficulty in checking whether the protocol is secure under the joint attack is in more qubits leading to an exponential blow up of the execution time.
 %
 % ---- Bibliography ----
 %
@@ -963,7 +959,7 @@ In this section, we present an on-the-fly algorithm to check if two configuratio
 % Other verification tools such as those in \cite{KKKKS16,AL18} also adopt this design choice; they disallow recursion in their modelling language.
 % Modifying the algorithm to deal with pLTSs with loops is possible, with an increased (but still polynomial) time complexity.
 \subsection{Algorithm}\label{sec:strong_bisim_alg}
-In Algorithm~\ref{alg:bisim}, the main function is \textbf{Bisim}$(t,u)$. It initialises the start state pair $(t,u)$, the set $W$ for visited state pairs, which is empty initially, and then searches for a bisimulation based on that initialisation. 
+In Algorithm~\ref{alg:bisim}, the main function is \textbf{Bisim}$(t,u)$. It initialises the start state pair $(t,u)$, the set $Visited$ for visited state pairs, which is empty initially, and then searches for a bisimulation based on that initialisation. 
 %The difference between it and that in the previous work in several aspects.
 The algorithm keeps updating three sets: the above mentioned $Visited$, the set $NonBisim$ for non-bisimilar state pairs and the set $Bisim$ for bisimilar state pairs. The function \textbf{Match}$(t,u,Visited)$ invokes a depth-first traversal to match a pair of 
 states $(t,u)$ with all their possible behaviours. There are three possibilities that two states are deemed non-bisimilar:  (1) one state has a transition that the other cannot match, (2) they do not have the same set of free quantum variables, or (3) the density operators corresponding to their quantum registers are different. If one of the three cases takes place, we add the state pair into $NonBisim$. Otherwise these two states are bisimilar, then we add the state pair into $Bisim$.
@@ -1505,7 +1501,7 @@ The implementation of E91 protocol uses more qubits than the protocols before fo
     \item The classical bits are named $B_{a}$, $K_{a}$ for $Alice$ and $B_{b}$, $K_{b}$ for $Bob$.
     \item The qubits $|q_1,q_2\rangle$ is used for preparing EPR pair, they can be initialized as $|00\rangle$. The qubits $|q_3,q_4\rangle$ is used for randomly generation the value of $B_{a}$ and $B_{b}$, they can also be initialized as $|00\rangle$.
 \end{itemize}
-\section{Operators}\label{sec:appc}
+\section{Matrix Representation of the Operators}\label{sec:appc}
 We have frequently used the Hadamard operator, the controlled-not operator and the Pauli operators in our examples. Their matrix representations are listed below.
 
 $$H = 
