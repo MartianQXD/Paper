@@ -370,6 +370,7 @@ $(\sum_{k \in K}p_k \cdot \Delta_k)(s)~=~\sum_{k\in K} p_k\cdot \Delta_k(s).$
 \end{definition}
 
 We often write $s\ar{\alpha}\Delta$ for $(s,\alpha,\Delta)\in\mathord{\rightarrow}$. %, and $s\ar{\alpha}$ for $\exists \Delta: s\ar{\alpha}\Delta$.
+In  pLTSs we not only consider relations between states, but also relations between distributions. Therefore, we make use of the lifting operation below \cite{Deng15}.
 \begin{definition}\label{def:lift}
 	Let  $\mathord{\aRel} \subseteq
 	S\times S$ be a relation between states.
@@ -427,13 +428,13 @@ Suppose there is a configuration $\CC=\langle P,\rho\rangle$, the partial trace 
 
 \section{Algorithm}
 \label{sec:algorithm}
-We present an on-the-fly algorithm to check if two configurations are ground weak bisimilar shown in Algorithm~\ref{alg:weak_bisim}. The algorithm updates two tables $NonBisim$ and $Bisim$ to record the verification results. When the algorithm terminates, $Bisim$ should contain all the state pairs which satisfy the bisimulation relation.
+We present an on-the-fly algorithm to check if two configurations are ground bisimilar shown in Algorithm~\ref{alg:weak_bisim}. The algorithm updates two tables $NonBisim$ and $Bisim$ to record the verification results. When the algorithm terminates, $Bisim$ should contain all the state pairs which satisfy the bisimulation relation.
 
 The function $\textbf{Bisim}(t,u)$, as what shown in Algorithm~\ref{alg:weak_bisim}, is the main function of the algorithm, which attempts to find the smallest bisimulation containing the pair $(t,u)$. It initialises $Bisim$ and a set named $Visited$ to store the visited pairs, then calls the function $\textbf{Match}$ to search for a bisimulation. The function \textbf{Match}$(t,u,Visited)$ invokes a depth-first traversal to match a pair of states $(t,u)$ with all their possible behaviours. The set $Visited$ is updated before the traversal for detecting the loops. We also match the behaviours of $t$ and $u$ from both directions as we are checking bisimulations. A pair of states is deemed non-bisimilar in three cases:
 \begin{itemize}
     \item one state has a transition that cannot be matched by any possible weak combined transition from the other;
     \item they do not have the same set of free quantum variables;
-    \item the density operator of them corresponding to their quantum registers are different.
+    \item the density operators of them corresponding to their quantum registers are different.
 \end{itemize}
 The first case is checked by $\textbf{MatchAction}(\alpha,t,u,Visited)$ described in Algorithm~\ref{alg:weak_bisim} which checks the equivalence of states through comparing their transitions. The function recursively discovers the next equivalent state pairs between the target states of the transitions. The others are done in $\textbf{Match}$. We add the pair of states to $NonBisim$ if one of above cases has occurred, otherwise it will be stored in $Bisim$.
 
@@ -444,7 +445,7 @@ Technically, the function $\textbf{MatchAction}$ checks the condition that if $t
 
 Let $T$ be the set of transitions we may use when resolving the nondeterministic choices in a weak combined transition, $S$ be the set of states involved in these transitions, and $R$ be the equivalence relation of the states. We construct a flow network as follow.
 
-Let $\vartriangle$ and $\blacktriangledown$ be two vertices that represent the source and the sink of the network respectively. The set of vertices $V$ is given below
+Let $\vartriangle$ and $\blacktriangledown$ be two vertices that represent the source and the sink of the network, respectively. The set of vertices $V$ is given below
 \[V=\{\vartriangle,\blacktriangledown\}\cup S\cup S^{tr}\cup S_{\alpha}\cup S_{\alpha}^{tr}\cup S_{\bot}\cup S_{R}\] where
 \begin{equation*}
     \begin{aligned}
@@ -491,7 +492,7 @@ To deal with loops, when the state pair to be considered is already contained in
 \label{alg:weak_bisim}
 \begin{algorithmic}[1]
 \Require Two pLTSs with  initial states $t$ and $u$.
-\Ensure A boolean value $\theta$ indicating if the two pLTSs are weak bisimilar.
+\Ensure A boolean value $\theta$ indicating if the two pLTSs are ground bisimilar.
 \Function{\textbf{GroundBisimulation}}{$t,u$} = 
 \State $NonBisim$ := $\emptyset$
 \State \textbf{function Bisim}($t, u$) = \textbf{try} \{
@@ -561,7 +562,7 @@ Given two states $t$ and $u$, the function \textbf{GroundBisimulation(t,u)} alwa
 \end{theorem}
 \begin{proof}
 %So far there is no while-loop in the qCCS, that brings convenience to the proof of termination. 
-The algorithm starts with the empty sets $NonBisim$ and $Bisim$. The next action to perform will be detected in \textbf{Match}. Then it invokes function \textbf{MatchAction} to find the next new pair of states and recursively call function \textbf{Match} to check them. Each time the state pair is checked non-bisimilar in function \textbf{Match}, it adds the state pair into $NonBisim$. Meanwhile, if it is also contained in the $Assumed$, the algorithm restarts a new execution of \textbf{Bisim}. Let variable $k$ denote the number of executions of \textbf{Bisim}, and $NonBisim_{k}$ be the set $NonBisim$ at the end of $\textbf{Bisim}_{k}$. From the structure of algorithm described before, we know $NonBisim_{k}\subseteq NonBisim_{k+1}$. As the system we considered contains finite states, there exists $n$ that $\textbf{Bisim}_{n}$ is the last execution of $\textbf{Bisim}$ and $\forall k<n, NonBisim_{k}\subseteq NonBisim_{n}$.
+The algorithm starts with the empty sets $NonBisim$ and $Bisim$. The next action to perform will be detected in \textbf{Match}. Then it invokes function \textbf{MatchAction} to find the next new pair of states and recursively call function \textbf{Match} to check them. Each time the state pair is checked non-bisimilar in function \textbf{Match}, it adds the state pair into $NonBisim$. Meanwhile, if it is also contained in the set $Assumed$, the algorithm restarts a new execution of \textbf{Bisim}. Let variable $k$ denote the number of executions of \textbf{Bisim}, and $NonBisim_{k}$ be the set $NonBisim$ at the end of $\textbf{Bisim}_{k}$. From the structure of the algorithm described before, it is easy to show by induction that $NonBisim_{k}\subseteq NonBisim_{k+1}$ for any $k\geq 0$. As the system we considered contains finite states, there exists some $n$ such that $\textbf{Bisim}_{n}$ is the last execution of $\textbf{Bisim}$.
 
 After the execution of $\textbf{Bisim}_{n}$, no more exceptions will be raised. Each time \textbf{Match} executes with $t$ and $u$ as its parameters, we will add $(t,u)$ into $Visited$. Furthermore, if we reach a node with no more action, we only compare the quantum variables used and the state of quantum registers. Since the system is finite, there will be no more state pairs added into $Visited$. From the structure of \textbf{Close}, the function $Match$ will not be invoked again. Then the whole algorithm terminates.
 \qed
