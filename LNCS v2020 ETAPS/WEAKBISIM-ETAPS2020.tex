@@ -201,7 +201,7 @@ Y. Deng}
 % First names are abbreviated in the running head.
 % If there are more than two authors, 'et al.' is used.
 %
-\institute{Shanghai Key Laboratory of Trustworthy Computing,\\ East China Normal University, China}
+\institute{Shanghai Key Laboratory of Trustworthy Computing,\\ East China Normal University, China\\ \email{52174501019@stu.ecnu.edu.cn, yxdeng@sei.ecnu.edu.cn}}
 %
 \maketitle              % typeset the header of the contribution
 %
@@ -316,9 +316,9 @@ The first condition says that a quantum system will not be referenced after it h
 	\linfer[\Rlts{Q-Com}]{\pair{P_1,\rho} \ar{\qc?r} \pair{P'_1,\rho} \qquad \pair{P_2,\rho}\ar{\qc!r} \pair{P'_2,\rho}}
 	{\pair{P_1\Cpar P_2, \rho } \ar{\tau} \pair{P'_1\Cpar P'_2, \rho}}
 	&
-	\slinfer[\Rlts{Oper}]{\pair{\CE[\widetilde{q}].P,\rho} \ar{\tau} \pair{P,\CE_{\widetilde{q}}(\rho)}}
+	\slinfer[\Rlts{Oper}]{\pair{\CE[\tilde{q}].P,\rho} \ar{\tau} \pair{P,\CE_{\tilde{q}}(\rho)}}
 	\\[3pt]
-	\linfer[\Rlts{Meas}]{M=\sum_{i\in I}\lambda_i E^i \qquad p_i=tr(E^i_{\widetilde{q}}\rho)}
+	\linfer[\Rlts{Meas}]{M=\sum_{i\in I}\lambda_i E^i \qquad p_i=tr(E^i_{\tilde{q}}\rho)}
 	{\pair{M[\tilde{q};x].P,\rho} \ar{\tau} \sum_{i\in I}p_i \pair{P[\lambda_i/x], E^i_{\tilde{q}}\rho E^i_{\tilde{q}} / p_i}}
 	&
 	\\
@@ -334,7 +334,7 @@ The first condition says that a quantum system will not be referenced after it h
 	\\[3pt]
 	\linfer[\Rlts{Cho}]{\pair{P,\rho} \ar{\alpha} \Delta \qquad \Op{b}=\texttt{true}}{\pair{\ifthen{b}{P},\rho} \ar{\alpha} \Delta}
 	&
-	\linfer[\Rlts{Cons}]{\pair{P[\widetilde{v}/\widetilde{x},\widetilde{r}/\widetilde{q}],\rho} \ar{\alpha} \Delta \qquad A(\widetilde{x}, \widetilde{q})\Defs P}{\pair{A(\tilde{v},\tilde{r}),\rho} \ar{\alpha} \Delta}
+	\linfer[\Rlts{Cons}]{\pair{P[\tilde{v}/\tilde{x},\tilde{r}/\tilde{q}],\rho} \ar{\alpha} \Delta \qquad A(\widetilde{x}, \tilde{q})\Defs P}{\pair{A(\tilde{v},\tilde{r}),\rho} \ar{\alpha} \Delta}
 	\end{array}\]
 	\caption{Operational semantics of qCCS. Here in rule $\Rlts{C-Outp}$, $\Op{e}$ is the evaluation of $e$, and in rule $\Rlts{Meas}$, $E^i_{\tilde{q}}$ denotes the operator $E^i$ acting on the quantum systems $\tilde{q}$.\label{fig:opsem}
 	}
@@ -428,19 +428,21 @@ Suppose there is a configuration $\CC=\langle P,\rho\rangle$, the partial trace 
 
 \section{Ground Bisimulation Checking Algorithm}\label{sec:algorithm}
 
-In this section, we present an on-the-fly algorithm to check if two configurations are ground weak bisimilar. For more detail, the algorithm updates two tables $NonBisim$ and $Bisim$ to record the verification results. $Bisim$ presents the ground bisimulation relation when the algorithm terminates. Furthermore, the algorithm return $True$ if the initial configuration pair is contained in $Bisim$.
+In this section, we present an on-the-fly algorithm to check if two configurations are ground bisimilar. For more detail, the algorithm updates two tables $NonBisim$ and $Bisim$ to record the verification results. $Bisim$ presents the ground bisimulation relation when the algorithm terminates. Furthermore, the algorithm return $True$ if the initial configuration pair is contained in $Bisim$.
 
-The decisive part of the algorithm is the check whether a configuration pair $(t, u)$ satisfies that $t$ is bisimilar with $u$. From the Definition~\ref{def:weak_bisim}, a pair of states is deemed non-bisimilar in three cases:
+The decisive part of the algorithm is the check whether two configurations $t$ and $u$ are bisimilar. From  Definition~\ref{def:weak_bisim}, a pair of configurations is deemed non-bisimilar in three cases:
+\vspace{-0.25em}
 \begin{itemize}
     \item one configuration has a transition that cannot be matched by any possible weak combined transition from the other;
-    \item they do not have the same set of free quantum variables;
+    \item they do not have the same set of free quantum variables for their processes;
     \item the density operators of them corresponding to their quantum registers are different.
 \end{itemize}
-The last two cases can be checked directly through comparing two qubit sets and computing the trace of their density operators. The first case means that some actions of two configurations are not matched, that is, it violates the condition that if $t\overset{\alpha}{\longmapsto}\Delta$ then there exists some $u$ such that $u\overset{\alpha}{\mapstochar\Longrightarrow}_{c}\Theta$ and $\Delta~\lift{\aRel}~\Theta$. Here we use as a subroutine of the algorithm in \cite{TH15} to reduce the problem to a network flow problem that can be solved in polynomial time.
+\vspace{-0.25em}
+The first case means that some actions of two configurations are not matched, that is, it violates the condition that if $t\overset{\alpha}{\longmapsto}\Delta$ then there exists some $u$ such that $u\overset{\alpha}{\mapstochar\Longrightarrow}_{c}\Theta$ and $\Delta \lift{\aRel} \Theta$. Here we use as a subroutine of the algorithm in \cite{TH15} to reduce the problem to a network flow problem that can be solved in polynomial time. The last two cases can be checked directly through the comparison of qubit sets and the computation of the trace of density operators.
 
 Let $T$ be the set of transitions we may use when resolving the nondeterministic choices in a weak combined transition, $S$ be the set of states involved in these transitions, and $R$ be the equivalence relation of the states. We construct a flow network as follow.
 
-Let $\vartriangle$ and $\blacktriangledown$ be two vertices that represent the source and the sink of the network, respectively. The set of vertices $V$ is given below
+Let $\vartriangle$ and $\blacktriangledown$ be two additional vertices represent the source and the sink of the network, respectively. The set of vertices $V$ is given below
 \[V=\{\vartriangle,\blacktriangledown\}\cup S\cup S^{tr}\cup S_{\alpha}\cup S_{\alpha}^{tr}\cup S_{\bot}\cup S_{R}\] where
 \begin{equation*}
     \begin{aligned}
@@ -481,13 +483,13 @@ Intuitively, the fourth constraint is referred to as the flow-conservation const
 
 \subsection{The Algorithm}
 \label{sec:algorithm_code}
-The function $\textbf{Bisim}(t,u)$, as what shown in Algorithm~\ref{alg:weak_bisim}, is the main function of the algorithm, which attempts to find the smallest bisimulation containing the pair $(t,u)$. It initialises $Bisim$ and a set named $Visited$ to store the visited pairs, then calls the function $\textbf{Match}$ to search for a bisimulation. The function \textbf{Match}$(t,u,Visited)$ invokes a depth-first traversal to match a pair of configurations $(t,u)$ with all their possible behaviours. The set $Visited$ is updated before the traversal for detecting the loops. It checks whether the configuration pair encounters one of the three cases depicted before (Line 12-16). We match the behaviours of $t$ and $u$ from both directions as we are checking bisimulations.
+The function $\textbf{Bisim}(t,u)$, as what shown in Algorithm~\ref{alg:weak_bisim}, is the main function of the algorithm, which attempts to find the smallest bisimulation containing the pair $(t,u)$. It initialises $Bisim$ and a set named $Visited$ to store the visited pairs, then calls the function $\textbf{Match}$ with the initial configuration pair $(t,u)$ to search for a bisimulation. The function \textbf{Match}$(t,u,Visited)$ invokes a depth-first traversal to match a pair of configurations $(t,u)$ with all their possible behaviours. The set $Visited$ is updated before the traversal for detecting the loops. It checks whether the configuration pair encounters one of the three cases depicted before (Line 12-16). We match the behaviours of $t$ and $u$ from both directions as we are checking bisimulations.
 
-An auxiliary function \textbf{Act}$(t)$ is invoked in \textbf{Match} to discover the next action that $t$ can perform as the parameters for the function \textbf{MatchAction}. If $t$ have no more action to do the function will return an empty set.
+An auxiliary function \textbf{Act}$(t)$ is invoked in \textbf{Match} to discover the next action that $t$ can perform as the parameter for the function \textbf{MatchAction}. If $t$ has no more action to do the function will return an empty set.
 
-Having defined the predicate \textbf{LP} before, we can defined the function $\textbf{MatchA}\\\text{-}\textbf{ction}(\alpha, t, u, Visited)$ to check whether the action of two configurations are matched. \textbf{MatchAction} invoke the function \textbf{Close}$(t,u,Visited)$ to construct an equivalence relation $R$ between the states from the target distribution and the weak transitions behaving the action asked.
+Having defined the predicate \textbf{LP} before, we can defined the function $\textbf{MatchA}\\\text{-}\textbf{ction}(\alpha, t, u, Visited)$ to check whether the action of two configurations are matched. \textbf{MatchAction} invoke the function \textbf{Close}$(t,u,Visited)$ to construct an equivalence relation $R$ between the configurations from the target distribution and the weak transitions behaving the action asked.
 
-To deal with loops, we update the set $Assumed$ to store all the assumptions we made. When the configuration pair to be considered is already contained in $Visited$ it will be assumed to be bisimilar and added to $Assumed$ (Line 40-41). Later on, if the pair of configurations are found to be non-bisimilar, it will be added to $NonBisim$ and a wrong assumption exception (Line 15-17) will be raised to restart the checking process from the original pair of configurations. Then \textbf{Bisim}$(t, u)$ renews the set $Bisim$ and $Visited$ to remove the pairs checked under the wrong assumption (Line 4).
+To deal with loops, we update the set $Assumed$ to store all the assumptions we made. When the configuration pair to be considered is already contained in $Visited$ it will be assumed to be bisimilar and added to $Assumed$ (Line 42-44). Later on, if the pair of configurations are found to be non-bisimilar, it will be added to $NonBisim$ and a wrong assumption exception will be raised to restart the checking process from the original pair of configurations (Line 18-21). Then \textbf{Bisim}$(t, u)$ renews the set $Bisim$ and $Visited$ to remove the pairs checked under the wrong assumption (Line 8).
 
 \begin{breakablealgorithm}
 \caption{Checking ground bisimulation}
@@ -559,21 +561,21 @@ To deal with loops, we update the set $Assumed$ to store all the assumptions we 
 
 \subsection{Termination and Correctness}
 \label{sec:properties}
-The proof of the termination and correctness of the algorithm is stated in Theorem~\ref{thm:termination} and~\ref{thm:correctness}. It relies on the size of the tables the algorithm updates. 
+The proof of the termination and correctness of the algorithm is stated in Theorem~\ref{thm:termination} and~\ref{thm:correctness}. It relies on the sets updated during the execution of the algorithm. 
 
 \begin{theorem}[Termination]\label{thm:termination}
 Given two states $t$ and $u$, the function \textbf{GroundBisimulation(t,u)} always terminates.
 \end{theorem}
 \begin{proof}
 %So far there is no while-loop in the qCCS, that brings convenience to the proof of termination. 
-The algorithm starts with the empty sets $NonBisim$ and $Bisim$. The next action to perform will be detected in \textbf{Match}. Then it invokes function \textbf{MatchAction} to find the next new pair of configurations and recursively call function \textbf{Match} to check them. Each time the configuration pair is checked non-bisimilar in function \textbf{Match}, it adds the configuration pair into $NonBisim$. Meanwhile, if it is also contained in the set $Assumed$, the algorithm restarts a new execution of \textbf{Bisim}. Let variable $k$ denote the number of executions of \textbf{Bisim}, and $NonBisim_{k}$ be the set $NonBisim$ at the end of $\textbf{Bisim}_{k}$. From the structure of the algorithm described before, it is easy to show by induction that $NonBisim_{k}\subseteq NonBisim_{k+1}$ for any $k\geq 0$. As the system we considered contains finite configurations, there exists some $n$ such that $\textbf{Bisim}_{n}$ is the last execution of $\textbf{Bisim}$.
+The algorithm starts with the empty sets $NonBisim$ and $Bisim$. The next action to perform will be detected in \textbf{Match}. Then it invokes function \textbf{MatchAction} to find the next new pair of configurations and recursively call function \textbf{Match} to check them. Each time the configuration pair is checked non-bisimilar in function \textbf{Match}, it adds the configuration pair into $NonBisim$. Meanwhile, if it is also contained in the set $Assumed$, the algorithm restarts a new execution of \textbf{Bisim}. Let variable $k$ denote the number of executions of \textbf{Bisim}, and $NonBisim_{k}$ be the set $NonBisim$ at the end of $\textbf{Bisim}_{k}$. From the structure of the algorithm described before, it is easy to show by induction that $NonBisim_{k}\subset NonBisim_{k+1}$ for any $k\geq 0$. As the system we considered contains finite configurations, there exists some $n$ such that $\textbf{Bisim}_{n}$ is the last execution of $\textbf{Bisim}$.
 
 After the execution of $\textbf{Bisim}_{n}$, no more exceptions will be raised. Each time \textbf{Match} executes with $t$ and $u$ as its parameters, we will add $(t,u)$ into $Visited$. Furthermore, if we reach a node with no more action, we only compare the quantum variables used and the state of quantum registers. Since the system is finite, there will be no more state pairs added into $Visited$. From the structure of \textbf{Close}, the function $Match$ will not be invoked again. Then the whole algorithm terminates.
 \qed
 \end{proof}
 
 \begin{theorem}[Correctness]\label{thm:correctness}
-Given two states $t$ and $u$ from two pLTSs,\\ \textbf{GroundBisimulation}$(t,u)$ returns \textit{true} if and only if they are ground bisimilar.
+Given two states $t$ and $u$ from two pLTSs, \textbf{Groun}\\\text{-}\textbf{dBisimulation}$(t,u)$ returns \textit{true} if and only if they are ground bisimilar.
 \end{theorem} 
 \begin{proof}
 Let $\textbf{Bisim}_{n}$ be the last execution of $\textbf{Bisim}$, and $NonBisim_{n}$, $Bisim_{n}$ be the table recording the checked state pairs at the end of $\textbf{Bisim}_{n}$. From the structure of \textbf{Match}, we can ensure that $NonBisim_{n}\cap Bisim_{n}=\emptyset$.
@@ -971,7 +973,7 @@ An auxiliary function \textbf{Act}$(t,u)$ is called in \textbf{Match} to discove
 
 The other set $Visited$ is updated in function \textbf{MatchAction}$(\alpha,t,u,Visited)$. This function discovers next pairs of states or distributions, depending on the type of transitions,  and recursively invokes the function \textbf{Match} or \textbf{MatchDistribution}. The current state pair is added to $W$ when the new functions are invoked.
 
-The function \textbf{MatchDistribution}$(\Delta,\Theta,\textit{R})$ is called if we need to compare a pair of state distributions instead of a single pair of states. It returns a boolean value indicating whether the distributions are equivalent. In order to do so, it compares each pair of states from the supports of the two distributions. After checking the bisimilarity of these state pairs, the function generates an equivalence relation of the state pairs not contained in the set $NonBisim$ for non-bisimilar state pairs. Another auxiliary function \textbf{Check}$(\Delta,\Theta,\textit{R})$ is used to check whether $\Delta$ and $\Theta$ are related by the lifted relation $\lift{\aRel}$. Technically, we take advantage of a nice property of the lifting operation: $\Delta\lift{\aRel}\Theta$ if and only if the maximum flow in an appropriately constructed network is $1$ \cite{BEM00},\cite{Deng15}. There are standard algorithms for computing the maximum flow in a network; see e.g. \cite{CHM90}.
+The function \textbf{MatchDistribution}$(\Delta,\Theta,\textit{R})$ is called if we need to compare a pair of state distributions instead of a single pair of states. It returns a boolean value indicating whether the distributions are equivalent. In order to do so, it compares each pair of states from the supports of the two distributions. After checking the bisimilarity of these state pairs, the function generates an equivalence relation of the state pairs not contained in the set $NonBisim$ for non-bisimilar state pairs. Another auxiliary function \textbf{Check}$(\Delta,\Theta,\textit{R})$ is used to check whether $\Delta$ and $\Theta$ are related by the lifted relation $\lift{\aRel}$. Technically, we take advantage of a nice property of the lifting operation: $\Delta \lift{\aRel} \Theta$ if and only if the maximum flow in an appropriately constructed network is $1$ \cite{BEM00},\cite{Deng15}. There are standard algorithms for computing the maximum flow in a network; see e.g. \cite{CHM90}.
 Besides the lifting condition, we check the disjunction of the returning boolean values from function \textbf{Match}. 
 
 When the algorithm detect that the pair to match is already contained in $Visited$, it will be supposed to be bisimilar and added to $Assumed$. If the pair is checked to be not bisimilar later, it will be added to $NonBisim$ and restart a new execution of \textbf{Bisim}. The set $Bisim$ and $Visited$ are reset to remove the pairs checked under the wrong assumption and together with their results. 
