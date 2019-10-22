@@ -1,0 +1,50 @@
+This is BibTeX, Version 0.99d (TeX Live 2016)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: BISIM-CONCUR2019.aux
+The style file: plainurl.bst
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+Reallocated global_strs (elt_size=20001) to 20 items from 10.
+Reallocated glb_str_end (elt_size=4) to 20 items from 10.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Database file #1: ref.bib
+You've used 33 entries,
+            2849 wiz_defined-function locations,
+            848 strings with 9837 characters,
+and the built_in function-call counts, 15671 in all, are:
+= -- 1632
+> -- 563
+< -- 16
++ -- 205
+- -- 168
+* -- 837
+:= -- 2233
+add.period$ -- 108
+call.type$ -- 33
+change.case$ -- 176
+chr.to.int$ -- 0
+cite$ -- 33
+duplicate$ -- 496
+empty$ -- 1452
+format.name$ -- 168
+if$ -- 4054
+int.to.chr$ -- 0
+int.to.str$ -- 33
+missing$ -- 35
+newline$ -- 168
+num.names$ -- 68
+pop$ -- 315
+preamble$ -- 1
+purify$ -- 149
+quote$ -- 0
+skip$ -- 1114
+stack$ -- 0
+substring$ -- 800
+swap$ -- 151
+text.length$ -- 16
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 124
+warning$ -- 0
+while$ -- 113
+width$ -- 35
+write$ -- 375
