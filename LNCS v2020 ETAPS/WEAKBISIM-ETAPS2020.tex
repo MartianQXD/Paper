@@ -440,7 +440,7 @@ The decisive part of the algorithm is the check whether two configurations $t$ a
 \vspace{-0.25em}
 The first case means that some actions of two configurations are not matched, that is, it violates the condition that if $t\overset{\alpha}{\longmapsto}\Delta$ then there exists some $u$ such that $u\overset{\alpha}{\mapstochar\Longrightarrow}_{c}\Theta$ and $\Delta \lift{\aRel} \Theta$. Here we use as a subroutine of the algorithm in \cite{TH15} to reduce the problem to a network flow problem that can be solved in polynomial time. The last two cases can be checked directly through the comparison of qubit sets and the computation of the trace of density operators.
 
-Let $T$ be the set of transitions we may use when resolving the nondeterministic choices in a weak combined transition, $S$ be the set of states involved in these transitions, and $R$ be the equivalence relation of the states. We construct the flow network as follow.
+Let $T$ be the set of transitions we may use when resolving the nondeterministic choices in a weak combined transition, $S$ be the set of states involved in these transitions, and $R$ be the equivalence relation of the states. We construct a flow network as follow.
 
 Let $\vartriangle$ and $\blacktriangledown$ be two additional vertices represent the source and the sink of the network, respectively. The set of vertices $V$ is given below
 \[V=\{\vartriangle,\blacktriangledown\}\cup S\cup S^{tr}\cup S_{\alpha}\cup S_{\alpha}^{tr}\cup S_{\bot}\cup S_{R}\] where
@@ -564,7 +564,7 @@ To deal with loops, we update the set $Assumed$ to store all the assumptions we 
 The proof of the termination and correctness of the algorithm is stated in Theorem~\ref{thm:termination} and~\ref{thm:correctness}. It relies on the sets updated during the execution of the algorithm. 
 
 \begin{theorem}[Termination]\label{thm:termination}
-Given two configurations $t$ and $u$, the function \textbf{GroundBisimulation(t,u)} always terminates.
+Given two states $t$ and $u$, the function \textbf{GroundBisimulation(t,u)} always terminates.
 \end{theorem}
 \begin{proof}
 %So far there is no while-loop in the qCCS, that brings convenience to the proof of termination. 
@@ -575,7 +575,7 @@ After the execution of $\textbf{Bisim}_{n}$, no more exceptions will be raised. 
 \end{proof}
 
 \begin{theorem}[Correctness]\label{thm:correctness}
-Given two configurations $t$ and $u$ from two pLTSs, \textbf{Groun}\\\text{-}\textbf{dBisimulation}$(t,u)$ returns \textit{true} if and only if they are ground bisimilar.
+Given two states $t$ and $u$ from two pLTSs, \textbf{Groun}\\\text{-}\textbf{dBisimulation}$(t,u)$ returns \textit{true} if and only if they are ground bisimilar.
 \end{theorem} 
 \begin{proof}
 Let $\textbf{Bisim}_{n}$ be the last execution of $\textbf{Bisim}$, and $NonBisim_{n}$, $Bisim_{n}$ be the table recording the checked state pairs at the end of $\textbf{Bisim}_{n}$. From the structure of \textbf{Match}, we can ensure that $NonBisim_{n}\cap Bisim_{n}=\emptyset$.
@@ -614,7 +614,7 @@ In this section, we report on an implementation of our approach and provide the 
 \subsection{Implementation}
 We have implemented both strong and weak ground bisimulation checkers, written in Python 3.7. The algorithm for checking strong bisimulation is shown in Appendix~\ref{sec:strong_bisim}. The workflow of our tool is sketched in Figure~\ref{fig:arch}. The tool consists of a pLTS generation module and a bisimulation checking module, devoted to modeling and verification, respectively.
 The tool inputs a specification and an implementation of a quantum protocol, both described as qCCS processes, the definition of user-defined operators (some of them are shown in Appendix~\ref{sec:appc}), as well as an initialisation of classical and quantum variables. Unlike classical variables, the initialisation of all quantum variables, deemed as a quantum register, is accomplished at the same time so to allow for superposition states.
-The final output of the tool is a result indicating whether the specification and the implementation are bisimilar under the same initial configurations. The algorithm records the bisimilar pairs and non-bisimilar pairs, i.e., the bisimulation relation is figured out in the traversal of configuration pairs.
+The final output of the tool is a result indicating whether the specification and the implementation are bisimilar under the same initial states. The algorithm records the bisimilar pairs and non-bisimilar pairs, i.e., the bisimulation relation is figured out in the traversal of configuration pairs.
 %
 %\subparagraph*{pLTS Generation Module.}
 
@@ -628,11 +628,84 @@ The tool is available in \cite{QBisim},
 where we also provide all the examples for the experiments to be discussed in Section~\ref{sec:exper}. %\url{https://github.com/MartianQXD/QBisim}. 
 %It has already prepared codes of the examples we used in directories \textsl{examples}.
 
-\subsection{BB84 Quantum Key Distribution Protocol}
-\label{sec:bb84}
-To illustrate the use of our tool,
-we formalise the BB84 quantum key distribution protocol. Our formalisation follows \cite{DF12}, where a manual analysis of the protocol is provided. Now we perform automatic verification via the ground bisimulation checker.
+\subsection{Super-dense Coding Protocol}\label{sec:sdc}
+We formalise the super-dense coding protocol. Our formalisation follows \cite{FDY14} to illustrate the use of our tool, where a manual analysis of the protocol is provided. Now we perform automatic verification via the ground bisimulation checker.
 More examples are given in Appendix~\ref{sec:examples}.
+
+Super-dense coding is proposed by Bennett and Wiesner in 1992~\cite{BW92}. It is a quantum communication protocol allowing two classical bits to be encoded in one qubit during a transmission, so it needs only one quantum channel. Such advantage is based on the use of a maximally
+entangled state, EPR state. An EPR state can be transformed into all the four kinds of EPR states through a 1-qubit operation, and these EPR states are mutually orthogonal. 
+\paragraph{Protocol.}
+We suppose the sender and the receiver of the communication are $Alice$ and $Bob$, then the protocol goes as follows:
+\begin{enumerate}
+    \item $Alice$ and $Bob$ prepare an EPR state $|\beta_{00}\rangle_{q_1,q_2}$ together. Then they share the qubits, $Alice$ holding $q_1$ and $Bob$ holding $q_2$.
+    \item If $Alice$ wants to send value $x\in \{0,1,2,3\}$, she applies the corresponding Pauli operation $\sigma^{x}$ on her qubit $q_1$.
+    \item $Alice$ sends the qubit $q_1$ to $Bob$.
+    \item $Bob$ applies a controlled-not operation on $q_1,q_2$ and a Hadamard operation on $q_1$ to remove the entanglement.
+    \item $Bob$ measures $q_1$ and $q_2$ to get the value $x$.
+\end{enumerate}
+After the execution of the protocol above, $Bob$ gets the value $x$ which $Alice$ wants to send. Note that $x$ could be represented in a 2-bit string. The protocol exactly transmits two classical bits of information by sending one qubit from $Alice$ to $Bob$.
+\paragraph{Implementation.}
+The modeling of super-dense coding protocol in qCCS follows \cite{FDY14}:
+\begin{flalign*}
+    Alice \overset{def}{=}& \underline{c}_{A}?q_1.\sum_{0\leq  i\leq 3}(\textbf{if}\ x=i\ \textbf{then}\ \sigma^{i}[q_1].\underline{e}!q_1.\textbf{nil});\\
+    Bob \overset{def}{=}& \underline{c}_{B}?q_2.\underline{e}?q_1.CN[q_1,q_2].H[q_1].M[q_1,q_2;x].d!x.\textbf{nil};\\
+    EPR \overset{def}{=}& Set^{\Psi}[q_1,q_2].\underline{c}_{B}!q_2.\underline{e}_{A}!q_1.\textbf{nil};\\
+    Sdc \overset{def}{=}& c?x.(Alice||Bob||EPR)\setminus \{\underline{c}_{A},\underline{c}_{B},\underline{e}\}
+\end{flalign*}
+where $CN$ is the controlled-not operation and $H$ is the Hadamard operation, $Set^{\Psi}$ is the operation transforming all the inputs into an EPR state $|\beta_{00}\rangle=(|00\rangle+|11\rangle)/\sqrt{2}$, its operation elements are $\{|\beta_{00}\rangle\langle 00|,|\beta_{00}\rangle\langle 01|,|\beta_{00}\rangle\langle 10|,|\beta_{00}\rangle\langle 11|\}$, and $\sigma^{i}$ are Pauli operators where $\sigma^{0}=I,\sigma^{1}=X,\sigma^{2}=Z,\sigma^{3}=Y$. The element set of measurement \textit{M} is $\{|00\rangle\langle 00|,|01\rangle\langle 01|,|10\rangle\langle 10|,|11\rangle\langle 11|\}$.
+\paragraph{Specification.}
+The specification of the protocol asks the process to return 2 qubit according to the value of classical bits it received. So it can be defined as:
+\begin{flalign*}
+    % Sdc_{spec} \overset{def}{=}& c?x.\tau^{11}.\sum_{i=0}^{3}(\textbf{if}\ x=i\ \textbf{then}\ Set^{i}[q_1,q_2].d!x.\textbf{nil})
+    Sdc_{spec} \overset{def}{=}& c?x.\sum_{i=0}^{3}(\textbf{if}\ x=i\ \textbf{then}\ Set^{i}[q_1,q_2].d!x.\textbf{nil})
+\end{flalign*}
+where $Set^{i}$ is the operation of transforming the current state into the state decided by the value of $i$ like $Set^{\Psi}$.
+% Here we have inserted some harmless $\tau$-transitions ($\tau^{11}$ stands for a series of $11$ $\tau$-transitions) because in ground bisimulations $\tau$-actions are not abstracted away. 
+\paragraph{Input.}
+Associated with the specification $Sdc$ are the following variables and operators that need to be declared.
+\begin{itemize}
+    \item The classical bit is named $x$. It stores the value $Alice$ wants to send. We test the program with different values of $x$.
+    \item The qubits are declared as a vector $|q_1,q_2\rangle$. They are used for generating the EPR state here. Without loss of generality, we set them to be $|00\rangle$.
+    \item The operation of transforming $|00\rangle$ into the EPR state is defined as $Set^{\Psi}$. 
+    \item The controlled-not operation is defined as $CN$.
+    \item The Hadamard operation is defined as $H$.
+    \item The Pauli operations are defined as $\sigma^0,\sigma^1,\sigma^2$ and $\sigma^3$.
+    \item The measurement is defined as $M$ with its operation elements.
+\end{itemize}
+
+For the specification $Sdc_{spec}$, we declare the following set of variables and operators.
+\begin{itemize}
+    \item The classical bit named $x$ is still required to store the value $Alice$ wants to send.
+    \item The qubits are declared as a vector $|q_1,q_2\rangle$. We set them to be $|00\rangle$.
+    \item The operation of transforming an arbitrary state into $|00\rangle$ (resp. $|01\rangle$, $|10\rangle$, $|11\rangle$) is defined as $Set^{0}$ (resp. $Set^{1}$, $Set^{2}$, $Set^{3}$).
+\end{itemize}
+%\subparagraph*{Generated pLTSs.}
+%The generated pLTSs of the super-dense coding example is illustrated in Figure~\ref{fig:sdc+tele}(a)-Figure~\ref{fig:sdc+tele}(d). If $x=1$, the length of the paths from both sides are 15. However, if $x=5$, the length of the paths from both sides are different.
+
+We see from the first two lines of Table~\ref{tab:weak_result} that not all the inputs can get a positive verification result. In the case $x=1$, we can check that $\langle Sdc,\rho_0\rangle \sim \langle Sdc_{spec},\rho_0\rangle$, where $\rho_0$ is the initial state of the quantum variables. In the case $x=5$, none of the four branches can be chosen, then the tool find that $\langle Sdc,\rho_0\rangle \not\sim \langle Sdc_{spec},\rho_0\rangle$. To correct it, some modifications are needed on both the implementation and the specification.
+\paragraph{Improved Super-dense Coding Protocol.}
+We improve the above qCCS programs by considering the case $i\neq 1,2,3,4$. In such case we send an alarming message and skip all the rest of operations. The new specification $Sdc'$ is defined below:
+\begin{flalign*}
+    Alice' \overset{def}{=}& \underline{c}_{A}?q_1.(\sum_{0\leq  i\leq 3}(\textbf{if}\ x=i\ \textbf{then}\ \sigma^{i}[q_1].\underline{e}!q_1.\textbf{nil})\ \\
+    &\qquad\qquad\qquad +\ \textbf{if not }\bigvee_{0\leq  i\leq 3} x=i\ \textbf{then}\ c_{C}!msg.\textbf{nil});\\
+    % Bob' \overset{def}{=}& \underline{c}_{B}?q_2.(\underline{e}?q_1.CN[q_1,q_2].H[q_1].M[q_1,q_2;x].d!x.\textbf{nil}\ +\ c_{C}?msg.\tau^{8}.d!x.\textbf{nil});\\
+    Bob' \overset{def}{=}& \underline{c}_{B}?q_2.(\underline{e}?q_1.CN[q_1,q_2].H[q_1].M[q_1,q_2;x].d!x.\textbf{nil}\ +\ c_{C}?msg.d!x.\textbf{nil});\\
+    EPR \overset{def}{=}& Set^{\Psi}[q_1,q_2].\underline{c}_{B}!q_2.\underline{c}_{A}!q_1.\textbf{nil};\\
+    Sdc' \overset{def}{=}& c?x.(Alice||Bob||EPR)\setminus \{\underline{c}_{A},\underline{c}_{B},c_{C},\underline{e}\}.
+\end{flalign*}
+We adjust the specification to add a new branch, so as to get $Sdc'_{spec}$:
+\begin{flalign*}
+    % Sdc'_{spec} \overset{def}{=}& c?x.\tau^{11}.(\sum_{i=0}^{3}(\textbf{if}\ x=i\ \textbf{then}\ Set^{i}[q_1,q_2].d!x.\textbf{nil})\\
+    % &\ +\ \textbf{if}\ \neg\bigvee_{0\leq  i\leq 3} x=i\  \textbf{then}\ Set^{\Psi}[q_1,q_2].d!x.\textbf{nil}).
+    Sdc'_{spec} \overset{def}{=}& c?x.(\sum_{i=0}^{3}(\textbf{if}\ x=i\ \textbf{then}\ Set^{i}[q_1,q_2].d!x.\textbf{nil})\\
+    &\ +\ \textbf{if not }\bigvee_{0\leq  i\leq 3} x=i\  \textbf{then}\ Set^{\Psi}[q_1,q_2].d!x.\textbf{nil}).
+\end{flalign*}
+
+The improved modelling processes are indeed bisimilar, which can be seen in Table~\ref{tab:weak_result}.
+
+\subsection{BB84 Quantum Key Distribution Protocol}
+\label{sec:ss}
+Our formalisation of the BB84 quantum key distribution protocol follows \cite{DF12}, where a manual analysis of the protocol is provided. Now we perform automatic verification via the weak ground bisimulation checker.
 % Now we perform automatic verification via the strong ground bisimulation checker.
 
 %We display four examples in our experiment: (1) super-dense coding protocol; (2) quantum teleportation protocol; (3) quantum secret sharing; (4) BB84 quantum key kistribution protocol. Below we make a brief introduction to the quantum secret sharing protocol as an illustration. Other examples are given in Appendix~\ref{sec:examples}.
@@ -640,7 +713,7 @@ More examples are given in Appendix~\ref{sec:examples}.
 The BB84 protocol provides a provably secure way to create a private key between two partners with a classical authenticated channel and a quantum insecure
 channel between them. The protocol does not make use of entangled states. It ensures its security through the basic property of quantum mechanics: if the states to be distinguished are not orthogonal, such as $|0\rangle$ and $|+\rangle$, then information gain about a quantum state is only possible at the expense of changing the state. Let the sender and the receiver be $Alice$ and $Bob$, respectively. The basic BB84 protocol with a sequence of qubits $\tilde{q}$ with size $n$ goes as follows:
 \begin{enumerate}
-	\item $Alice$ randomly generates two sequences of bits $\tilde{B}_a$ and $\tilde{K}_a$ using her qubits $\tilde{q}$. Note that $\tilde{q}$ here are auxiliary qubits for random generation which are not modified in this step.
+	\item $Alice$ randomly generates two sequences of bits $\tilde{B}_a$ and $\tilde{K}_a$ using her qubits $\tilde{q}$. Note that $\tilde{q}$ here are auxiliary qubits which are not modified in this step.
 	\item $Alice$ sets the state of $\tilde{q}$, such that the \textit{i}th bits of $\tilde{q}$ is $|x_{y}\rangle$ where $x$ and $y$ are the \textit{i}th bits of $\tilde{B}_a$ and $\tilde{K}_a$, and respectively, $|0_0\rangle=|0\rangle$, $|0_1\rangle=|1\rangle$, $|1_0\rangle=|+\rangle=(|0\rangle+|1\rangle)/\sqrt{2}$ and $|1_1\rangle=|-\rangle=(|0\rangle-|1\rangle)/\sqrt{2}$.
 	\item $Alice$ sends her qubits $\tilde{q}$ to $Bob$.
 	\item $Bob$ randomly generates a sequence of bits $\tilde{B}_b$ using his qubits $\tilde{q}'$.
@@ -648,7 +721,7 @@ channel between them. The protocol does not make use of entangled states. It ens
 	\item $Bob$ sends his choice of measurements $\tilde{B}_{b}$ to $Alice$, and after receiving the information, $Alice$ sends her $\tilde{B}_{a}$ to $Bob$.
 	\item $Alice$ and $Bob$ match two sequences of bits $\tilde{B}_{a}$ and $\tilde{B}_{b}$ to determine at which positions the bits are equal. If the bits match, they keep the corresponding bits of $\tilde{K}_a$ and $\tilde{K}_b$. Otherwise, they discard them.
 \end{enumerate}
-After the execution of the basic BB84 protocol, the remaining bits of $\tilde{K}_a$ and $\tilde{K}_b$ should be the same, provided that the communication channels are perfect and there is no eavesdropper.
+After the execution the basic BB84 protocol, the remaining bits of $\tilde{K}_a$ and $\tilde{K}_b$ should be the same, provided that the communication channels are perfect and there is no eavesdropper.
 
 Then we consider the case that there exists an eavesdropper called $Eve$ taking part in the communication. $Alice$ and $Bob$ also have more behaviours to detect $Eve$. In the BB84 protocol with an eavesdropper, let $\tilde{K'}_a$ and $\tilde{K'}_b$ to be the remaining bits of $\tilde{K}_a$ and $\tilde{K}_b$ with size $k$. Then $Alice$, $Bob$ and $Eve$ proceed as follows:
 \begin{enumerate}
@@ -668,7 +741,7 @@ BB84 \overset{def}{=}& (Alice||Bob)\setminus\{a2b,b2a,\underline{A2B}\}
 \end{flalign*}
 where there are several special operations:
 \begin{itemize}
-	\item $Ran[q;x]$ is equal to quantum operations $Set_{+}[q].M_{0,1}[q;x].Set_{0}[q]$, where $Set_{+}$ (resp.$Set_{0}$) is the operation which sets a qubit it applies on to $|+\rangle$ (resp.$|0\rangle$), $M_{0,1}[q;x]$ is the quantum measurement on $q$ according to the basis $\{|0\rangle,|1\rangle\}$ and stores the result into $x$.
+	\item $Ran[q;x]=Set_{+}[q].M_{0,1}[q;x].Set_{0}[q]$, where $Set_{+}$ (resp.$Set_{0}$) is the operation which sets a qubit it applies on to $|+\rangle$ (resp.$|0\rangle$), $M_{0,1}[q;x]$ is the quantum measurement on $q$ according to the basis $\{|0\rangle,|1\rangle\}$ and stores the result into $x$.
 	\item $Set_{K}[q]$ sets the qubit $q$ to the state $|K\rangle$.
 	\item $H_{B}[q]$ applies $H$ or does nothing on the qubit $q$ depending on whether the value of $B$ is 1 or 0.
 	\item $M_{B}[q;K]$ is the quantum measurement on $q$ according to the basis $\{|+\rangle,|-\rangle\}$ or $\{|0\rangle,|1\rangle\}$ depending on whether the value of $B$ is 1 or 0.
@@ -719,7 +792,7 @@ Bob' \overset{def}{=}& key_{b}?K'_{b}.a2b?x.a2b?K''_{a}.b2a!SubStr(K'_{b},x).\\
 \end{flalign*}
 where there are three more special operations:
 \begin{itemize}
-	\item $Pstr_m$ is a measurement similar to $Ran$; it randomly generates a sequence of $\lceil m/2\rceil$ bits ranging from 1 to $m$. As there is only one bit in this example, here it just generates the value of $x$.
+	\item $Pstr_m$ is a measurement similar to $Ran$; it randomly generates a sequence of $\lceil m/2\rceil$ bits ranging from 1 to $m$. Here it just generates the value of $x$.
 	\item $SubStr(K,x)$ returns the substring of $K$ at the index specified by $x$. As the example here only consider one bit, $x$ decides the return is $K$ or nothing.
 	\item $RemStr(K,x)$ returns the remaining substring of $K$ deleting $SubStr(K,x)$.
 \end{itemize}
@@ -730,7 +803,7 @@ Eve \overset{def}{=}& \underline{A2E}?q_1.Ran[q_3;B_{e}].M_{B_{e}}[q_1;K_{e}].Se
 \end{flalign*}
 With the participation of $Eve$, we adjust the communication of $Alice$ and $Bob$:
 \begin{flalign*}
-Alice\rightarrow Alice[f_{a}],\qquad Bob\rightarrow Bob[f_{b}]
+Alice\rightarrow Alice[f_{a}], Bob\rightarrow Bob[f_{b}]
 \end{flalign*}
 where $f_{a}(\underline{A2B})=\underline{A2E}$, and $f_{b}(\underline{A2B})=\underline{E2B}$.
 
@@ -740,11 +813,11 @@ Next, we introduce a test process $Test$ before arriving at the new implementati
 % &(\textbf{if}\ x\neq y\ \textbf{then}\  fail!0.\textbf{nil}\\
 % &\ +\ \textbf{if}\ x=y\ \textbf{then}\ key_{e}!z.skey!x.\textbf{nil});\\
 Test \overset{def}{=}& key'_{a}?x.key'_{b}?y.key'_{e}?z.\\
-&\qquad(\textbf{if}\ x\neq y\ \textbf{then}\ fail!0.\textbf{nil}\ +\ \textbf{if}\ x=y\ \textbf{then}\ key_{e}!z.skey!x.\textbf{nil})\\
-+&\ msg_{a}?x.msg_{b}?y.key'_{e}?z.alarm!0.\textbf{nil};\\
+&((\textbf{if}\ x\neq y\ \textbf{then}\ fail!0.\textbf{nil}\ +\ \textbf{if}\ x=y\ \textbf{then}\ key_{e}!z.skey!x.\textbf{nil})\\
+&+\ msg_{a}?x.msg_{b}?y.key'_{e}?z.alarm!0.\textbf{nil});\\
 BB84' \overset{def}{=}& (Alice||Bob||Alice'||Bob'||Eve||Test)\setminus C
 \end{flalign*}
-where $C=\{a2b,b2a,key_{a},key_{b},\underline{A2E},\underline{E2B},alarm\}$.
+where $C=\{a2b,b2a,key_{a},key_{b},\underline{A2E},\underline{E2B},alarm_{a},alarm_{b}\}$.
 \paragraph{Specification with an Eavesdropper.}
 Taking into account the presence of an eavesdropper, we define the new specification as follows:
 \begin{flalign*}
@@ -856,7 +929,7 @@ In each case, we report the final outcome (whether an implementation is equivale
 It can be seen in Table~\ref{tab:weak_result} there exists the cases where negative verification results are obtained. Some of them are already discussed in Section~\ref{sec:sdc}. We now comment on the other case.
 % We verify the super-dense coding protocol with two different initial values of variable $x$ in the first two rows. If $x=1$, we can check that the implementation behaves the same as the specification. However, if $x=5$, the behaviour of the implementation differs from that of the specification, and they are even not trace equivalent. See Appendix~\ref{sec:sdc} for more discussion and the improvement of the formal modelling.
 
-We also verify the protocols which make the use of the entanglement such as super-dense coding protocol, teleportation protocol and quantum secrect sharing protocol. There is a part of input qubits are used to generate the EPR state which is actually free of input. We can find that there is no difference between the result information from different initial valuations of qubits.
+We also verify the other protocols make the use of the entanglement such as teleportation protocol and quantum secrect sharing protocol. There is a part of input qubits are used to generate the EPR state which is actually free of input. We can find that there is no difference between the result information from different initial valuations of qubits.
 
 Besides BB84 protocol, we make experiments on other quantum key distribution protocols including B92 and E91 while we only verify whether the naive BB84 protocol will alarm if there is an eavesdropper attending in the communication.
 % Another example whose outcome is non-bisimilarity is on the second last line in Table~\ref{tab:result}, which is the naive BB84 protocol with an eavesdropper. As shown in the last line of the table, we modified implementation is bisimilar to the specification.
@@ -869,7 +942,7 @@ We have presented an on-the-fly algorithm to check ground bisimulation for quant
 As to future work, there are several interesting problems remain to be addressed.
 For example, there is a problem with the current work is to compare quantum processes with predetermined states of quantum registers. Indeed, there are occasions where one would expect two processes to be equivalent for arbitrary initial states. It is infeasible to enumerate all those states. Then the symbolic bisimulations proposed in~\cite{FDY14} will be useful. We are considering to implement the algorithm for symbolic ground bisimulation, and then tackle the more challenging symbolic open bisimulation, both proposed in that work. 
 
-Another problem may stay in the experiment of Sect.~\ref{sec:bb84} where for convenience of the experiment we only consider the case that there is one qubit instead of a sequence of qubits which presents the security shown in the origin paper~\cite{BB84}. While more general cases, mentioned in several previous works~\cite{Mayers98,LC99,SP00}, suppose a stronger eavesdropper who is able to make any operation permitted by quantum mechanic to manipulate the sequence of the qubits as a single entity when attacking the communication. So when we check the protocol in such case we inevitably need to deal with a sequence of qubits. The difficulty in checking whether the protocol is secure under the joint attack is in more qubits leading to an exponential blow up of the execution time.
+Another problem may stay in the experiment of Sect.~\ref{sec:ss} where for convenience of the experiment we only consider the case that there is one qubit instead of a sequence of qubits which presents the security shown in the origin paper~\cite{BB84}. While more general cases, mentioned in several previous works~\cite{Mayers98,LC99,SP00}, suppose a stronger eavesdropper who is able to make any operation permitted by quantum mechanic to manipulate the sequence of the qubits as a single entity when attacking the communication. So when we check the protocol in such case we inevitably need to deal with a sequence of qubits. The difficulty in checking whether the protocol is secure under the joint attack is in more qubits leading to an exponential blow up of the execution time.
 %
 % ---- Bibliography ----
 %
@@ -1257,81 +1330,6 @@ columns headed by \textbf{Impl} and \textbf{Spec} show the numbers of nodes cont
 
 \section{Examples}
 \label{sec:examples}
-\subsection{Super-dense Coding Protocol}\label{sec:sdc}
-% We formalise the super-dense coding protocol. Our formalisation follows \cite{FDY14} to illustrate the use of our tool, where a manual analysis of the protocol is provided. Now we perform automatic verification via the ground bisimulation checker.
-% More examples are given in Appendix~\ref{sec:examples}.
-
-Super-dense coding is proposed by Bennett and Wiesner in 1992~\cite{BW92}. It is a quantum communication protocol allowing two classical bits to be encoded in one qubit during a transmission, so it needs only one quantum channel. Such advantage is based on the use of a maximally
-entangled state, EPR state. An EPR state can be transformed into all the four kinds of EPR states through a 1-qubit operation, and these EPR states are mutually orthogonal. 
-\paragraph{Protocol.}
-We suppose the sender and the receiver of the communication are $Alice$ and $Bob$, then the protocol goes as follows:
-\begin{enumerate}
-    \item $Alice$ and $Bob$ prepare an EPR state $|\beta_{00}\rangle_{q_1,q_2}$ together. Then they share the qubits, $Alice$ holding $q_1$ and $Bob$ holding $q_2$.
-    \item If $Alice$ wants to send value $x\in \{0,1,2,3\}$, she applies the corresponding Pauli operation $\sigma^{x}$ on her qubit $q_1$.
-    \item $Alice$ sends the qubit $q_1$ to $Bob$.
-    \item $Bob$ applies a controlled-not operation on $q_1,q_2$ and a Hadamard operation on $q_1$ to remove the entanglement.
-    \item $Bob$ measures $q_1$ and $q_2$ to get the value $x$.
-\end{enumerate}
-After the execution of the protocol above, $Bob$ gets the value $x$ which $Alice$ wants to send. Note that $x$ could be represented in a 2-bit string. The protocol exactly transmits two classical bits of information by sending one qubit from $Alice$ to $Bob$.
-\paragraph{Implementation.}
-The modeling of super-dense coding protocol in qCCS follows \cite{FDY14}:
-\begin{flalign*}
-    Alice \overset{def}{=}& \underline{c}_{A}?q_1.\sum_{0\leq  i\leq 3}(\textbf{if}\ x=i\ \textbf{then}\ \sigma^{i}[q_1].\underline{e}!q_1.\textbf{nil});\\
-    Bob \overset{def}{=}& \underline{c}_{B}?q_2.\underline{e}?q_1.CN[q_1,q_2].H[q_1].M[q_1,q_2;x].d!x.\textbf{nil};\\
-    EPR \overset{def}{=}& Set^{\Psi}[q_1,q_2].\underline{c}_{B}!q_2.\underline{e}_{A}!q_1.\textbf{nil};\\
-    Sdc \overset{def}{=}& c?x.(Alice||Bob||EPR)\setminus \{\underline{c}_{A},\underline{c}_{B},\underline{e}\}
-\end{flalign*}
-where $CN$ is the controlled-not operation and $H$ is the Hadamard operation, $Set^{\Psi}$ is the operation transforming all the inputs into an EPR state $|\beta_{00}\rangle=(|00\rangle+|11\rangle)/\sqrt{2}$, its operation elements are $\{|\beta_{00}\rangle\langle 00|,|\beta_{00}\rangle\langle 01|,|\beta_{00}\rangle\langle 10|,|\beta_{00}\rangle\langle 11|\}$, and $\sigma^{i}$ are Pauli operators where $\sigma^{0}=I,\sigma^{1}=X,\sigma^{2}=Z,\sigma^{3}=Y$. The element set of measurement \textit{M} is $\{|00\rangle\langle 00|,|01\rangle\langle 01|,|10\rangle\langle 10|,|11\rangle\langle 11|\}$.
-\paragraph{Specification.}
-The specification of the protocol asks the process to return 2 qubit according to the value of classical bits it received. So it can be defined as:
-\begin{flalign*}
-    % Sdc_{spec} \overset{def}{=}& c?x.\tau^{11}.\sum_{i=0}^{3}(\textbf{if}\ x=i\ \textbf{then}\ Set^{i}[q_1,q_2].d!x.\textbf{nil})
-    Sdc_{spec} \overset{def}{=}& c?x.\sum_{i=0}^{3}(\textbf{if}\ x=i\ \textbf{then}\ Set^{i}[q_1,q_2].d!x.\textbf{nil})
-\end{flalign*}
-where $Set^{i}$ is the operation of transforming the current state into the state decided by the value of $i$ like $Set^{\Psi}$.
-% Here we have inserted some harmless $\tau$-transitions ($\tau^{11}$ stands for a series of $11$ $\tau$-transitions) because in ground bisimulations $\tau$-actions are not abstracted away. 
-\paragraph{Input.}
-Associated with the specification $Sdc$ are the following variables and operators that need to be declared.
-\begin{itemize}
-    \item The classical bit is named $x$. It stores the value $Alice$ wants to send. We test the program with different values of $x$.
-    \item The qubits are declared as a vector $|q_1,q_2\rangle$. They are used for generating the EPR state here. Without loss of generality, we set them to be $|00\rangle$.
-    \item The operation of transforming $|00\rangle$ into the EPR state is defined as $Set^{\Psi}$. 
-    \item The controlled-not operation is defined as $CN$.
-    \item The Hadamard operation is defined as $H$.
-    \item The Pauli operations are defined as $\sigma^0,\sigma^1,\sigma^2$ and $\sigma^3$.
-    \item The measurement is defined as $M$ with its operation elements.
-\end{itemize}
-
-For the specification $Sdc_{spec}$, we declare the following set of variables and operators.
-\begin{itemize}
-    \item The classical bit named $x$ is still required to store the value $Alice$ wants to send.
-    \item The qubits are declared as a vector $|q_1,q_2\rangle$. We set them to be $|00\rangle$.
-    \item The operation of transforming an arbitrary state into $|00\rangle$ (resp. $|01\rangle$, $|10\rangle$, $|11\rangle$) is defined as $Set^{0}$ (resp. $Set^{1}$, $Set^{2}$, $Set^{3}$).
-\end{itemize}
-%\subparagraph*{Generated pLTSs.}
-%The generated pLTSs of the super-dense coding example is illustrated in Figure~\ref{fig:sdc+tele}(a)-Figure~\ref{fig:sdc+tele}(d). If $x=1$, the length of the paths from both sides are 15. However, if $x=5$, the length of the paths from both sides are different.
-
-We see from the first two lines of Table~\ref{tab:weak_result} that not all the inputs can get a positive verification result. In the case $x=1$, we can check that $\langle Sdc,\rho_0\rangle \sim \langle Sdc_{spec},\rho_0\rangle$, where $\rho_0$ is the initial state of the quantum variables. In the case $x=5$, none of the four branches can be chosen, then the tool find that $\langle Sdc,\rho_0\rangle \not\sim \langle Sdc_{spec},\rho_0\rangle$. To correct it, some modifications are needed on both the implementation and the specification.
-\paragraph{Improved Super-dense Coding Protocol.}
-We improve the above qCCS programs by considering the case $i\neq 1,2,3,4$. In such case we send an alarming message and skip all the rest of operations. The new specification $Sdc'$ is defined below:
-\begin{flalign*}
-    Alice' \overset{def}{=}& \underline{c}_{A}?q_1.(\sum_{0\leq  i\leq 3}(\textbf{if}\ x=i\ \textbf{then}\ \sigma^{i}[q_1].\underline{e}!q_1.\textbf{nil})\ \\
-    &\qquad\qquad\qquad +\ \textbf{if not }\bigvee_{0\leq  i\leq 3} x=i\ \textbf{then}\ c_{C}!msg.\textbf{nil});\\
-    % Bob' \overset{def}{=}& \underline{c}_{B}?q_2.(\underline{e}?q_1.CN[q_1,q_2].H[q_1].M[q_1,q_2;x].d!x.\textbf{nil}\ +\ c_{C}?msg.\tau^{8}.d!x.\textbf{nil});\\
-    Bob' \overset{def}{=}& \underline{c}_{B}?q_2.(\underline{e}?q_1.CN[q_1,q_2].H[q_1].M[q_1,q_2;x].d!x.\textbf{nil}\ +\ c_{C}?msg.d!x.\textbf{nil});\\
-    EPR \overset{def}{=}& Set^{\Psi}[q_1,q_2].\underline{c}_{B}!q_2.\underline{c}_{A}!q_1.\textbf{nil};\\
-    Sdc' \overset{def}{=}& c?x.(Alice||Bob||EPR)\setminus \{\underline{c}_{A},\underline{c}_{B},c_{C},\underline{e}\}.
-\end{flalign*}
-We adjust the specification to add a new branch, so as to get $Sdc'_{spec}$:
-\begin{flalign*}
-    % Sdc'_{spec} \overset{def}{=}& c?x.\tau^{11}.(\sum_{i=0}^{3}(\textbf{if}\ x=i\ \textbf{then}\ Set^{i}[q_1,q_2].d!x.\textbf{nil})\\
-    % &\ +\ \textbf{if}\ \neg\bigvee_{0\leq  i\leq 3} x=i\  \textbf{then}\ Set^{\Psi}[q_1,q_2].d!x.\textbf{nil}).
-    Sdc'_{spec} \overset{def}{=}& c?x.(\sum_{i=0}^{3}(\textbf{if}\ x=i\ \textbf{then}\ Set^{i}[q_1,q_2].d!x.\textbf{nil})\\
-    &\ +\ \textbf{if not }\bigvee_{0\leq  i\leq 3} x=i\  \textbf{then}\ Set^{\Psi}[q_1,q_2].d!x.\textbf{nil}).
-\end{flalign*}
-
-The improved modelling processes are indeed bisimilar, which can be seen in Table~\ref{tab:weak_result}.
-
 \subsection{Quantum Teleportation Protocol}
 Quantum teleportation~\cite{BB93} is one of the most important protocols in quantum information theory. It teleports an unknown quantum state by only sending classical information, so it just requires a classical communication channel. It makes use of a maximally entangled state. 
 %The post-measurement state can be known from the result of partial measurement for a set of entangled states. 
