@@ -801,10 +801,10 @@ Table~\ref{tab:weak_result} provides a summary of our experimental results obtai
                 >{\centering\arraybackslash}m{2.5cm}
                 ||>{\centering\arraybackslash}m{3.9cm}
                 |>{\centering\arraybackslash}m{0.5cm}
-                |>{\centering\arraybackslash}m{0.6cm}
-                |>{\centering\arraybackslash}m{0.6cm}
-                |>{\centering\arraybackslash}m{0.7cm}
-                |>{\centering\arraybackslash}m{0.7cm}
+                |>{\centering\arraybackslash}m{0.64cm}
+                |>{\centering\arraybackslash}m{0.62cm}
+                |>{\centering\arraybackslash}m{0.64cm}
+                |>{\centering\arraybackslash}m{0.64cm}
                 |>{\centering\arraybackslash}m{1cm}}
 \hline
 \multicolumn{9}{c}{\textbf{Weak bisimulation}}\\
@@ -844,7 +844,7 @@ Table~\ref{tab:weak_result} provides a summary of our experimental results obtai
 \hline
 \end{tabular}
 \caption{Experimental results. The
-columns headed by \textbf{Impl} and \textbf{Spec} show the numbers of nodes contained in the generated pLTSs of the implementations and specifications, respectively. Column \textbf{N} shows the sizes of the sets of non-bisimilar state pairs  and Column \textbf{B} shows the sizes of the sets of bisimilar state pairs. Column \textbf{ms} shows the time cost of the verification in milliseconds.}\label{tab:weak_result}
+columns headed by \textbf{Imp} and \textbf{Spe} show the numbers of nodes contained in the generated pLTSs of the implementations and specifications, respectively. Column \textbf{N} shows the sizes of the sets of non-bisimilar state pairs  and Column \textbf{B} shows the sizes of the sets of bisimilar state pairs. Column \textbf{ms} shows the time cost of the verification in milliseconds.}\label{tab:weak_result}
 \end{table}
 
 In each case, we report the final outcome (whether an implementation is equivalent to its specification), the number of nodes in two pLTSs, the numbers of non-bisimilar and bisimilar state pairs in $NonBisim$ and $Bisim$, respectively, as well as the verification time of our weak ground bisimulation checking algorithm. The time cost shown in the table excludes the part of pLTS generation which takes around 1 second in all the examples.
@@ -869,7 +869,7 @@ We have presented an on-the-fly algorithm to check ground bisimulation for quant
 As to future work, there are several interesting problems remain to be addressed.
 For example, there is a problem with the current work is to compare quantum processes with predetermined states of quantum registers. Indeed, there are occasions where one would expect two processes to be equivalent for arbitrary initial states. It is infeasible to enumerate all those states. Then the symbolic bisimulations proposed in~\cite{FDY14} will be useful. We are considering to implement the algorithm for symbolic ground bisimulation, and then tackle the more challenging symbolic open bisimulation, both proposed in that work. 
 
-Another problem may stay in the experiment of Sect.~\ref{sec:bb84} where for convenience of the experiment we only consider the case that there is one qubit instead of a sequence of qubits which presents the security shown in the origin paper~\cite{BB84}. While more general cases, mentioned in several previous works~\cite{Mayers98,LC99,SP00}, suppose a stronger eavesdropper who is able to make any operation permitted by quantum mechanic to manipulate the sequence of the qubits as a single entity when attacking the communication. So when we check the protocol in such case we inevitably need to deal with a sequence of qubits. The difficulty in checking whether the protocol is secure under the joint attack is in more qubits leading to an exponential blow up of the execution time.
+Another problem may stay in the experiment of Sect.~\ref{sec:bb84} where for convenience of the experiment we only considered the case that there is one qubit instead of a sequence of qubits. It presents the security of BB84 shown in its original paper~\cite{BB84}. While more general cases, mentioned in several previous works~\cite{Mayers98,LC99,SP00}, suppose a stronger eavesdropper who is able to make any operation permitted by quantum mechanic to manipulate the sequence of the qubits as a single entity when making an attack. So when we check the protocol in such case we inevitably need to deal with multiple qubits. The difficulty in checking whether the protocol is secure under the joint attack is more qubits leading to an exponential blow up of the execution time.
 %
 % ---- Bibliography ----
 %
@@ -1025,7 +1025,7 @@ The number of state pairs is at most $n^2$. The number of state pairs examined i
 We conducted experiments on several quantum communication protocols with a few different input variables.  
 Table~\ref{tab:strong_result} provides a summary of our experimental results obtained on a macOS machine with an Intel Core i7 2.5 GHz processor and 16GB of RAM. 
 
-The strong bisimulation algorithm matches one-step actions of pLTSs, so several $\tau$ are needed to add into the implementation or specification to match the internal action from another side. That is the reason why there is more states in \textbf{Spec} than those in Table~\ref{tab:weak_result}.
+The strong bisimulation algorithm matches one-step actions of pLTSs, so several $\tau$ are needed to add into the implementation or specification to match the internal action from another side. That is the reason why there is more states in \textbf{Spe} than those in Table~\ref{tab:weak_result}.
 
 \begin{longtable}{@{}m{0pt}@{}
                 >{\centering\arraybackslash}m{2.5cm}
@@ -1071,10 +1071,9 @@ The strong bisimulation algorithm matches one-step actions of pLTSs, so several 
 \rule{0pt}{3mm}&B92 & \tabincell{c}{$q_1q_2=|00\rangle$} & Yes & 86 & 106 & 120 & 164 & 1484 \\
 \hline
 \rule{0pt}{3mm}&E91 & \tabincell{c}{$q_1q_2q_3q_4=|0000\rangle$} & Yes & 136 & 124 & 304 & 369 & 4024 \\
-\hline
-\vspace{1em}\\
+\hline\\
 \caption{Experimental results of the algorithm~\ref{alg:bisim}. The
-columns headed by \textbf{Impl} and \textbf{Spec} show the numbers of nodes contained in the generated pLTSs of the implementations and specifications, respectively. Column \textbf{N} shows the sizes of the sets of non-bisimilar state pairs  and Column \textbf{B} shows the sizes of the sets of bisimilar state pairs. Column \textbf{ms} shows the time cost of the verification in milliseconds.}\label{tab:strong_result}
+columns headed by \textbf{Imp} and \textbf{Spe} show the numbers of nodes contained in the generated pLTSs of the implementations and specifications, respectively. Column \textbf{N} shows the sizes of the sets of non-bisimilar state pairs  and Column \textbf{B} shows the sizes of the sets of bisimilar state pairs. Column \textbf{ms} shows the time cost of the verification in milliseconds.}\label{tab:strong_result}
 \end{longtable}
 
 % \section{Correctness of Algorithm~\ref{alg:bisim}}
