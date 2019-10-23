@@ -264,7 +264,7 @@ A(\tilde{q};\tilde{x})
 \end{array}\]
 where $f$ is a relabelling function and $L\subseteq \cChan\cup \qChan$ is a set of channels.
 Most of the constructors are standard as in CCS \cite{ccs}.
-We briefly explain a few new constructors. The process $\qc?q.P$ receives a quantum datum along quantum channel $\qc$ and evolves into $P$, while $\qc!q.P$ sends out a quantum datum along quantum channel $\qc$ before evolving into $P$. The symbol $\CE$ represents a trace-preserving super-operator applied on the systems $\tilde{q}$. The process $M[\widetilde{q};x].P$ measures the state of qubits $\widetilde{q}$
+We briefly explain a few new constructors. The process $\qc?q.P$ receives a quantum datum along quantum channel $\qc$ and evolves into $P$, while $\qc!q.P$ sends out a quantum datum along quantum channel $\qc$ before evolving into $P$. The symbol $\CE$ represents a trace-preserving super-operator applied on the systems $\tilde{q}$. The process $M[\tilde{q};x].P$ measures the state of qubits $\tilde{q}$
 according to the observable $M$ and stores the measurement outcome into the
 classical variable $x$ of $P$.
 
@@ -428,7 +428,7 @@ Suppose there is a configuration $\CC=\langle P,\rho\rangle$, the partial trace 
 
 \section{Ground Bisimulation Checking Algorithm}\label{sec:algorithm}
 
-In this section, we present an on-the-fly algorithm to check if two configurations are ground bisimilar. For more detail, the algorithm updates two tables $NonBisim$ and $Bisim$ to record the verification results. $Bisim$ presents the ground bisimulation relation when the algorithm terminates. Furthermore, the algorithm return $\texttt{true}$ if the initial configuration pair is contained in $Bisim$.
+In this section, we present an on-the-fly algorithm to check if two processes with fixed initial quantum configurations are ground bisimilar. For more detail, the algorithm updates two tables $NonBisim$ and $Bisim$ to record the verification results. $Bisim$ presents the ground bisimulation relation when the algorithm terminates. Furthermore, the algorithm returns $\texttt{true}$ if the initial configuration pair is contained in $Bisim$.
 
 The decisive part of the algorithm is the check whether two configurations $t$ and $u$ are bisimilar. From  Definition~\ref{def:weak_bisim}, a pair of configurations is deemed non-bisimilar in three cases:
 \vspace{-0.25em}
@@ -483,9 +483,9 @@ Intuitively, the fourth constraint is referred to as the flow-conservation const
 
 \subsection{The Algorithm}
 \label{sec:algorithm_code}
-The function $\textbf{Bisim}(t,u)$, as what shown in Algorithm~\ref{alg:weak_bisim}, is the main function of the algorithm, which attempts to find the smallest bisimulation containing the pair $(t,u)$. It initialises $Bisim$ and a set named $Visited$ to store the visited pairs, then calls the function $\textbf{Match}$ with the initial configuration pair $(t,u)$ to search for a bisimulation. The function \textbf{Match}$(t,u,Visited)$ invokes a depth-first traversal to match a pair of configurations $(t,u)$ with all their possible behaviours. The set $Visited$ is updated before the traversal for detecting the loops. It checks whether the configuration pair encounters one of the three cases depicted before (Line 12-16). We match the behaviours of $t$ and $u$ from both directions as we are checking bisimulations.
+The function $\textbf{Bisim}(t,u)$, as what shown in Algorithm~\ref{alg:weak_bisim}, is the main function of the algorithm, which attempts to find the smallest bisimulation containing the pair $(t,u)$. It initialises $Bisim$ and a set named $Visited$ to store the visited pairs, then calls the function $\textbf{Match}$ with the initial configuration pair $(t,u)$ to search for a bisimulation. The function \textbf{Match}$(t,u,Visited)$ invokes a depth-first traversal to match a pair of configurations $(t,u)$ with all their possible behaviours. It checks whether the configuration pair encounters one of the three cases depicted before (Line 12-16). The set $Visited$ is updated before the traversal. This set is used for detecting loops. We match the behaviours of $t$ and $u$ from both directions as we are checking bisimulations.
 
-An auxiliary function \textbf{Act}$(t)$ is invoked in \textbf{Match} to discover the next action that $t$ can perform as the parameter for the function \textbf{MatchAction}. If $t$ has no more action to do the function will return an empty set.
+An auxiliary function \textbf{Act}$(t)$ is invoked in \textbf{Match} to discover the next action that $t$ can perform as the parameter for the function \textbf{MatchAction}. If $t$ has no more action to do, the function will return an empty set.
 
 Having defined the predicate \textbf{LP} before, we can defined the function $\textbf{MatchA}\\\text{-}\textbf{ction}(\alpha, t, u, Visited)$ to check whether the action of two configurations are matched. \textbf{MatchAction} invoke the function \textbf{Close}$(t,u,Visited)$ to construct an equivalence relation $R$ between the configurations from the target distribution and the weak transitions behaving the action asked.
 
@@ -568,9 +568,9 @@ Given two configurations $t$ and $u$, the function \textbf{GroundBisimulation(t,
 \end{theorem}
 \begin{proof}
 %So far there is no while-loop in the qCCS, that brings convenience to the proof of termination. 
-The algorithm starts with the empty sets $NonBisim$ and $Bisim$. Each execution of \textbf{Bisim} renews the sets except $NonBisim$. So we focus on the change of $NonBisim$. For a pair of configurations, the next action to perform will be detected in \textbf{Match}. Then it invokes function \textbf{MatchAction} to find the next new pair of configurations and recursively call function \textbf{Match} to check them. Each configuration pair checked non-bisimilar in function \textbf{Match} is added into $NonBisim$. Meanwhile, if it is contained in the set $Assumed$, that is, the algorithm has made an assumption such pair is bisimilar, the algorithm restarts a new execution of \textbf{Bisim}. Let variable $k$ denote the number of executions of \textbf{Bisim}, and $NonBisim_{k}$ be the set $NonBisim$ at the end of $\textbf{Bisim}_{k}$. The function updates $NonBisim_{k}$ at least once before it raising an exception. Hence, it is easy to show by induction that $NonBisim_{k}\subset NonBisim_{k+1}$ for any $k\geq 0$ except the last execution of $\textbf{Bisim}$ where the equality may be attained. As the system we considered contains finite configurations, there exists some $n$ such that $\textbf{Bisim}_{n}$ is the last execution of $\textbf{Bisim}$.
+The algorithm starts with the empty sets $NonBisim$ and $Bisim$. Each execution of \textbf{Bisim} renews the sets except $NonBisim$. So we focus on the change of $NonBisim$. For a pair of configurations, the next action to perform will be detected in \textbf{Match}. Then it invokes function \textbf{MatchAction} to find the next new pair of configurations and recursively call function \textbf{Match} to check them. Each configuration pair checked non-bisimilar in function \textbf{Match} is added into $NonBisim$. Meanwhile, if it is contained in the set $Assumed$, that is, the algorithm has made an assumption such pair is bisimilar, the algorithm restarts a new execution of \textbf{Bisim} to solve the wrong assumption. Let variable $k$ denote the number of executions of \textbf{Bisim}, and $NonBisim_{k}$ be the set $NonBisim$ at the end of $\textbf{Bisim}_{k}$. The function updates $NonBisim_{k}$ at least once before it raising an exception. Hence, it is easy to show by induction that $NonBisim_{k}\subset NonBisim_{k+1}$ for any $k\geq 0$ except the last execution of $\textbf{Bisim}$ where the equality may be attained. As the system we considered contains finite configurations, there exists some $n$ such that $\textbf{Bisim}_{n}$ is the last execution of $\textbf{Bisim}$.
 
-In the execution of $\textbf{Bisim}_{n}$, as it is the last time $\textbf{Bisim}$ run, no more exceptions will be raised. Each time \textbf{Match} executes with $t$ and $u$ as its parameters, we will add $(t,u)$ into $Visited$. Furthermore, if we reach a node with no more action, we only compare the quantum variables used and the state of quantum registers. The function \textbf{Close} will not invoke $\textbf{Match}$ again if it meets the pair visited before. Since the system is finite, there will be no more configuration pairs added into $Visited$ and then no more $\textbf{Match}$ invoked. After finalizing all $\textbf{Match}$, the whole algorithm terminates.
+In the execution of $\textbf{Bisim}_{n}$, as it is the last time $\textbf{Bisim}$ run, no more exceptions will be raised. Each time \textbf{Match} executes with $t$ and $u$ as its parameters, we add $(t,u)$ into $Visited$. Furthermore, if we reach a node with no more action, we only compare the quantum variables used and the state of quantum registers. The function \textbf{Close} will not invoke $\textbf{Match}$ again if it meets the pair visited before. Since the system is finite, there will be no more configuration pairs added into $Visited$ and then no more $\textbf{Match}$ invoked. After finalizing all $\textbf{Match}$, the whole algorithm terminates.
 \qed
 \end{proof}
 
@@ -578,7 +578,7 @@ In the execution of $\textbf{Bisim}_{n}$, as it is the last time $\textbf{Bisim}
 Given two configurations $t$ and $u$ from two pLTSs, \textbf{GroundBisimulation}$(t,u)$ returns $\texttt{true}$ if and only if they are ground bisimilar.
 \end{theorem} 
 \begin{proof}
-Let $\textbf{Bisim}_{n}$ be the last execution of $\textbf{Bisim}$, and $NonBisim_{n}$, $Bisim_{n}$ be the table recording the checked state pairs at the end of $\textbf{Bisim}_{n}$. From the branching statement of \textbf{Match} (Line 17-21), since only the pair of configurations not contained in $Visited$ can be checked in \textbf{Match}, we can ensure that $NonBisim_{n}\cap Bisim_{n}=\emptyset$.
+Let $\textbf{Bisim}_{n}$ be the last execution of $\textbf{Bisim}$, and $NonBisim_{n}$, $Bisim_{n}$ be the table recording the checked state pairs at the end of $\textbf{Bisim}_{n}$. From the branching statement of \textbf{Match} (Line 17-21), since only the pair of configurations not visited can be checked in \textbf{Match}, we can ensure that $NonBisim_{n}\cap Bisim_{n}=\emptyset$.
 
 Then we discuss the final return of the $\textbf{Bisim}_{n}$. If the return is $\texttt{false}$ then we can conclude $s\not\sim t$ directly. If the return is $\texttt{true}$ then there is $Bisim_{n} = Visited_{n} - NonBisim_{n}$. According to the cases return $\texttt{true}$ in the function \textbf{Close} (Line 40,42-44), for each pair $(t, u)\in Bisim_{n}$, it satisfies that $\forall\alpha\in Act(t), t\overset{\alpha}{\longmapsto}\Delta\text{ then there exists } u \text{ such that } u\overset{\alpha}{\mapstochar\Longrightarrow}_{c}\Theta$, we have $\forall t'\in\lceil\Delta\rceil$, $\exists u'\in\lceil\Theta\rceil$, $(t', u')\in Assumed_{n}\cup Bisim_{n}$ and vice versa. Furthermore, as the algorithm always adds pairs into $Assumed_{n}$, if it is detected contained in $Visited_{n}$, we can imply that $Assumed_{n}\subseteq Visited_{n}$. As there is no more wrong assumption detected in the execution of $\textbf{Bisim}_{n}$, then we have $Assumed_{n}\subseteq Bisim_{n}$ which implies that $Bisim_{n}=Assumed_{n}\cup Bisim_{n}$ and $(t', u')\in Bisim_{n}$. We also ensure that $(t, u)\in Bisim_{n}$ satisfies that $qv(P)=qv(Q)$ and $tr_{qv(P)}(\rho)=tr_{qv(Q)}(\sigma)$, where $t=\langle P,\rho\rangle$ and $u=\langle Q,\sigma\rangle$. This relies on the checking statement in $\textbf{Match}$ before adding the pair to $Bisim_{n}$. Then by Definition.~\ref{def:weak_bisim}, $Bisim_{n}$ constitutes a bisimulation relation containing the root configuration pair $(t, u)$.
 \qed
@@ -605,7 +605,7 @@ In this section, we report on an implementation of our approach and provide the 
 \includegraphics[width=\textwidth]{images/architecture.eps}
 \caption{Verification workflow.}
 \label{fig:arch}
-\vspace{-2em}
+\vspace{-1em}
 \end{figure}
 
 \subsection{Implementation}
@@ -844,7 +844,7 @@ Table~\ref{tab:weak_result} provides a summary of our experimental results obtai
 \end{tabular}
 \caption{Experimental results. The
 columns headed by \textbf{Imp} and \textbf{Spe} show the numbers of nodes contained in the generated pLTSs of the implementations and specifications, respectively. Column \textbf{N} shows the sizes of the sets of non-bisimilar state pairs  and Column \textbf{B} shows the sizes of the sets of bisimilar state pairs. Column \textbf{ms} shows the time cost of the verification in milliseconds.}\label{tab:weak_result}
-\vspace{-3em}
+\vspace{-2em}
 \end{table}
 
 In each case, we report the final outcome (whether an implementation is equivalent to its specification), the number of nodes in two pLTSs, the numbers of non-bisimilar and bisimilar state pairs in $NonBisim$ and $Bisim$, respectively, as well as the verification time of our weak ground bisimulation checking algorithm. The time cost shown in the table excludes the part of pLTS generation which takes around 1 second in all the examples.
@@ -853,18 +853,17 @@ In each case, we report the final outcome (whether an implementation is equivale
 
 % In Table~\ref{tab:weak_result} there are cases where negative verification results are obtained. One of them is already discussed in Section~\ref{sec:ss}. We now comment on the other case.
 % We verify the super-dense coding protocol with two different initial values of variable $x$ in the first two rows. If $x=1$, we can check that the implementation behaves the same as the specification. However, if $x=5$, the behaviour of the implementation differs from that of the specification, and they are even not trace equivalent. See Appendix~\ref{sec:sdc} for more discussion and the improvement of the formal modelling.
-It can be seen in Table~\ref{tab:weak_result} there exists the cases where negative verification results are obtained. Some of them are already discussed in Section~\ref{sec:sdc}. We now comment on the other case.
+It can be seen in Table~\ref{tab:weak_result} there exists the cases where negative verification results are obtained. The case of BB84 protocol is already discussed in Section~\ref{sec:bb84}. 
+% We now comment on the other case.
 % We verify the super-dense coding protocol with two different initial values of variable $x$ in the first two rows. If $x=1$, we can check that the implementation behaves the same as the specification. However, if $x=5$, the behaviour of the implementation differs from that of the specification, and they are even not trace equivalent. See Appendix~\ref{sec:sdc} for more discussion and the improvement of the formal modelling.
 
-We also verify the protocols which make the use of the entanglement such as super-dense coding protocol, teleportation protocol and quantum secrect sharing protocol. There is a part of input qubits are used to generate the EPR state which is actually free of input. We can find that there is no difference between the result information from different initial valuations of qubits.
-
-Besides BB84 protocol, we make experiments on other quantum key distribution protocols including B92 and E91 while we only verify whether the naive BB84 protocol will alarm if there is an eavesdropper attending in the communication.
+We also verify the protocols which make the use of the entanglement such as super-dense coding protocol, teleportation protocol and quantum secrect sharing protocol. Besides BB84 protocol, we make experiments on other quantum key distribution protocols including B92 and E91.
 % Another example whose outcome is non-bisimilarity is on the second last line in Table~\ref{tab:result}, which is the naive BB84 protocol with an eavesdropper. As shown in the last line of the table, we modified implementation is bisimilar to the specification.
 
 Not all the cases in Table~\ref{tab:weak_result} give the size of the set $NonBisim$ of non-bisimilar state pairs, as the bisimulation checking algorithm may immediately terminate once a negative verification result is obtained, i.e. the two initial states are not bisimilar. 
 
 \section{Conclusion and Future Work}\label{sec:con}
-We have presented an on-the-fly algorithm to check ground bisimulation for quantum processes in qCCS. We have developed a tool to verify quantum communication protocols basing on the algorithm. The behavioural equivalence considered in the previous work is a strong notion of ground bisimulation with all actions visible. In current work, our algorithm verifies a weak notion of bisimulation that abstracts away invisible actions. We have carried out experiments on several non-trivial quantum communication protocols from super-dense coding to key distribution and found the tool helpful.
+We have presented an on-the-fly algorithm to check ground bisimulation for quantum processes in qCCS. We have developed a tool to verify quantum communication protocols basing on the algorithm. In current work, our algorithm verifies a weak notion of bisimulation that abstracts away invisible actions. We have carried out experiments on several non-trivial quantum communication protocols from super-dense coding to key distribution and found the tool helpful.
 
 As to future work, there are several interesting problems remain to be addressed.
 For example, there is a problem with the current work is to compare quantum processes with predetermined states of quantum registers. Indeed, there are occasions where one would expect two processes to be equivalent for arbitrary initial states. It is infeasible to enumerate all those states. Then the symbolic bisimulations proposed in~\cite{FDY14} will be useful. We are considering to implement the algorithm for symbolic ground bisimulation, and then tackle the more challenging symbolic open bisimulation, both proposed in that work. 
