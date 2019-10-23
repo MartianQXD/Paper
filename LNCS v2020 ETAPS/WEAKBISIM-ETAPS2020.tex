@@ -570,7 +570,7 @@ Given two configurations $t$ and $u$, the function \textbf{GroundBisimulation(t,
 %So far there is no while-loop in the qCCS, that brings convenience to the proof of termination. 
 The algorithm starts with the empty sets $NonBisim$ and $Bisim$. Each execution of \textbf{Bisim} renews the sets except $NonBisim$. So we focus on the change of $NonBisim$. For a pair of configurations, the next action to perform will be detected in \textbf{Match}. Then it invokes function \textbf{MatchAction} to find the next new pair of configurations and recursively call function \textbf{Match} to check them. Each configuration pair checked non-bisimilar in function \textbf{Match} is added into $NonBisim$. Meanwhile, if it is contained in the set $Assumed$, that is, the algorithm has made an assumption such pair is bisimilar, the algorithm restarts a new execution of \textbf{Bisim}. Let variable $k$ denote the number of executions of \textbf{Bisim}, and $NonBisim_{k}$ be the set $NonBisim$ at the end of $\textbf{Bisim}_{k}$. The function updates $NonBisim_{k}$ at least once before it raising an exception. Hence, it is easy to show by induction that $NonBisim_{k}\subset NonBisim_{k+1}$ for any $k\geq 0$ except the last execution of $\textbf{Bisim}$ where the equality may be attained. As the system we considered contains finite configurations, there exists some $n$ such that $\textbf{Bisim}_{n}$ is the last execution of $\textbf{Bisim}$.
 
-In the execution of $\textbf{Bisim}_{n}$, as it is the last time $\textbf{Bisim}$ run, no more exceptions will be raised. Each time \textbf{Match} executes with $t$ and $u$ as its parameters, we will add $(t,u)$ into $Visited$. Furthermore, if we reach a node with no more action, we only compare the quantum variables used and the state of quantum registers. The function \textbf{Close} will not invoke $\textbf{Match}$ again if it meets the pair visited before. Since the system is finite, there will be no more configuration pairs added into $Visited$. After finalizing all $\textbf{Match}$, the whole algorithm terminates.
+In the execution of $\textbf{Bisim}_{n}$, as it is the last time $\textbf{Bisim}$ run, no more exceptions will be raised. Each time \textbf{Match} executes with $t$ and $u$ as its parameters, we will add $(t,u)$ into $Visited$. Furthermore, if we reach a node with no more action, we only compare the quantum variables used and the state of quantum registers. The function \textbf{Close} will not invoke $\textbf{Match}$ again if it meets the pair visited before. Since the system is finite, there will be no more configuration pairs added into $Visited$ and then no more $\textbf{Match}$ invoked. After finalizing all $\textbf{Match}$, the whole algorithm terminates.
 \qed
 \end{proof}
 
@@ -590,7 +590,9 @@ At the end of this section, we analyse the time complexity of the algorithm.
 Let the number of nodes reachable from $t$ and $u$ be n. The time complexity of function \textbf{GroundBisimulation}$(t,u)$ is polynomial in $n$. % and the space complexity of it is $O(n^2)$.
 \end{theorem}
 \begin{proof}
-The number of state pairs is at most $n^2$. The number of state pairs examined in the $k$th execution of \textbf{Bisim} is at most $O(n^2-k)$. Therefore, the total number of state pairs examined is as most $O(n^2+(n^2-1)+...+1)=O(n^4)$. Since the pLTSs are assumed to be finite trees, the number of comparisons of transitions does not exceed some constant. Moreover, each comparison may call the function \textbf{LP} at most once, where constructing of the flow network and solving the linear programming problem are both polynomial in $n$ if we use the algorithm in~\cite{TH15}. As a result, the whole algorithm is also polynomial in $n$.
+The number of state pairs is at most $n^2$. The number of state pairs examined in the $k$th execution of \textbf{Bisim} is at most $O(n^2-k)$. Therefore, the total number of state pairs examined is as most $O(n^2+(n^2-1)+...+1)=O(n^4)$. Since the pLTSs are assumed to be finite trees, the number of comparisons of transitions does not exceed some constant. Moreover, each comparison may call the function \textbf{LP} at most once, where constructing of the flow network and solving the linear programming problem are both polynomial in $n$ if we use the algorithm in~\cite{TH15}. 
+% The time complexity of solving the linear programming problem is up to the method we choose such as two-phase simplex algorithm. 
+As a result, the whole algorithm is also polynomial in $n$.
 \qed
 \end{proof}
 
@@ -603,6 +605,7 @@ In this section, we report on an implementation of our approach and provide the 
 \includegraphics[width=\textwidth]{images/architecture.eps}
 \caption{Verification workflow.}
 \label{fig:arch}
+\vspace{-2em}
 \end{figure}
 
 \subsection{Implementation}
@@ -790,6 +793,7 @@ We conducted experiments on several quantum communication protocols with a few d
 Table~\ref{tab:weak_result} provides a summary of our experimental results obtained on a macOS machine with an Intel Core i7 2.5 GHz processor and 16GB of RAM.
 
 \begin{table}[htbp]
+\vspace{-1em}
 \scriptsize
 \centering
 \begin{tabular}{@{}m{0pt}@{}
@@ -840,6 +844,7 @@ Table~\ref{tab:weak_result} provides a summary of our experimental results obtai
 \end{tabular}
 \caption{Experimental results. The
 columns headed by \textbf{Imp} and \textbf{Spe} show the numbers of nodes contained in the generated pLTSs of the implementations and specifications, respectively. Column \textbf{N} shows the sizes of the sets of non-bisimilar state pairs  and Column \textbf{B} shows the sizes of the sets of bisimilar state pairs. Column \textbf{ms} shows the time cost of the verification in milliseconds.}\label{tab:weak_result}
+\vspace{-3em}
 \end{table}
 
 In each case, we report the final outcome (whether an implementation is equivalent to its specification), the number of nodes in two pLTSs, the numbers of non-bisimilar and bisimilar state pairs in $NonBisim$ and $Bisim$, respectively, as well as the verification time of our weak ground bisimulation checking algorithm. The time cost shown in the table excludes the part of pLTS generation which takes around 1 second in all the examples.
@@ -893,7 +898,7 @@ states $(t,u)$ with all their possible behaviours. There are three possibilities
 An auxiliary function \textbf{Act}$(t,u)$ is called in \textbf{Match} to discover the next action that both $t$ and $u$ can perform. If the two states have no more action to do then the function returns an empty set. If only one of them has no more action to do then the two states are immediately declared to be non-bisimilar. 
 %It makes the algorithm more efficient as it terminates at an early time point if those pLTSs are indeed not bisimilar. Next we prove why we can ensure that.
 
-The other set $Visited$ is updated in function \textbf{MatchAction}$(\alpha,t,u,Visited)$. This function discovers next pairs of states or distributions, depending on the type of transitions,  and recursively invokes the function \textbf{Match} or \textbf{MatchDistribution}. The current state pair is added to $W$ when the new functions are invoked.
+The other set $Visited$ is updated in function \textbf{MatchAction}$(\alpha,t,u,Visited)$. This function discovers next pairs of states or distributions, depending on the type of transitions,  and recursively invokes the function \textbf{Match} (through \textbf{Close}) or \textbf{MatchDistribution}. The current state pair is added to $W$ when the new functions are invoked.
 
 The function \textbf{MatchDistribution}$(\Delta,\Theta,\textit{R})$ is called if we need to compare a pair of state distributions instead of a single pair of states. It returns a boolean value indicating whether the distributions are equivalent. In order to do so, it compares each pair of states from the supports of the two distributions. After checking the bisimilarity of these state pairs, the function generates an equivalence relation of the state pairs not contained in the set $NonBisim$ for non-bisimilar state pairs. Another auxiliary function \textbf{Check}$(\Delta,\Theta,\textit{R})$ is used to check whether $\Delta$ and $\Theta$ are related by the lifted relation $\lift{\aRel}$. Technically, we take advantage of a nice property of the lifting operation: $\Delta \lift{\aRel} \Theta$ if and only if the maximum flow in an appropriately constructed network is $1$ \cite{BEM00},\cite{Deng15}. There are standard algorithms for computing the maximum flow in a network; see e.g. \cite{CHM90}.
 Besides the lifting condition, we check the disjunction of the returning boolean values from function \textbf{Match}. 
@@ -943,7 +948,7 @@ Let $\textit{R}\subseteq Dist(Con)\times Dist(Con)$ be the (strong) open bisimul
 \Switch{$\alpha$}
 \Case{$c!$}
 \For{$t\xrightarrow{c!e_i}t_i$, $u\xrightarrow{c!e'_j}u_j$}
-    \State $\theta_{ij}:=\textbf{Match}(t_i,u_j,Visited\cup \{(t,u)\})$
+    \State $\theta_{ij}:=\textbf{Close}(t_i,u_j,Visited\cup \{(t,u)\})$
 \EndFor
 \State \textbf{return} $\bigwedge_{i}(\bigvee_j(\theta_{ij}\wedge e_i=e'_j))\wedge\bigwedge_{j}(\bigvee_i(\theta_{ij}\wedge e_i=e'_j))$
 \EndCase
@@ -955,7 +960,7 @@ Let $\textit{R}\subseteq Dist(Con)\times Dist(Con)$ be the (strong) open bisimul
 \EndCase
 \Otherwise{}
 \For{$t\xrightarrow{\alpha}t_i$, $u\xrightarrow{\alpha}u_j$}
-    \State $\theta_{ij}:=\textbf{Match}(t_i,u_j,Visited\cup \{(t,u)\})$
+    \State $\theta_{ij}:=\textbf{Close}(t_i,u_j,Visited\cup \{(t,u)\})$
 \EndFor
 \State \textbf{return} $\bigwedge_{i}(\bigvee_j\theta_{ij})\wedge\bigwedge_{j}(\bigvee_i\theta_{ij})$
 \EndOtherwise
@@ -992,14 +997,14 @@ Now let us prove the termination and correctness of the algorithm.
 Given two states $t$ and $u$ from two pLTSs, \textbf{Bisimulation(t,u)} always terminates.
 \end{theorem} 
 \begin{proof}
-The algorithm starts with the empty sets $NonBisim$ and $Bisim$. The next action to perform will be detected in \textbf{Match}. Then it invokes function \textbf{MatchAction} to find the next new pair of states and recursively call function \textbf{Match} to check them. Each time the state pair is checked not bisimilar in function \textbf{Match}, it adds the state pair into $NonBisim$. Meanwhile, if it is also contained in the $Assumed$, the algorithm restarts a new execution of \textbf{Bisim}. Let variable $k$ denote the number of executions of \textbf{Bisim}, and $NonBisim_{k}$ be the set $NonBisim$ at the end of $\textbf{Bisim}_{k}$. From the structure of algorithm described before, we know $NonBisim_{k}\subseteq NonBisim_{k+1}$. As the system we considered contains finite states, there exists $n$ that $\textbf{Bisim}_{n}$ is the last execution of $\textbf{Bisim}$ and $\forall k<n, NonBisim_{k}\subseteq NonBisim_{n}$.
+The algorithm starts with the empty sets $NonBisim$ and $Bisim$. Each execution of \textbf{Bisim} renews the sets except $NonBisim$. So we focus on the change of $NonBisim$. For a pair of configurations, the next action to perform will be detected in \textbf{Match}. Then it invokes function \textbf{MatchAction} to find the next new pair of configurations and recursively call function \textbf{Match} or \textbf{MatchDistribution} to check them. Each configuration pair checked non-bisimilar in function \textbf{Match} is added into $NonBisim$. Meanwhile, if it is contained in the set $Assumed$, that is, the algorithm has made an assumption such pair is bisimilar, the algorithm restarts a new execution of \textbf{Bisim}. Let variable $k$ denote the number of executions of \textbf{Bisim}, and $NonBisim_{k}$ be the set $NonBisim$ at the end of $\textbf{Bisim}_{k}$. The function updates $NonBisim_{k}$ at least once before it raising an exception. Hence, it is easy to show by induction that $NonBisim_{k}\subset NonBisim_{k+1}$ for any $k\geq 0$ except the last execution of $\textbf{Bisim}$ where the equality may be attained. As the system we considered contains finite configurations, there exists some $n$ such that $\textbf{Bisim}_{n}$ is the last execution of $\textbf{Bisim}$.
 
-At the execution of $\textbf{Bisim}_{n}$, no more exceptions will be raised. Each time \textbf{Match} executes with $t,u$ as its parameters, we will add $(t,u)$ into $Visited$ at the same time. Furthermore, if we reach the leaf nodes, there is no more action, we only compare the quantum variables used and the state of quantum registers. Since the system is finite, there will be no more state pairs can be added into $Visited$. From the structure of \textbf{Close}, the function $Match$ will not be invoked again.  Then the whole algorithm terminates.
+In the execution of $\textbf{Bisim}_{n}$, as it is the last time $\textbf{Bisim}$ run, no more exceptions will be raised. Each time \textbf{Match} executes with $t$ and $u$ as its parameters, we will add $(t,u)$ into $Visited$. Furthermore, if we reach a node with no more action, we only compare the quantum variables used and the state of quantum registers. The function \textbf{Close} will not invoke $\textbf{Match}$ again if it meets the pair visited before. Since the system is finite, there will be no more configuration pairs added into $Visited$ and then no more $\textbf{Match}$ invoked. Similarly, distributions matched in $\textbf{MatchDistribution}$ are finite so that there are finite times of invoking $\textbf{Match}$. After finalizing all $\textbf{Match}$, the whole algorithm terminates.
 \qed
 \end{proof}
 
 \begin{theorem}[Correctness]\label{thm:strong_alg_correctness}
-Given two states $t$ and $u$ from two pLTSs, \textbf{Bisim}$(t,u)$ returns $\texttt{true}$ if and only if they are ground bisimilar.
+Given two states $t$ and $u$ from two pLTSs, \textbf{Bisimu}\\\text{-}\textbf{lation}$(t,u)$ returns $\texttt{true}$ if and only if they are ground bisimilar.
 \end{theorem} 
 \begin{proof}
 The proof of the correctness is similar to that in~\cite{HL95}. Since our algorithm is not symbolic, our treatement of boolean constraints is easier. On the other hand, we need to deal with probability distributions and have an extra procedure \textbf{MatchDistribution} to check if two distributions are related by a lifted relation.
