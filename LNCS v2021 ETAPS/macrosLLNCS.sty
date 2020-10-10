@@ -1,0 +1,174 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Fonts
+%\newfont{\fsc}{eusm10 scaled 1000}      % frenchscript letters
+%\newfont{\bbb}{bbm10 scaled 1000}       % blackboard bold
+
+\newcommand{\sset}[1]{\{ {#1}  \}  } % singleton set
+\newcommand{\aRel}{\ensuremath{\mathrel{{\mathcal R }}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Operational semantics
+\newcommand{\ar}[1]{\mathrel{\stackrel{#1}{\longrightarrow}}}
+\newcommand{\nar}[1]{ \not \mathrel{ {\ar{ #1}}  }}
+\newcommand{\dar}[1]{\mathrel{\stackrel{#1}{\Longrightarrow}}}
+\newcommand\Wide[1] {~~~#1~~~}
+\newcommand{\Defs}{\mathrel{:=}}
+\newcommand\Eqn[1] {(\ref{eq:#1})}
+\newcommand\Lem[1] {Lemma~\ref{lem:#1}}
+\newcommand\Thm[1] {Thm.~\ref{thm:#1}}
+
+%\newcommand{\Op}[1]{\mbox{\bbb [}#1\mbox{\bbb ]}}
+\newcommand{\Op}[1]{\mbox{[\![}#1\mbox{]\!]}}
+\newcommand{\size}[1]{\mathrel{|{#1}|}}
+\newcommand{\cov}[1]{\mathit{cc}({#1})}
+\newcommand{\covInf}[1]{\mathit{cc}_\omega({#1})}
+\newcommand{\DeltaP}{{\Delta\kern-.1em'}}
+\newcommand{\bisim}{\mathrel{\approx_{\mbox{\tiny \it bis}}}}
+\newcommand{\sbisim}{\mathrel{\approx_{\mbox{\tiny \it sbis}}}}
+\newcommand{\bisims}{\mathrel{\approx^s_{\mbox{\tiny \it bis}}}}
+
+\newcommand{\BNFsep}{\;\;|\;\;}
+\newcommand{\Cnil}{\mathop{\textbf{\textsf{nil}}}}
+\newcommand{\Cpar}{\mathrel{||}}
+
+%%%%%%%%%%%%%%%%%% rules
+\newcommand{\Rlts}[1]{\ensuremath{\textit{(#1)}}}%%%%
+%%%%%%
+%%% Reasoning environment (CCM)
+%%%
+%%% Use this rather than eg array, because it breaks properly
+%%% at page boundaries.
+%%%
+\newenvironment{Reason}{%
+ \begin{tabbing}\hspace{4em}\=\kill}{\end{tabbing}\vspace{-2.5ex}}
+\newcommand\Space {~ \\}
+\newcommand\Step[2]%
+ {#1 \> $\begin{array}[t]{lll}#2\end{array}$ \\}
+\newcommand\StepR[3]%
+ {#1 \> $\begin{array}[t]{lll}#3\end{array}$
+ \` {\RF \makebox[0pt][r]{#2}} \\}
+\newcommand\WideStep[2] {#1 \> $\begin{array}[t]{lll}#2\end{array}$ \\}
+\newcommand\WideStepR[3] {#1 \` {\RF #2} \\ \> $\begin{array}[t]{lll}#3\end{array}$ \\}
+\newcommand\WideThinStepR[3] {#1 \` {\RF #2} \\ \> $#3$ \\}
+\newcommand\ThinStep[2] {#1 \> $#2$ \\}
+\newcommand\ThinStepR[3] {#1 \> $#3$ \` {\RF #2} \\}
+\newcommand\RF {\small}
+ %weak arrow
+%%%%%%%% Inferences %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\makeatletter
+
+\newcommand{\nowidth}[2][l]{\makebox[0cm][#1]{#2}}%
+\newcommand{\mnowidth}[2][l]{\makebox[0cm][#1]{$#2$}}%
+
+\RequirePackage{ifthen}   % provides \ifthenelse
+\newcommand{\ifemptyelse}[3]{\ifx\@@bullshit#1\@@bullshit#2\else#3\fi}
+\newcommand{\ifnotempty}[2]{\ifx\@@bullshit#1\@@bullshit\else#2\fi}
+\newenvironment{scope}
+  {\bgroup\ignorespaces}
+  {\egroup\global\@ignoretrue}
+
+\newbox\@topbox
+\newbox\@botbox
+\newcommand{\linfer}[3][{}]{%
+  \ifemptyelse{#1}{
+    \setbox\@topbox\hbox{%
+      \renewcommand{\arraystretch}{1}%
+      $\begin{array}{l}#2\end{array}$}%
+    }{
+    \ifemptyelse{#2}{
+      \setbox\@topbox\hbox{%
+        \renewcommand{\arraystretch}{1}%
+        $\begin{array}{l}\mnowidth[l]{\scriptstyle#1}\\\ \end{array}$}%
+      }{
+      \setbox\@topbox\hbox{%
+        \renewcommand{\arraystretch}{1}%
+        $\begin{array}{l}\mnowidth[l]{\scriptstyle#1}\\#2\end{array}$}%
+      }
+    }
+  \setbox\@botbox\hbox{%
+    % \def\tilde##1{\widetilde{##1}}%
+    \renewcommand{\arraystretch}{1}%
+    $\begin{array}{l}#3\end{array}$}%
+  \ifdim\wd\@botbox<\wd\@topbox% which is bigger?  set the other to match
+    \setbox\@botbox\hbox to \wd\@topbox{\box\@botbox\hfil}
+  \else
+    \setbox\@topbox\hbox to \wd\@botbox{\box\@topbox\hfil}
+  \fi
+  \frac{\box\@topbox}{\box\@botbox}
+  }
+\newcommand{\linferSIDE}[4][{}]{%
+  \ifemptyelse{#1}{
+    \setbox\@topbox\hbox{%
+      \renewcommand{\arraystretch}{1}%
+      $\begin{array}{l}#2\end{array}$}%
+    }{
+    \ifemptyelse{#2}{
+      \setbox\@topbox\hbox{%
+        \renewcommand{\arraystretch}{1}%
+        $\begin{array}{l}\mnowidth[l]{\scriptstyle#1}\\\ \end{array}$}%
+      }{
+      \setbox\@topbox\hbox{%
+        \renewcommand{\arraystretch}{1}%
+        $\begin{array}{l}\mnowidth[l]{\scriptstyle#1}\\#2\end{array}$}%
+      }
+    }
+  \setbox\@botbox\hbox{%
+    % \def\tilde##1{\widetilde{##1}}%
+    \renewcommand{\arraystretch}{1}%
+    $\begin{array}{l}#3\end{array}$}%
+  \ifdim\wd\@botbox<\wd\@topbox% which is bigger?  set the other to match
+    \setbox\@botbox\hbox to \wd\@topbox{\box\@botbox\hfil}
+  \else
+    \setbox\@topbox\hbox to \wd\@botbox{\box\@topbox\hfil}
+  \fi
+  \frac{\box\@topbox}{\box\@botbox}
+  \hbox{\;\footnotesize$
+    \begin{scope}%
+      \renewcommand{\arraystretch}{1}%
+      \begin{array}[c]{l}%
+        #4%
+      \end{array}%
+    \end{scope}%
+    $}%
+}
+\newcommand{\slinfer}[2][{}]{\renewcommand{\arraystretch}{1}%
+                  \begin{array}{l}{\scriptstyle #1}\\#2\end{array}}
+
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%Theorem-like environments
+% \newtheorem{defi}{Definition}[section]
+% %\newtheorem{theo}{Theorem}[section]
+% %\newtheorem{prop}{Proposition}[section]
+% %\newtheorem{lemm}{Lemma}[section]
+% %\newtheorem{coro}{Corollary}[section]
+% %\newtheorem{exam}{Example}[section]
+% %\newtheorem{rema}{Remark}[section]
+% % CCM 080519 did this to make it easier to edit;
+% % can always change it back once we're done.
+% \newtheorem{theo}[defi]{Theorem}
+% \newtheorem{prop}[defi]{Proposition}
+% \newtheorem{lemm}[defi]{Lemma}
+% \newtheorem{coro}[defi]{Corollary}
+% \newtheorem{exam}[defi]{Example}
+% \newtheorem{rema}[defi]{Remark}
+
+% \newenvironment{definition}{\begin{defi} \rm}{\end{defi}}
+% \newenvironment{theorem}{\begin{theo} \rm}{\end{theo}}
+% \newenvironment{proposition}{\begin{prop} \rm}{\end{prop}}
+% \newenvironment{lemma}{\begin{lemm} \rm}{\end{lemm}}
+% \newenvironment{corollary}{\begin{coro}\rm}{\end{coro}}
+% \newenvironment{example}{\begin{exam}\rm}{ \hfill $\Box$\end{exam}}
+% \newenvironment{definitionArg}[1][]{\begin{defi}[#1] \rm}{\end{defi}}
+% \newenvironment{theoremArg}[1][]{\begin{theo}[#1] \rm}{\end{theo}}
+% \newenvironment{propositionArg}[1][]{\begin{prop}[#1] \rm}{\end{prop}}
+% \newenvironment{lemmaArg}[1][]{\begin{lemm}[#1] \rm}{\end{lemm}}
+% \newenvironment{exampleArg}[1][]{\begin{exam}[#1]\rm}{ \hfill $\Box$\end{exam}}
+% \newenvironment{remark}{\begin{rema} \rm}{\end{rema}}
+% % \newenvironment{proof}{\begin{trivlist} \item[\hspace{\labelsep}\bf Proof:]}
+% %                  {\hfill $\Box$\end{trivlist}}
+%\newenvironment{itemise}{\begin{list}{$\bullet$}{\leftmargin 18pt
+%                        \labelwidth\leftmargini\advance\labelwidth-\labelsep
+%                        \topsep 4pt \itemsep 2pt \parsep 2pt}}{\end{list}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

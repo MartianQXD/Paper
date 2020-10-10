@@ -1,0 +1,122 @@
+\begin{thebibliography}{10}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\providecommand{\doi}[1]{https://doi.org/#1}
+
+\bibitem{AG04}
+Aaronson, S., Gottesman, D.: Improved simulation of stabilizer circuits.
+  Physical Review {A}  \textbf{70}(052328) (2004)
+
+\bibitem{AL18}
+Ardeshir{-}Larijani, E., Gay, S.J., Nagarajan, R.: Automated equivalence
+  checking of concurrent quantum systems. ACM Transactions on Computational
+  Logic  \textbf{19}(4),  28:1--28:32 (2018)
+
+\bibitem{B92}
+Bennett, C.H.: Quantum cryptography using any two nonorthogonal states.
+  Physical Review Letters  \textbf{68},  3121--3124 (1992)
+
+\bibitem{BB84}
+Bennett, C.H., Brassard, G.: Quantum cryptography: Public-key distribution and
+  coin tossing. In: Proceedings of the IEEE International Conference on
+  Computer, Systems and Signal Processing. pp. 175--179 (1984)
+
+\bibitem{BB93}
+Bennett, C.H., Brassard, G., Crepeau, C., Jozsa, R., Peres, A., Wootters, W.:
+  Teleporting an unknown quantum state via dual classical and {EPR} channels.
+  Physical Review Letters  \textbf{70},  1895--1899 (1993)
+
+\bibitem{Da11}
+Davidson, T.A.S.: Formal Verification Techniques using Quantum Process
+  Calculus. Ph.D. thesis, University of Warwick (2011)
+
+\bibitem{DF12}
+Deng, Y., Feng, Y.: Open bisimulation for quantum processes. In: Proceedings of
+  the 7th IFIP International Conference on Theoretical Computer Science.
+  Lecture Notes in Computer Science, vol.~7604, pp. 119--133. Springer (2012)
+
+\bibitem{EHKT13}
+Eisentraut, C., Hermanns, H., Kr{\"{a}}mer, J., Turrini, A., Zhang, L.:
+  Deciding bisimilarities on distributions. In: Joshi, K.R., Siegle, M.,
+  Stoelinga, M., D'Argenio, P.R. (eds.) Quantitative Evaluation of Systems -
+  10th International Conference, {QEST} 2013, Buenos Aires, Argentina, August
+  27-30, 2013. Proceedings. Lecture Notes in Computer Science, vol.~8054, pp.
+  72--88. Springer (2013). \doi{10.1007/978-3-642-40196-1\_6},
+  \url{https://doi.org/10.1007/978-3-642-40196-1\_6}
+
+\bibitem{ehz}
+Eisentraut, C., Hermanns, H., Zhang, L.: On probabilistic automata in
+  continuous time. In: Proc. LICS'10. pp. 342--351. IEEE Computer Society
+  (2010)
+
+\bibitem{FDJY07}
+Feng, Y., Duan, R., Ji, Z., Ying, M.: Probabilistic bisimulations for quantum
+  processes. Information and Computation  \textbf{205}(11),  1608--1639 (2007)
+
+\bibitem{FDY14}
+Feng, Y., Deng, Y., Ying, M.: Symbolic bisimulation for quantum processes. ACM
+  Transactions on Computational Logic  \textbf{15}(2),  1--32 (2014)
+
+\bibitem{FDY11}
+Feng, Y., Duan, R., Ying, M.: Bisimulation for quantum processes. In:
+  Proceedings of the 38th Annual ACM SIGPLAN-SIGACT Symposium on Principles of
+  Programming Languages. pp. 523--534. ACM (2011)
+
+\bibitem{GN05}
+Gay, S.J., Nagarajan, R.: Communicating quantum processes. In: Palsberg, J.,
+  Abadi, M. (eds.) Proceedings of the 32Nd ACM SIGPLAN-SIGACT Symposium on
+  Principles of Programming Languages. pp. 145--157 (2005)
+
+\bibitem{HL95}
+Hennessy, M., Lin, H.: Symbolic bisimulations. Theoretical Computer Science
+  \textbf{138}(2),  353--389 (1995)
+
+\bibitem{HKK14}
+Hermanns, H., Krc{\'{a}}l, J., Kret{\'{\i}}nsk{\'{y}}, J.: Probabilistic
+  bisimulation: Naturally on distributions. In: {CONCUR} 2014 - Concurrency
+  Theory - 25th International Conference, {CONCUR} 2014, Rome, Italy, September
+  2-5, 2014. Proceedings. pp. 249--265 (2014).
+  \doi{10.1007/978-3-662-44584-6\_18},
+  \url{https://doi.org/10.1007/978-3-662-44584-6\_18}
+
+\bibitem{JL04}
+Jorrand, P., Lalire, M.: Toward a quantum process algebra. In: Proceedings of
+  the 1st Conference on Computing Frontiers. pp. 111--119. ACM (2004)
+
+\bibitem{KKKKS16}
+Kubota, T., Kakutani, Y., Kato, G., Kawano, Y., Sakurada, H.: Semi-automated
+  verification of security proofs of quantum cryptographic protocols. Journal
+  of Symbolic Computa  \textbf{73},  192--220 (2016)
+
+\bibitem{La06}
+Lalire, M.: Relations among quantum processes: Bisimilarity and congruence.
+  Mathematical Structures in Computer Science  \textbf{16(3)},  407--428 (2006)
+
+\bibitem{ccs}
+Milner, R.: Communication and Concurrency. Prentice-Hall (1989)
+
+\bibitem{San96}
+Sangiorgi, D.: A theory of bisimulation for the pi-calculus. Acta Informatica
+  \textbf{33}(1),  69--97 (1996)
+
+\bibitem{Sel04}
+Selinger, P.: Towards a quantum programming language. Mathematical Structures
+  in Computer Science  \textbf{14}(4),  527--586 (2004)
+
+\bibitem{SP00}
+Shor, P., Preskill, J.: Simple proof of security of the {BB}84 quantum key
+  distribution protocol. Physical Review Letters  \textbf{85}(2),  441--444
+  (2000)
+
+\bibitem{YFDJ09}
+Ying, M., Feng, Y., Duan, R., Ji, Z.: An algebra of quantum processes. ACM
+  Transactions on Computational Logic  \textbf{10}(3),  1--36 (2009)
+
+\bibitem{ZYSHEJG18}
+Zhang, L., Yang, P., Song, L., Hermanns, H., Eisentraut, C., Jansen, D.N.,
+  Godskesen, J.C.: Probabilistic bisimulation for realistic schedulers. Acta
+  Informatica  \textbf{55}(6),  461--488 (2018).
+  \doi{10.1007/s00236-018-0313-1},
+  \url{https://doi.org/10.1007/s00236-018-0313-1}
+
+\end{thebibliography}
